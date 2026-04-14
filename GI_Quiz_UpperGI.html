@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Upper GI Quiz — GERD, Barrett's, PUD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.15);
+    --correct: #4ade80;
+    --correct-bg: rgba(74, 222, 128, 0.12);
+    --incorrect: #f87171;
+    --incorrect-bg: rgba(248, 113, 113, 0.12);
+    --warning: #fbbf24;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* Header */
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .quiz-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .quiz-header .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .quiz-header .authors {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--surface);
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .score-display { font-weight: 600; color: var(--accent); }
+
+  /* Question card */
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--surface2);
+    animation: fadeIn 0.35s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .question-number {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .question-type {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .section-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .question-stem {
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.65;
+    margin-bottom: 22px;
+    color: #f1f5f9;
+  }
+
+  /* Choices */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .choice-card:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .choice-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .choice-card.disabled { cursor: default; pointer-events: none; }
+  .choice-card.correct-answer {
+    border-color: var(--correct) !important;
+    background: var(--correct-bg) !important;
+  }
+  .choice-card.incorrect-answer {
+    border-color: var(--incorrect) !important;
+    background: var(--incorrect-bg) !important;
+  }
+  .choice-card.missed-correct {
+    border-color: var(--correct) !important;
+    background: var(--correct-bg) !important;
+    opacity: 0.7;
+  }
+
+  .choice-indicator {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .choice-card.selected .choice-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .checkbox-indicator {
+    border-radius: 4px !important;
+  }
+  .choice-card.correct-answer .choice-indicator {
+    border-color: var(--correct);
+    background: var(--correct);
+    color: var(--bg);
+  }
+  .choice-card.incorrect-answer .choice-indicator {
+    border-color: var(--incorrect);
+    background: var(--incorrect);
+    color: var(--bg);
+  }
+  .choice-card.missed-correct .choice-indicator {
+    border-color: var(--correct);
+    background: transparent;
+    color: var(--correct);
+  }
+
+  .choice-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .choice-result-icon {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    color: var(--bg);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .btn-secondary:hover { background: var(--border); }
+
+  .button-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* Explanation panel */
+  .explanation {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--correct);
+    background: rgba(74, 222, 128, 0.06);
+    animation: fadeIn 0.35s ease;
+  }
+  .explanation.wrong {
+    border-left-color: var(--incorrect);
+    background: rgba(248, 113, 113, 0.06);
+  }
+  .explanation-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .explanation-title.right { color: var(--correct); }
+  .explanation-title.wrong { color: var(--incorrect); }
+  .explanation-body {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .explanation-body strong { color: var(--text); }
+
+  /* Results screen */
+  .results-screen { animation: fadeIn 0.4s ease; }
+  .results-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .results-score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .results-percent {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .results-message {
+    font-size: 1rem;
+    margin-top: 12px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .missed-list {
+    margin-top: 24px;
+  }
+  .missed-list h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--incorrect);
+  }
+  .missed-item {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin-bottom: 14px;
+    border: 1px solid var(--surface2);
+    border-left: 4px solid var(--incorrect);
+  }
+  .missed-item-q {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 8px;
+    color: #f1f5f9;
+  }
+  .missed-item-detail {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .missed-item-detail strong { color: var(--text); }
+
+  /* Start screen */
+  .start-screen {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .start-screen h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #f1f5f9;
+  }
+  .start-screen p {
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .start-details {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin: 24px 0;
+    border: 1px solid var(--surface2);
+    text-align: left;
+  }
+  .start-details li {
+    margin-bottom: 6px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    list-style: none;
+    padding-left: 20px;
+    position: relative;
+  }
+  .start-details li::before {
+    content: "\2022";
+    position: absolute;
+    left: 4px;
+    color: var(--accent);
+    font-weight: bold;
+  }
+
+  /* Hide/show */
+  .hidden { display: none !important; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 14px 10px 40px; }
+    .quiz-header h1 { font-size: 1.2rem; }
+    .question-card { padding: 20px 16px; }
+    .question-stem { font-size: 0.98rem; }
+    .choice-card { padding: 12px 14px; }
+    .choice-text { font-size: 0.9rem; }
+    .btn { padding: 12px 20px; font-size: 0.9rem; width: 100%; }
+    .button-row { flex-direction: column; }
+    .results-score { font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="quiz-header">
+    <h1>Supplemental Instructor Review &mdash; Upper GI Quiz</h1>
+    <div class="subtitle">GERD, Barrett&rsquo;s, PUD &bull; 10 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+
+  <!-- Progress (hidden on start) -->
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 10</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <div id="mainContent"></div>
+</div>
+
+<script>
+// ============================================================
+//  QUESTION DATA — Upper GI (10 Questions)
+// ============================================================
+const questions = [
+  {
+    id: 1,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 52-year-old patient with a BMI of 36 presents to the clinic reporting substernal burning that worsens when lying down after meals. The patient denies chest pain on exertion. What is the PRIMARY mechanism driving this patient's symptoms?",
+    choices: [
+      "Excess hydrochloric acid production by parietal cells",
+      "Incompetent lower esophageal sphincter (LES) due to increased intra-abdominal pressure",
+      "Esophageal motility disorder causing food stasis",
+      "Vagal nerve overstimulation increasing gastric secretion"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Incompetent LES due to increased intra-abdominal pressure.</strong><br><br>Obesity (BMI 36) increases intra-abdominal pressure, which pushes upward against the stomach and weakens the lower esophageal sphincter. When the LES cannot maintain its tone, gastric acid refluxes into the esophagus, causing the substernal burning that worsens with lying down (gravity no longer helps keep acid in the stomach).<br><br><strong>Why the others are wrong:</strong><br>A) Excess HCl production is not the primary issue in GERD — the problem is the acid getting where it shouldn't be, not overproduction.<br>C) Esophageal motility disorders (like achalasia) present differently — usually with dysphagia, not classic burning.<br>D) Vagal stimulation affects secretion, but the root cause in an obese patient is mechanical — the increased abdominal pressure on the LES."
+  },
+  {
+    id: 2,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A nurse is educating a GERD patient about lifestyle modifications. Which of the following substances or factors weaken lower esophageal sphincter (LES) tone? <strong>Select all that apply.</strong>",
+    choices: [
+      "Chocolate",
+      "Caffeine",
+      "Nicotine",
+      "High-fiber foods",
+      "Carbonated beverages",
+      "Antacids"
+    ],
+    correct: [0, 1, 2, 4],
+    explanation: "<strong>Correct: Chocolate, caffeine, nicotine, and carbonated beverages all weaken LES tone.</strong><br><br><strong>Chocolate</strong> contains methylxanthines that relax smooth muscle, including the LES. <strong>Caffeine</strong> similarly relaxes the LES and stimulates acid secretion. <strong>Nicotine</strong> directly reduces LES pressure and decreases mucosal blood flow. <strong>Carbonated beverages</strong> cause gastric distension, which reflexively relaxes the LES.<br><br><strong>Why the others are wrong:</strong><br>D) High-fiber foods do NOT weaken the LES — fiber is generally protective and supports healthy GI motility. It's fatty and fried foods that weaken LES tone.<br>F) Antacids do NOT weaken the LES — they neutralize acid that has already been produced. They are part of the treatment, not the problem."
+  },
+  {
+    id: 3,
+    type: "tf",
+    typeLabel: "True / False",
+    stem: "Barrett's esophagus represents normal, healthy healing of acid-damaged esophageal tissue.",
+    choices: [
+      "True",
+      "False"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: FALSE.</strong><br><br>Barrett's esophagus is <strong>metaplasia</strong>, not normal healing. The normal squamous epithelium of the esophagus is replaced by columnar epithelium (intestinal-type cells) in response to chronic acid exposure. This is the body's <strong>adaptation</strong> — columnar cells are more acid-resistant than squamous cells — but it is NOT healthy healing.<br><br>This distinction matters because Barrett's is a <strong>precancerous condition</strong>. The metaplastic columnar cells can undergo dysplasia and progress to esophageal adenocarcinoma. This is why patients with Barrett's require regular endoscopic surveillance with biopsies. Adaptation is not the same as healing — the tissue has fundamentally changed its identity."
+  },
+  {
+    id: 4,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 67-year-old patient with chronic osteoarthritis has been taking ibuprofen 800 mg three times daily for the past 6 months. The patient presents to the ED with coffee-ground emesis and a heart rate of 108 bpm. Which of the following BEST explains this clinical picture?",
+    choices: [
+      "Esophageal variceal rupture from portal hypertension",
+      "Mallory-Weiss tear from forceful vomiting",
+      "Bleeding peptic ulcer from NSAID-induced mucosal damage",
+      "Gastric cancer metastasis causing erosion"
+    ],
+    correct: [2],
+    explanation: "<strong>Correct: Bleeding peptic ulcer from NSAID-induced mucosal damage.</strong><br><br>NSAIDs (like ibuprofen) inhibit cyclooxygenase (COX), which reduces prostaglandin production. Prostaglandins normally protect the gastric mucosa by stimulating mucus and bicarbonate secretion and maintaining mucosal blood flow. Chronic NSAID use strips away this protective barrier, allowing acid to erode the mucosa and form ulcers. <strong>Coffee-ground emesis</strong> indicates upper GI bleeding where blood has been partially digested by gastric acid. The <strong>tachycardia (HR 108)</strong> is a compensatory response to blood loss.<br><br><strong>Why the others are wrong:</strong><br>A) Esophageal varices occur with portal hypertension from liver disease — there is no history suggesting cirrhosis.<br>B) Mallory-Weiss tears cause bleeding from forceful retching/vomiting — this patient's bleeding is the CAUSE of vomiting, not the result.<br>D) While gastric cancer can cause bleeding, the direct connection to 6 months of high-dose NSAID use makes PUD far more likely. Always think of the most common cause first."
+  },
+  {
+    id: 5,
+    type: "except",
+    typeLabel: "All EXCEPT",
+    stem: "All of the following are recognized complications of peptic ulcer disease (PUD) <strong>EXCEPT</strong>:",
+    choices: [
+      "Hemorrhage from erosion into a blood vessel",
+      "Perforation leading to peritonitis",
+      "Barrett's esophagus with columnar metaplasia",
+      "Gastric outlet obstruction from scarring and edema"
+    ],
+    correct: [2],
+    explanation: "<strong>Correct: Barrett's esophagus is NOT a complication of PUD.</strong><br><br>Barrett's esophagus is a complication of <strong>chronic GERD</strong>, not peptic ulcer disease. It involves metaplastic change in the esophagus from chronic acid reflux — this is a different pathological process from ulcer formation in the stomach or duodenum.<br><br><strong>Why the others ARE complications of PUD:</strong><br>A) <strong>Hemorrhage</strong> — ulcers can erode into blood vessels (especially the gastroduodenal artery in posterior duodenal ulcers), causing life-threatening GI bleeding.<br>B) <strong>Perforation</strong> — ulcers can erode through the full thickness of the stomach/duodenal wall, releasing gastric contents into the peritoneal cavity and causing peritonitis — a surgical emergency.<br>D) <strong>Gastric outlet obstruction</strong> — chronic ulceration near the pylorus causes repeated inflammation, scarring, and edema that can narrow or block the gastric outlet."
+  },
+  {
+    id: 6,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A patient has been admitted with intractable vomiting for 3 days. The ABG results show pH 7.52, PaCO2 48 mmHg, and HCO3- 38 mEq/L. Which of the following BEST explains this acid-base disturbance?",
+    choices: [
+      "Loss of bicarbonate in vomitus causing metabolic acidosis with respiratory compensation",
+      "Loss of hydrochloric acid (HCl) in vomitus causing metabolic alkalosis with respiratory compensation",
+      "Hyperventilation from pain causing respiratory alkalosis",
+      "Lactic acid buildup from dehydration causing metabolic acidosis"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Loss of HCl in vomitus causing metabolic alkalosis with respiratory compensation.</strong><br><br>Vomiting removes <strong>hydrochloric acid (HCl)</strong> from the stomach. When you lose acid, the blood becomes more alkaline — metabolic alkalosis. The ABG confirms this: pH 7.52 (alkalotic), HCO3- 38 (elevated base = metabolic cause), and PaCO2 48 (the body is compensating by <strong>retaining CO2</strong> — hypoventilating to add acid back).<br><br>Remember the rule: <strong>Vomiting = losing acid = alkalosis. Diarrhea = losing base = acidosis.</strong><br><br><strong>Why the others are wrong:</strong><br>A) Vomiting loses HCl (acid), NOT bicarbonate. Bicarbonate is lost in diarrhea (lower GI secretions are bicarb-rich).<br>C) The PaCO2 is elevated (48), not decreased. Hyperventilation would show LOW PaCO2.<br>D) While dehydration can occur, the ABG clearly shows alkalosis, not acidosis."
+  },
+  {
+    id: 7,
+    type: "priority",
+    typeLabel: "Priority / First Action",
+    stem: "A patient with known peptic ulcer disease suddenly develops a rigid, board-like abdomen with severe diffuse pain, rebound tenderness, and a temperature of 39.1\u00b0C (102.4\u00b0F). What is the nurse's FIRST action?",
+    choices: [
+      "Administer IV morphine for pain management",
+      "Make the patient NPO and notify the provider/activate rapid response",
+      "Obtain a complete metabolic panel and CBC",
+      "Administer an IV proton pump inhibitor"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Make the patient NPO and notify the provider/activate rapid response.</strong><br><br>This presentation — sudden rigid abdomen, rebound tenderness, fever in a PUD patient — is classic for <strong>perforation with peritonitis</strong>. This is a <strong>surgical emergency</strong>. The nurse's first priority is to:<br>1. <strong>Make the patient NPO</strong> (nothing by mouth — any oral intake could leak into the peritoneal cavity)<br>2. <strong>Notify the provider immediately / activate rapid response</strong> — this patient likely needs emergent surgery<br><br><strong>Why the others are wrong:</strong><br>A) Pain management is important but NOT the first action. Additionally, masking pain can interfere with surgical assessment. The priority is recognizing the emergency and getting surgical help.<br>C) Labs will be needed, but ordering labs delays the critical notification. Recognize the emergency FIRST.<br>D) A PPI won't help a perforated ulcer — the acid is already in the peritoneal cavity. This patient needs a surgeon, not more medication."
+  },
+  {
+    id: 8,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A nurse is assessing a patient suspected of having an upper GI bleed. Which of the following assessment findings are consistent with upper GI bleeding? <strong>Select all that apply.</strong>",
+    choices: [
+      "Hematemesis (vomiting blood)",
+      "Melena (black, tarry stools)",
+      "Coffee-ground emesis",
+      "Clay-colored (acholic) stools",
+      "Tachycardia with hypotension"
+    ],
+    correct: [0, 1, 2, 4],
+    explanation: "<strong>Correct: Hematemesis, melena, coffee-ground emesis, and tachycardia with hypotension.</strong><br><br><strong>Hematemesis</strong> (bright red or dark blood in vomit) indicates active upper GI bleeding. <strong>Melena</strong> (black, tarry, foul-smelling stool) occurs when blood from the upper GI tract is digested as it passes through the intestines — the iron in hemoglobin is oxidized, turning it black. <strong>Coffee-ground emesis</strong> indicates blood that has been partially digested by gastric acid. <strong>Tachycardia and hypotension</strong> are signs of hemodynamic compromise from blood loss — the heart rate increases to compensate for decreased circulating volume.<br><br><strong>Why D is wrong:</strong><br>Clay-colored (acholic) stools indicate <strong>absence of bile</strong>, not GI bleeding. This is seen in biliary obstruction or liver disease — when bile can't reach the intestine, stool loses its normal brown color (which comes from bilirubin breakdown). This is a hepatobiliary finding, not a bleeding sign."
+  },
+  {
+    id: 9,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 58-year-old patient with a 15-year history of poorly controlled GERD undergoes an upper endoscopy. The biopsy report states: \"Replacement of normal squamous epithelium with columnar epithelium in the distal esophagus.\" What is this finding, and what is the PRIMARY clinical concern?",
+    choices: [
+      "Esophageal candidiasis; risk of systemic fungal infection",
+      "Barrett's esophagus; increased risk of esophageal adenocarcinoma",
+      "Erosive esophagitis; risk of esophageal stricture",
+      "Esophageal dysplasia; immediate need for esophagectomy"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Barrett's esophagus with increased risk of esophageal adenocarcinoma.</strong><br><br>The key finding is <strong>squamous-to-columnar metaplasia</strong> in the esophagus. The esophagus is normally lined with squamous cells. After years of chronic acid exposure from GERD, the body adapts by replacing them with columnar cells (more acid-resistant, like intestinal lining). This adaptation is called <strong>Barrett's esophagus</strong>.<br><br>The primary concern is that Barrett's is a <strong>precancerous condition</strong>. The progression goes: chronic GERD → metaplasia (Barrett's) → dysplasia → adenocarcinoma. These patients need regular endoscopic surveillance.<br><br><strong>Why the others are wrong:</strong><br>A) Candidiasis shows white plaques, not columnar metaplasia — and it's associated with immunosuppression, not GERD.<br>C) Erosive esophagitis involves inflammation and erosions but doesn't show metaplastic cellular change on biopsy.<br>D) While dysplasia can develop within Barrett's tissue, the biopsy describes metaplasia (columnar replacement), not dysplasia. Barrett's alone doesn't require esophagectomy — it requires surveillance."
+  },
+  {
+    id: 10,
+    type: "tf",
+    typeLabel: "True / False",
+    stem: "Projectile vomiting in an adult patient can indicate increased intracranial pressure (ICP) or another neurological cause, rather than being exclusively a gastrointestinal problem.",
+    choices: [
+      "True",
+      "False"
+    ],
+    correct: [0],
+    explanation: "<strong>Correct: TRUE.</strong><br><br><strong>Projectile vomiting</strong> is vomiting that is forceful and often occurs without preceding nausea. While it CAN have GI causes (such as pyloric stenosis in infants), in <strong>adults it is a major red flag for increased intracranial pressure (ICP)</strong> or other neurological causes (brain tumors, meningitis, hydrocephalus).<br><br>This is a critical distinction for nurses: not all vomiting is GI. The vomiting center is located in the <strong>medulla oblongata</strong>, and increased pressure on the brain can directly stimulate it. When a patient presents with projectile vomiting — especially if it's sudden onset, occurs without nausea, or is accompanied by headache, vision changes, or altered mental status — think <strong>neuro, not just GI</strong>.<br><br>Key teaching point: In infants, projectile vomiting classically suggests pyloric stenosis (a GI cause). In adults, always consider neurological causes first."
+  }
+];
+
+// ============================================================
+//  QUIZ ENGINE
+// ============================================================
+let currentQ = 0;
+let score = 0;
+let answered = 0;
+let userAnswers = []; // store user selections per question
+let results = [];     // store {qIndex, correct: bool}
+
+const main = document.getElementById('mainContent');
+const progressArea = document.getElementById('progressArea');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const scoreDisplay = document.getElementById('scoreDisplay');
+
+function init() {
+  userAnswers = questions.map(() => []);
+  results = [];
+  score = 0;
+  answered = 0;
+  currentQ = 0;
+  showStart();
+}
+
+// ---------- Start screen ----------
+function showStart() {
+  progressArea.classList.add('hidden');
+  main.innerHTML = `
+    <div class="start-screen">
+      <h2>Upper GI Pathophysiology</h2>
+      <p>10-question Upper GI quiz</p>
+      <div class="start-details">
+        <ul>
+          <li>GERD &mdash; mechanisms, risk factors, lifestyle modifications</li>
+          <li>Barrett&rsquo;s esophagus &mdash; metaplasia, cancer risk, surveillance</li>
+          <li>Peptic ulcer disease &mdash; NSAIDs, H. pylori, complications</li>
+          <li>Upper GI bleeding &mdash; assessment findings, emergencies</li>
+          <li>Vomiting &mdash; acid-base disturbances, neurological causes</li>
+          <li>Question types: Multiple Choice, Select All That Apply, True/False, All EXCEPT, Priority</li>
+          <li>SATA questions are scored all-or-nothing</li>
+          <li>Detailed explanations after every question</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()">Begin Quiz</button>
+    </div>`;
+}
+
+function startQuiz() {
+  progressArea.classList.remove('hidden');
+  showQuestion();
+}
+
+// ---------- Render question ----------
+function showQuestion() {
+  const q = questions[currentQ];
+  const pct = (currentQ / questions.length) * 100;
+  progressBar.style.width = pct + '%';
+  progressText.textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  scoreDisplay.textContent = answered > 0 ? `Score: ${score}/${answered}` : 'Score: 0/0';
+
+  const isCheckbox = (q.type === 'sata');
+  const indicatorClass = isCheckbox ? 'choice-indicator checkbox-indicator' : 'choice-indicator';
+
+  let choicesHTML = q.choices.map((ch, i) => {
+    const letter = String.fromCharCode(65 + i);
+    return `
+      <div class="choice-card" data-index="${i}" onclick="toggleChoice(${i}, ${isCheckbox})">
+        <div class="${indicatorClass}">${letter}</div>
+        <div class="choice-text">${ch}</div>
+      </div>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="question-card">
+      <div class="question-meta">
+        <span class="question-number">Question ${q.id} of ${questions.length}</span>
+        <span class="question-type">${q.typeLabel}</span>
+      </div>
+      <div class="question-stem">${q.stem}</div>
+      <div class="choices" id="choicesContainer">${choicesHTML}</div>
+      <div class="button-row" id="buttonRow">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button>
+      </div>
+      <div id="explanationArea"></div>
+    </div>`;
+}
+
+// ---------- Toggle choice ----------
+function toggleChoice(index, isCheckbox) {
+  const cards = document.querySelectorAll('.choice-card');
+  if (cards[0].classList.contains('disabled')) return;
+
+  if (isCheckbox) {
+    cards[index].classList.toggle('selected');
+  } else {
+    cards.forEach(c => c.classList.remove('selected'));
+    cards[index].classList.add('selected');
+  }
+
+  // Enable submit if at least one selected
+  const anySelected = document.querySelector('.choice-card.selected');
+  document.getElementById('submitBtn').disabled = !anySelected;
+}
+
+// ---------- Submit ----------
+function submitAnswer() {
+  const q = questions[currentQ];
+  const cards = document.querySelectorAll('.choice-card');
+  const selected = [];
+  cards.forEach((c, i) => { if (c.classList.contains('selected')) selected.push(i); });
+
+  userAnswers[currentQ] = selected;
+
+  // Check correctness
+  const correctSet = new Set(q.correct);
+  const selectedSet = new Set(selected);
+  let isCorrect = correctSet.size === selectedSet.size && [...correctSet].every(v => selectedSet.has(v));
+
+  results.push({ qIndex: currentQ, correct: isCorrect });
+  answered++;
+  if (isCorrect) score++;
+
+  // Highlight cards
+  cards.forEach((c, i) => {
+    c.classList.add('disabled');
+    const wasSelected = selectedSet.has(i);
+    const isRight = correctSet.has(i);
+
+    if (wasSelected && isRight) {
+      c.classList.remove('selected');
+      c.classList.add('correct-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    } else if (wasSelected && !isRight) {
+      c.classList.remove('selected');
+      c.classList.add('incorrect-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10007;';
+    } else if (!wasSelected && isRight) {
+      c.classList.add('missed-correct');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    }
+  });
+
+  // Show explanation
+  const expArea = document.getElementById('explanationArea');
+  expArea.innerHTML = `
+    <div class="explanation ${isCorrect ? '' : 'wrong'}">
+      <div class="explanation-title ${isCorrect ? 'right' : 'wrong'}">
+        ${isCorrect ? '&#10003; Correct!' : '&#10007; Incorrect'}
+      </div>
+      <div class="explanation-body">${q.explanation}</div>
+    </div>`;
+
+  // Update score display
+  scoreDisplay.textContent = `Score: ${score}/${answered}`;
+
+  // Replace submit with next
+  const btnRow = document.getElementById('buttonRow');
+  if (currentQ < questions.length - 1) {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="nextQuestion()">Next Question &rarr;</button>`;
+  } else {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+  }
+}
+
+// ---------- Next ----------
+function nextQuestion() {
+  currentQ++;
+  showQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------- Results ----------
+function showResults() {
+  progressBar.style.width = '100%';
+  progressText.textContent = 'Quiz Complete';
+  scoreDisplay.textContent = `Final: ${score}/${questions.length}`;
+
+  const pct = Math.round((score / questions.length) * 100);
+
+  // Message
+  let message = '';
+  if (pct >= 90) message = 'Outstanding work! You have a strong command of Upper GI pathophysiology.';
+  else if (pct >= 80) message = 'Great job! Review the missed questions to solidify your understanding.';
+  else if (pct >= 70) message = 'Good effort! Focus on the topics where you missed questions.';
+  else if (pct >= 60) message = 'You are building a foundation. Review the explanations carefully and try again.';
+  else message = 'This material is challenging. Review the chapter content and explanations, then retake the quiz.';
+
+  // Missed questions
+  const missed = results.filter(r => !r.correct);
+
+  let missedHTML = '';
+  if (missed.length > 0) {
+    missedHTML = `
+      <div class="missed-list">
+        <h3>Review Missed Questions (${missed.length})</h3>
+        ${missed.map(m => {
+          const q = questions[m.qIndex];
+          const correctLetters = q.correct.map(c => String.fromCharCode(65 + c)).join(', ');
+          const userLetters = userAnswers[m.qIndex].map(c => String.fromCharCode(65 + c)).join(', ') || 'None';
+          return `
+            <div class="missed-item">
+              <div class="missed-item-q">Q${q.id}: ${q.stem.replace(/<[^>]*>/g, '')}</div>
+              <div class="missed-item-detail">
+                <strong>Your answer:</strong> ${userLetters}<br>
+                <strong>Correct answer:</strong> ${correctLetters}<br><br>
+                ${q.explanation}
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  main.innerHTML = `
+    <div class="results-screen">
+      <div class="results-header">
+        <div class="results-score">${score}/${questions.length}</div>
+        <div class="results-percent">${pct}%</div>
+        <div class="results-message">${message}</div>
+      </div>
+      <div class="button-row" style="justify-content:center; margin-bottom: 24px;">
+        <button class="btn btn-primary" onclick="init()">Retake Quiz</button>
+        ${missed.length > 0 ? `<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>` : ''}
+      </div>
+      ${missedHTML}
+    </div>`;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initialize
+init();
+</script>
+</body>
+</html>
