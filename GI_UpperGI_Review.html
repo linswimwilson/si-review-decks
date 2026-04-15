@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Chapter 9: Upper GI Pathophysiology Review</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -685,7 +685,9 @@
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .slide {
-      padding: 24px 20px 80px 20px;
+      padding: 56px 20px 80px 20px;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 56px);
+      justify-content: flex-start;
     }
 
     /* Typography */
