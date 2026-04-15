@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 10: Endocrine — Adrenal Disorders Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --blue: #38bdf8;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --purple: #a78bfa;
+  --teal: #22d3ee;
+  --green: #34d399;
+  --text: #f1f5f9;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── SCROLLBAR STYLING ── */
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 3px; }
+.slide::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.5); }
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 4px;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  transition: width 0.4s ease;
+  z-index: 1000;
+}
+
+/* ── SLIDE COUNTER ── */
+#slide-counter {
+  position: fixed; bottom: 18px; right: 24px;
+  font-size: 0.85rem; color: var(--text-muted);
+  z-index: 1000; font-variant-numeric: tabular-nums;
+}
+
+/* ── NAV BUTTONS ── */
+.nav-btn {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: rgba(30,41,59,0.85); border: 1px solid rgba(56,189,248,0.2);
+  color: var(--text-dim); width: 44px; height: 44px;
+  border-radius: 50%; font-size: 1.3rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; transition: all 0.2s;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.nav-btn:hover { background: rgba(56,189,248,0.15); color: var(--blue); border-color: var(--blue); }
+#prev-btn { left: 16px; }
+#next-btn { right: 16px; }
+
+/* ── SLIDES ── */
+.slide {
+  display: none; flex-direction: column; justify-content: center; align-items: center;
+  position: absolute; inset: 0; overflow-y: auto;
+  padding: 48px 60px 80px 60px;
+  animation: fadeIn 0.35s ease;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148,163,184,0.3) transparent;
+}
+.slide.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SLIDE TYPE: TITLE ── */
+.slide.title { text-align: center; }
+.slide.title h1 {
+  font-size: 3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1.15; margin-bottom: 12px;
+}
+.slide.title .subtitle {
+  font-size: 1.15rem; color: var(--text-dim); margin-bottom: 28px; font-weight: 400;
+}
+.slide.title .meta {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;
+}
+
+/* ── SLIDE TYPE: ANCHOR ── */
+.slide.anchor { text-align: center; }
+.slide.anchor h2 {
+  font-size: 2.8rem; font-weight: 900; line-height: 1.15; margin-bottom: 18px;
+}
+.slide.anchor .subline {
+  font-size: 1.2rem; color: var(--text-dim); max-width: 700px; line-height: 1.6;
+}
+
+/* ── SLIDE TYPE: NARRATIVE ── */
+.slide.narrative { align-items: flex-start; max-width: 960px; margin: 0 auto; }
+.slide.narrative h3 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 28px; width: 100%;
+}
+.slide.narrative ul { list-style: none; width: 100%; }
+.slide.narrative ul li {
+  padding: 10px 0 10px 28px; position: relative;
+  font-size: 1.05rem; line-height: 1.55; color: var(--text);
+}
+.slide.narrative ul li::before {
+  content: ''; position: absolute; left: 0; top: 18px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
+}
+
+/* ── SLIDE TYPE: FLOW ── */
+.slide.flow { text-align: center; }
+.slide.flow h3 {
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 36px;
+}
+.flow-chain {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: nowrap; gap: 0; overflow-x: auto; max-width: 100%;
+  padding: 10px 0;
+}
+.flow-step {
+  background: var(--bg-card); border: 1px solid rgba(56,189,248,0.25);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 0.95rem; font-weight: 500; white-space: nowrap;
+  min-width: fit-content;
+}
+.flow-arrow {
+  font-size: 1.4rem; color: var(--blue); margin: 0 6px; flex-shrink: 0;
+}
+
+/* ── SLIDE TYPE: COMPARE ── */
+.slide.compare { text-align: center; }
+.slide.compare h3 {
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 32px;
+}
+.compare-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+  max-width: 880px; width: 100%;
+}
+.compare-col {
+  background: var(--bg-card); border-radius: 16px; padding: 28px;
+  text-align: left; border-top: 4px solid var(--blue);
+}
+.compare-col.col-danger { border-top-color: var(--red); }
+.compare-col h4 {
+  font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;
+}
+.compare-col ul { list-style: none; }
+.compare-col ul li {
+  padding: 6px 0 6px 20px; position: relative;
+  font-size: 0.95rem; line-height: 1.5; color: var(--text-dim);
+}
+.compare-col ul li::before {
+  content: ''; position: absolute; left: 0; top: 13px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
+}
+.compare-col.col-danger ul li::before { background: var(--red); }
+
+/* ── SLIDE TYPE: CHECK ── */
+.slide.check { text-align: center; }
+.slide.check h3 {
+  font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;
+  color: var(--purple);
+}
+.slide.check .check-label {
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--purple); margin-bottom: 8px; font-weight: 600;
+}
+.check-question {
+  font-size: 1.15rem; color: var(--text); max-width: 720px;
+  line-height: 1.6; margin-bottom: 28px;
+}
+.check-options {
+  display: flex; flex-direction: column; gap: 12px;
+  max-width: 560px; width: 100%;
+}
+.check-option {
+  background: var(--bg-card); border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 1rem; cursor: pointer; transition: all 0.2s;
+  text-align: left; color: var(--text);
+}
+.check-option:hover { border-color: var(--purple); background: rgba(167,139,250,0.08); }
+.check-option.correct {
+  border-color: var(--green) !important; background: rgba(52,211,153,0.1) !important;
+}
+.check-option.incorrect {
+  border-color: var(--red) !important; background: rgba(239,68,68,0.08) !important;
+  opacity: 0.7;
+}
+.check-explanation {
+  display: none; margin-top: 22px; padding: 18px 24px;
+  background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 12px; max-width: 620px;
+  font-size: 0.95rem; line-height: 1.6; color: var(--text-dim);
+  text-align: left;
+}
+.check-explanation.visible { display: block; }
+
+/* ── SLIDE TYPE: CASE ── */
+.slide.case { text-align: center; }
+.slide.case h3 {
+  font-size: 1.4rem; font-weight: 700; color: var(--teal); margin-bottom: 6px;
+}
+.slide.case .case-label {
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--teal); margin-bottom: 8px; font-weight: 600;
+}
+.case-scenario {
+  background: var(--bg-card); border: 1px solid rgba(34,211,238,0.2);
+  border-radius: 16px; padding: 24px 32px; max-width: 680px;
+  font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;
+  text-align: left; color: var(--text);
+}
+.case-scenario strong { color: var(--teal); }
+.case-reveal-btn {
+  background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.3);
+  color: var(--teal); padding: 12px 32px; border-radius: 10px;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-family: 'Inter', sans-serif;
+}
+.case-reveal-btn:hover { background: rgba(34,211,238,0.2); }
+.case-answer {
+  display: none; margin-top: 22px; padding: 20px 28px;
+  background: rgba(34,211,238,0.06); border: 1px solid rgba(34,211,238,0.15);
+  border-radius: 12px; max-width: 640px;
+  font-size: 0.95rem; line-height: 1.65; color: var(--text-dim);
+  text-align: left;
+}
+.case-answer.visible { display: block; }
+
+/* ── SLIDE TYPE: SECTION-DIVIDER ── */
+.slide.section-divider { text-align: center; }
+.slide.section-divider h2 {
+  font-size: 2.4rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--yellow), var(--red));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 12px;
+}
+.slide.section-divider .divider-sub {
+  font-size: 1.1rem; color: var(--text-muted);
+}
+
+/* ── COLOR CARDS ── */
+.color-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  max-width: 820px; width: 100%;
+}
+.color-card {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--bg-card); border-radius: 12px; padding: 14px 18px;
+  border-left: 5px solid;
+}
+.color-card .swatch {
+  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+}
+.color-card .card-text {
+  font-size: 0.92rem; line-height: 1.45;
+}
+.color-card .card-text strong {
+  display: block; font-size: 0.95rem; margin-bottom: 2px;
+}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-yellow { color: var(--yellow); font-weight: 600; }
+.hl-red { color: var(--red); font-weight: 600; }
+.hl-green { color: var(--green); font-weight: 600; }
+.hl-purple { color: var(--purple); font-weight: 600; }
+.hl-teal { color: var(--teal); font-weight: 600; }
+
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 6px;
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+.badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.badge-blue { background: rgba(56,189,248,0.15); color: var(--blue); }
+
+/* ── CALLOUT BOX ── */
+.callout {
+  margin-top: 18px; padding: 14px 20px;
+  border-radius: 10px; font-size: 0.95rem; line-height: 1.55;
+  width: 100%; max-width: 820px;
+}
+.callout-blue {
+  background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: var(--text-dim);
+}
+.callout-red {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--text-dim);
+}
+.callout-yellow {
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--text-dim);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .slide { padding: 56px 20px 80px 20px; padding-top: calc(env(safe-area-inset-top, 0px) + 56px); justify-content: flex-start; }
+
+  /* Typography */
+  .slide.title h1 { font-size: 1.8rem; }
+  .slide.anchor h2 { font-size: 1.6rem; }
+  .slide.section-divider h2 { font-size: 1.6rem; }
+  .slide.narrative h3,
+  .slide.flow h3,
+  .slide.compare h3,
+  .slide.check h3,
+  .slide.case h3 { font-size: 1.2rem; }
+  .slide.narrative ul li,
+  .slide p,
+  .check-question,
+  .check-option,
+  .case-scenario,
+  .case-answer,
+  .check-explanation,
+  .compare-col ul li,
+  .subline,
+  .divider-sub { font-size: 0.9rem; }
+
+  /* Grids: stack to single column */
+  .compare-grid { grid-template-columns: 1fr; gap: 16px; }
+  .color-cards { grid-template-columns: 1fr; }
+  .check-options { gap: 8px; }
+
+  /* Reduce card/box padding */
+  .compare-col { padding: 18px; }
+  .case-scenario { padding: 16px 20px; }
+  .check-explanation { padding: 14px 18px; }
+  .color-card { padding: 10px 14px; gap: 12px; }
+  .color-card .swatch { width: 28px; height: 28px; }
+
+  /* Flow chains: stack vertical */
+  .flow-chain {
+    flex-direction: column; align-items: center;
+    overflow-x: visible; gap: 0; padding: 10px 0;
+  }
+  .flow-step {
+    padding: 10px 18px; font-size: 0.85rem;
+    white-space: normal; text-align: center; width: 80%;
+  }
+  .flow-arrow {
+    transform: rotate(90deg); margin: 4px 0;
+  }
+
+  /* Nav buttons: smaller, tighter to edges */
+  .nav-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+  #prev-btn { left: 8px; }
+  #next-btn { right: 8px; }
+
+  /* Slide counter */
+  #slide-counter { bottom: 12px; right: 16px; font-size: 0.75rem; }
+
+  /* Callout */
+  .callout { padding: 12px 16px; font-size: 0.85rem; }
+}
+
+/* ── TOUCH HINT ── */
+.start-hint {
+  font-size: 0.8rem; color: var(--text-muted); margin-top: 28px;
+  opacity: 0.7;
+}
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progress-bar" style="width: 0%;"></div>
+
+<!-- Slide Counter -->
+<div id="slide-counter">1 / 25</div>
+
+<!-- Nav Buttons -->
+<button class="nav-btn" id="prev-btn" aria-label="Previous slide">&#8592;</button>
+<button class="nav-btn" id="next-btn" aria-label="Next slide">&#8594;</button>
+
+<!-- ============================================================ -->
+<!--  SLIDE 1 — TITLE                                            -->
+<!-- ============================================================ -->
+<div class="slide title active">
+  <h1>Chapter 10: Endocrine &mdash; Adrenal Disorders</h1>
+  <div class="subtitle">Section 3 &mdash; Cortisol, aldosterone, and the balance between Cushing&rsquo;s and Addison&rsquo;s</div>
+  <div class="meta">
+    Lindsay Wilson &amp; Claude Code<br>
+    Supplemental Instructor Review
+  </div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 2 — SECTION DIVIDER: Adrenal Anatomy                 -->
+<!-- ============================================================ -->
+<div class="slide section-divider">
+  <h2>Adrenal Anatomy</h2>
+  <div class="divider-sub">Two glands, two layers, very different hormones</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 3 — NARRATIVE: Adrenal Glands — Structure             -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-blue">Adrenal Glands &mdash; Structure</span></h3>
+  <ul>
+    <li>Located on top of each kidney &mdash; small but critical</li>
+    <li>Two distinct layers with completely different functions</li>
+    <li><span class="hl-red">Medulla</span> (inner): produces <strong>epinephrine &amp; norepinephrine</strong> (catecholamines) &mdash; fight-or-flight response</li>
+    <li><span class="hl-blue">Cortex</span> (outer): produces <strong>steroids</strong> &mdash; mineralocorticoids, glucocorticoids, gonadocorticoids</li>
+    <li>Think: the <span class="hl-yellow">cortex</span> is the layer that matters most for Cushing&rsquo;s and Addison&rsquo;s</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 4 — NARRATIVE: The Two Cortex Hormones You Must Know  -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-yellow">The Two Cortex Hormones You Must Know</span></h3>
+  <ul>
+    <li><span class="hl-blue">Cortisol</span> (glucocorticoid): manages carb/fat/protein metabolism, suppresses inflammation, raises blood glucose, controls sleep/wake cycle (highest AM, lowest PM), boosts energy for stress response</li>
+    <li><span class="hl-green">Aldosterone</span> (mineralocorticoid): causes kidneys to retain Na&#8314; and water, increases intravascular volume and BP, excretes K&#8314; in urine &rarr; blood K&#8314; falls</li>
+  </ul>
+  <div class="callout callout-blue">
+    <strong>Link them:</strong> Cortisol = sugar, inflammation, stress. Aldosterone = salt, water, potassium.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 5 — FLOW: The HPA Axis                               -->
+<!-- ============================================================ -->
+<div class="slide flow">
+  <h3><span class="hl-blue">The HPA Axis</span></h3>
+  <div class="flow-chain">
+    <div class="flow-step">Hypothalamus<br><small>releases CRH</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">Anterior Pituitary<br><small>releases ACTH</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">Adrenal Cortex<br><small>releases Cortisol</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color: rgba(245,158,11,0.4); color: var(--yellow);">Negative Feedback<br><small>&larr; back to hypothalamus</small></div>
+  </div>
+  <div class="callout callout-yellow" style="margin-top: 28px; max-width: 700px;">
+    <strong>Ask yourself:</strong> Where in this chain did the problem start? Hypothalamus? Pituitary? Adrenal gland itself? Exogenous meds?
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 6 — QUICK CHECK: Aldosterone & Potassium              -->
+<!-- ============================================================ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <h3>Aldosterone &amp; Potassium</h3>
+  <div class="check-question">
+    Aldosterone causes the kidneys to retain sodium and water. <strong>What happens to potassium?</strong>
+  </div>
+  <div class="check-options">
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Potassium is also retained</div>
+    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Potassium is excreted in urine, so blood potassium falls</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Potassium is unaffected by aldosterone</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Potassium moves into bone storage</div>
+  </div>
+  <div class="check-explanation">
+    <strong>B. Potassium is excreted in urine, so blood potassium falls.</strong> Aldosterone causes the kidneys to retain Na&#8314; while excreting K&#8314; &mdash; it&rsquo;s a swap. The Na/K relationship is key. Bone storage is calcium, not potassium.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 7 — SECTION DIVIDER: Cushing's Syndrome              -->
+<!-- ============================================================ -->
+<div class="slide section-divider">
+  <h2>Cushing&rsquo;s Syndrome</h2>
+  <div class="divider-sub">Too much cortisol &mdash; the body in overdrive</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 8 — ANCHOR: Cushing's = EXCESS                       -->
+<!-- ============================================================ -->
+<div class="slide anchor">
+  <h2 style="color: var(--yellow);">Cushing&rsquo;s = EXCESS Cortisol</h2>
+  <div class="subline">Think: <strong>too much of everything cortisol does.</strong><br><br>
+    Too much sugar (hyperglycemia). Too much sodium/water (edema, hypertension).<br>
+    Too much immune suppression (infections, delayed healing).<br>
+    Bones break down (osteoporosis).
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 9 — NARRATIVE: Cushing's — Causes                    -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-yellow">Cushing&rsquo;s &mdash; Causes</span></h3>
+  <ul>
+    <li><span class="hl-red">#1 cause: Iatrogenic</span> &mdash; taking exogenous glucocorticoid medications (prednisone, dexamethasone) for chronic inflammatory conditions (asthma, arthritis, IBD)</li>
+    <li>Adrenal tumors secreting excess cortisol</li>
+    <li>Pituitary tumors secreting excess ACTH (Cushing&rsquo;s <em>disease</em> specifically)</li>
+    <li>Paraneoplastic syndrome &mdash; ectopic ACTH secretion from cancer (e.g., small cell lung cancer)</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 10 — NARRATIVE: Cushing's — The Classic Look          -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-yellow">Cushing&rsquo;s &mdash; The Classic Look</span> <span class="badge badge-yellow">Think: Santa Claus</span></h3>
+  <ul>
+    <li><span class="hl-red">Truncal obesity</span> with thin extremities</li>
+    <li><span class="hl-red">Moon face</span> &mdash; round, full, red</li>
+    <li><span class="hl-red">Buffalo hump</span> &mdash; fat pad on upper back</li>
+    <li><span class="hl-yellow">Purple striae</span> (stretch marks) on abdomen</li>
+    <li>Thin, fragile skin that bruises easily</li>
+    <li>Muscle weakness and wasting</li>
+  </ul>
+  <div class="callout callout-yellow">
+    <strong>Instructor mnemonic:</strong> Does Santa have Cushing&rsquo;s? Round face, big belly, red cheeks &mdash; yes.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 11 — NARRATIVE: Cushing's — Metabolic Effects         -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-red">Cushing&rsquo;s &mdash; Metabolic Effects</span> <span class="badge badge-red">High Yield</span></h3>
+  <ul>
+    <li><span class="hl-yellow">Hyperglycemia</span> &rarr; steroid-induced diabetes (cortisol raises blood sugar)</li>
+    <li><span class="hl-yellow">Hypertension + edema</span> (cortisol has aldosterone-like effects &rarr; Na&#8314;/H&#8322;O retention)</li>
+    <li><span class="hl-red">Hypokalemia</span> (K&#8314; excreted)</li>
+    <li><span class="hl-red">Osteoporosis</span> (cortisol prevents bones from absorbing calcium &rarr; fracture risk)</li>
+    <li>Immunosuppression &rarr; infections, wounds that won&rsquo;t heal</li>
+    <li>Mood changes, irritability, psychosis. Females: hirsutism. Males: hair loss.</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 12 — QUICK CHECK: Cushing's Case                     -->
+<!-- ============================================================ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <h3>Cushing&rsquo;s Recognition</h3>
+  <div class="check-question">
+    A patient on long-term prednisone for rheumatoid arthritis develops a <strong>round face, weight gain around the trunk, easy bruising, and a blood glucose of 210</strong>. What is this?
+  </div>
+  <div class="check-options">
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Addison's disease from steroid use</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">B. Normal side effects of aging</div>
+    <div class="check-option" data-correct="true" onclick="handleCheck(this)">C. Iatrogenic Cushing's syndrome from exogenous glucocorticoids</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Hypothyroidism</div>
+  </div>
+  <div class="check-explanation">
+    <strong>C. Iatrogenic Cushing&rsquo;s syndrome.</strong> Moon face + truncal obesity + easy bruising + hyperglycemia in a patient on chronic steroids = textbook iatrogenic Cushing&rsquo;s. Addison&rsquo;s is cortisol DEFICIENCY (the opposite). Hypothyroidism causes weight gain but not this classic constellation.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 13 — NARRATIVE: Cushing's — Treatment                 -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-green">Cushing&rsquo;s &mdash; Treatment</span></h3>
+  <ul>
+    <li><strong>If iatrogenic:</strong> <span class="hl-yellow">GRADUAL tapering</span> of glucocorticoids &mdash; let adrenals wake back up</li>
+    <li><strong>If tumor:</strong> surgery, radiation, chemotherapy</li>
+    <li>Manage complications: hyperglycemia, infections, edema, osteoporosis, bleeding</li>
+    <li>Fall prevention (osteoporosis + muscle weakness = high fracture risk)</li>
+  </ul>
+  <div class="callout callout-red">
+    <strong>NEVER abruptly stop steroids!</strong> The adrenal glands are &ldquo;asleep&rdquo; from suppression. Sudden withdrawal &rarr; adrenal crisis (Addison&rsquo;s-like collapse) &rarr; potentially fatal.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 14 — SECTION DIVIDER: Addison's Disease               -->
+<!-- ============================================================ -->
+<div class="slide section-divider">
+  <h2>Addison&rsquo;s Disease</h2>
+  <div class="divider-sub">Too little cortisol &mdash; the body running on empty</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 15 — ANCHOR: Addison's = DEFICIENT                   -->
+<!-- ============================================================ -->
+<div class="slide anchor">
+  <h2 style="color: var(--blue);">Addison&rsquo;s = DEFICIENT Cortisol &amp; Aldosterone</h2>
+  <div class="subline">Think: <strong>NOT ENOUGH of everything.</strong><br><br>
+    Not enough sugar (hypoglycemia). Not enough Na/water retention (dehydration, hypotension).<br>
+    Not enough immune modulation. The body can&rsquo;t handle stress.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 16 — NARRATIVE: Addison's — Causes                   -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-blue">Addison&rsquo;s &mdash; Causes</span></h3>
+  <ul>
+    <li><span class="hl-red">#1: Autoimmune destruction</span> of the adrenal cortex</li>
+    <li>Infections (TB, fungal), hemorrhage, tumors destroying adrenal tissue</li>
+    <li>Pituitary dysfunction &rarr; insufficient ACTH</li>
+    <li>Hypothalamic dysfunction &rarr; insufficient CRH</li>
+    <li>Abrupt withdrawal of exogenous steroids (adrenals have atrophied)</li>
+  </ul>
+  <div class="callout callout-blue">
+    <strong>Fun fact:</strong> JFK had Addison&rsquo;s disease &mdash; his famous tan was actually hyperpigmentation from excess ACTH stimulating melanocytes.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 17 — NARRATIVE: Addison's — Manifestations            -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-red">Addison&rsquo;s &mdash; Manifestations</span> <span class="badge badge-red">High Yield</span></h3>
+  <ul>
+    <li><span class="hl-red">Hypotension</span> (especially orthostatic/postural)</li>
+    <li><span class="hl-yellow">Hypoglycemia</span> (no cortisol to raise glucose)</li>
+    <li><span class="hl-red">Hyperkalemia</span> (no aldosterone to excrete K&#8314;) &mdash; <strong>HEART CONCERN</strong></li>
+    <li><span class="hl-blue">Hyponatremia</span> (no aldosterone to retain Na&#8314;) &mdash; <strong>BRAIN CONCERN</strong></li>
+    <li><span class="hl-yellow">Hyperpigmentation</span> &mdash; dark/bronze skin (excess ACTH stimulates melanocytes)</li>
+    <li>Extreme fatigue, weakness, weight loss, salt craving, nausea, vomiting, chronic diarrhea, mood changes</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 18 — ANCHOR: Adrenal Crisis                          -->
+<!-- ============================================================ -->
+<div class="slide anchor">
+  <h2 style="color: var(--red);">Adrenal Crisis = Medical Emergency</h2>
+  <div class="subline" style="max-width: 740px;">
+    Na&#8314; drops, K&#8314; spikes, BP crashes, kidneys shut down.<br><br>
+    Profound fatigue, dehydration, vascular collapse.<br><br>
+    <strong>Can be triggered by:</strong> stress, illness, surgery, or abruptly stopping steroids.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 19 — NARRATIVE: Addison's — Treatment                 -->
+<!-- ============================================================ -->
+<div class="slide narrative">
+  <h3><span class="hl-green">Addison&rsquo;s &mdash; Treatment</span></h3>
+  <ul>
+    <li><strong>Lifelong hormone replacement:</strong> hydrocortisone (cortisol) + fludrocortisone (aldosterone)</li>
+    <li>Wear <span class="hl-red">medical alert bracelet</span> at all times. Carry extra medication.</li>
+    <li><strong>Dietary:</strong> <span class="hl-blue">INCREASE sodium</span> intake (they lose Na&#8314;). <span class="hl-yellow">LOW potassium</span> diet (they retain K&#8314;). Fluid replacement.</li>
+    <li><span class="hl-red">Stress dosing:</span> increase steroids during illness, surgery, or stress</li>
+  </ul>
+  <div class="callout callout-red">
+    <strong>Addison&rsquo;s patients cannot mount a normal stress response.</strong> Any illness, injury, or surgery requires increased steroid doses &mdash; otherwise they risk adrenal crisis.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 20 — QUICK CHECK: Addison's Electrolytes              -->
+<!-- ============================================================ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <h3>Addison&rsquo;s Electrolytes</h3>
+  <div class="check-question">
+    A patient with Addison&rsquo;s disease would be expected to have which electrolyte pattern?
+  </div>
+  <div class="check-options">
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. High sodium, low potassium</div>
+    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Low sodium, high potassium</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. High calcium, low phosphate</div>
+    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Normal electrolytes with elevated glucose</div>
+  </div>
+  <div class="check-explanation">
+    <strong>B. Low sodium, high potassium.</strong> Without aldosterone, the kidneys cannot retain Na&#8314; (so it drops) and cannot excrete K&#8314; (so it rises). High Na&#8314;/low K&#8314; is the Cushing&rsquo;s pattern. High calcium/low phosphate is hyperparathyroidism. Addison&rsquo;s causes HYPOglycemia, not elevated glucose.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 21 — COMPARE: Cushing's vs Addison's                 -->
+<!-- ============================================================ -->
+<div class="slide compare">
+  <h3>Cushing&rsquo;s <span class="hl-yellow">vs.</span> Addison&rsquo;s</h3>
+  <div class="compare-grid">
+    <div class="compare-col" style="border-top-color: var(--yellow);">
+      <h4 style="color: var(--yellow);">Cushing&rsquo;s (EXCESS Cortisol)</h4>
+      <ul>
+        <li><strong>Cortisol:</strong> High</li>
+        <li><strong>Glucose:</strong> High (steroid diabetes)</li>
+        <li><strong>Na&#8314;:</strong> High (retained)</li>
+        <li><strong>K&#8314;:</strong> Low (excreted)</li>
+        <li><strong>BP:</strong> Hypertension</li>
+        <li><strong>Weight:</strong> Obese (truncal)</li>
+        <li><strong>Skin:</strong> Thin, bruises, striae</li>
+        <li><strong>Look:</strong> Moon face, buffalo hump</li>
+        <li><strong>Tx:</strong> Taper steroids, surgery</li>
+      </ul>
+    </div>
+    <div class="compare-col" style="border-top-color: var(--blue);">
+      <h4 style="color: var(--blue);">Addison&rsquo;s (DEFICIENT Cortisol/Aldo)</h4>
+      <ul>
+        <li><strong>Cortisol:</strong> Low</li>
+        <li><strong>Glucose:</strong> Low</li>
+        <li><strong>Na&#8314;:</strong> Low (lost)</li>
+        <li><strong>K&#8314;:</strong> High (retained)</li>
+        <li><strong>BP:</strong> Hypotension</li>
+        <li><strong>Weight:</strong> Weight loss</li>
+        <li><strong>Skin:</strong> Hyperpigmentation (bronze)</li>
+        <li><strong>Look:</strong> Thin, fatigued</li>
+        <li><strong>Tx:</strong> Lifelong replacement</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 22 — SECTION DIVIDER: Clinical Application            -->
+<!-- ============================================================ -->
+<div class="slide section-divider">
+  <h2>Clinical Application</h2>
+  <div class="divider-sub">Put it all together</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 23 — CASE: Rosa                                       -->
+<!-- ============================================================ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <h3>Meet Rosa</h3>
+  <div class="case-scenario">
+    <strong>Rosa, 45 y/o female</strong>, has been taking <strong>prednisone 40mg daily for 3 years</strong> for lupus. She presents with a <strong>round face, central obesity, purple stretch marks</strong> on her abdomen, <strong>blood glucose 245</strong>, and <strong>BP 162/98</strong>.<br><br>
+    She asks if she can just stop the prednisone because of the side effects.<br><br>
+    <em>What is the diagnosis? Can she stop the prednisone?</em>
+  </div>
+  <button class="case-reveal-btn" onclick="revealCase(this)">Reveal Answer</button>
+  <div class="case-answer">
+    <strong>Diagnosis: Iatrogenic Cushing&rsquo;s syndrome.</strong><br><br>
+    Rosa has textbook Cushing&rsquo;s from chronic exogenous steroid use: moon face, truncal obesity, purple striae, hyperglycemia, hypertension.<br><br>
+    <span class="hl-red"><strong>She absolutely CANNOT stop prednisone abruptly.</strong></span> After 3 years, her adrenal glands are completely suppressed. Sudden withdrawal &rarr; adrenal crisis &rarr; cardiovascular collapse &rarr; death. She must <strong>GRADUALLY taper</strong> under medical supervision while managing her complications.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 24 — CASE: James                                      -->
+<!-- ============================================================ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <h3>Meet James</h3>
+  <div class="case-scenario">
+    <strong>James, 34 y/o male</strong>, presents to the ED with <strong>profound fatigue, BP 78/50, blood glucose 52</strong>, and <strong>dark bronze skin discoloration</strong>. Labs: <strong>Na&#8314; 128, K&#8314; 6.1</strong>. He reports salt cravings and has lost 20 lbs without trying.<br><br>
+    <em>What is the diagnosis? What is the most immediately dangerous lab value?</em>
+  </div>
+  <button class="case-reveal-btn" onclick="revealCase(this)">Reveal Answer</button>
+  <div class="case-answer">
+    <strong>Diagnosis: Addison&rsquo;s disease (adrenal insufficiency).</strong><br><br>
+    James has every hallmark: hypotension, hypoglycemia, hyponatremia (Na&#8314; 128), hyperkalemia (K&#8314; 6.1), bronze skin hyperpigmentation, weight loss, salt cravings, fatigue.<br><br>
+    <strong>Most immediately dangerous: <span class="hl-red">K&#8314; 6.1 (hyperkalemia)</span></strong> &mdash; can cause fatal cardiac dysrhythmias. This is a medical emergency.<br><br>
+    <strong>Treatment:</strong> IV fluids, IV hydrocortisone, continuous cardiac monitoring, correct electrolytes urgently.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SLIDE 25 — ANCHOR: Final Summary                            -->
+<!-- ============================================================ -->
+<div class="slide anchor">
+  <h2 style="font-size: 2.2rem; background: linear-gradient(135deg, var(--blue), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Adrenal Disorders &mdash; The Big Picture</h2>
+  <div class="subline" style="max-width: 760px; text-align: left; margin-top: 20px; font-size: 1.05rem; line-height: 1.85;">
+    <span class="hl-yellow">&bull;</span> Cushing&rsquo;s = <strong>too much</strong> cortisol. Addison&rsquo;s = <strong>not enough</strong>. They are OPPOSITES in every way.<br>
+    <span class="hl-yellow">&bull;</span> <strong>Cushing&rsquo;s:</strong> high glucose, high Na&#8314;, low K&#8314;, hypertension, moon face, buffalo hump.<br>
+    <span class="hl-blue">&bull;</span> <strong>Addison&rsquo;s:</strong> low glucose, low Na&#8314;, high K&#8314;, hypotension, bronze skin, weight loss.<br>
+    <span class="hl-red">&bull;</span> <strong>NEVER</strong> abruptly stop steroids &mdash; gradual taper only.<br>
+    <span class="hl-red">&bull;</span> Adrenal crisis and Cushing&rsquo;s complications can both be <strong>fatal</strong>.<br>
+    <span class="hl-purple">&bull;</span> K&#8314; = <strong>heart</strong> concern. Na&#8314; = <strong>brain</strong> concern. Always check electrolytes.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  JAVASCRIPT                                                  -->
+<!-- ============================================================ -->
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const progressBar = document.getElementById('progress-bar');
+  const counter = document.getElementById('slide-counter');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  function updateUI() {
+    progressBar.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+    prevBtn.style.opacity = current === 0 ? '0.3' : '1';
+    prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
+    nextBtn.style.opacity = current === total - 1 ? '0.3' : '1';
+    nextBtn.style.pointerEvents = current === total - 1 ? 'none' : 'auto';
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current) return;
+    slides[current].classList.remove('active');
+    slides[current].style.display = 'none';
+    current = index;
+    slides[current].classList.add('active');
+    slides[current].style.display = 'flex';
+    slides[current].scrollTop = 0;
+    slides[current].style.animation = 'none';
+    slides[current].offsetHeight;
+    slides[current].style.animation = '';
+    updateUI();
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); next();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); prev();
+    } else if (e.key === 'Home') {
+      e.preventDefault(); goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); goTo(total - 1);
+    }
+  });
+
+  // Button navigation
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  // Touch/swipe navigation
+  let touchStartX = 0;
+  let touchStartY = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) next(); else prev();
+    }
+  }, { passive: true });
+
+  updateUI();
+})();
+
+// Quiz handler
+function handleCheck(el) {
+  const parent = el.closest('.slide');
+  const options = parent.querySelectorAll('.check-option');
+  const explanation = parent.querySelector('.check-explanation');
+
+  if (parent.dataset.answered) return;
+  parent.dataset.answered = 'true';
+
+  options.forEach(function(opt) {
+    opt.style.cursor = 'default';
+    if (opt.dataset.correct === 'true') {
+      opt.classList.add('correct');
+    } else if (opt === el && opt.dataset.correct === 'false') {
+      opt.classList.add('incorrect');
+    }
+  });
+  explanation.classList.add('visible');
+}
+
+// Case reveal handler
+function revealCase(btn) {
+  const answer = btn.nextElementSibling;
+  answer.classList.add('visible');
+  btn.style.display = 'none';
+}
+</script>
+</body>
+</html>
