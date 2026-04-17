@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chapter 10 Endocrine Warm-Up Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --text-dim: #94a3b8; --accent: #38bdf8;
+    --accent-glow: rgba(56,189,248,0.15); --correct: #4ade80;
+    --correct-bg: rgba(74,222,128,0.12); --incorrect: #f87171;
+    --incorrect-bg: rgba(248,113,113,0.12); --warning: #fbbf24;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .container { max-width:820px; margin:0 auto; padding:20px 16px 60px; }
+  .quiz-header { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--surface2); }
+  .quiz-header h1 { font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .quiz-header .subtitle { font-size:0.85rem; color:var(--text-dim); }
+  .quiz-header .authors { font-size:0.78rem; color:var(--text-dim); margin-top:2px; font-style:italic; }
+  .progress-wrap { background:var(--surface); border-radius:20px; height:10px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:20px; transition:width 0.4s ease; width:0%; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--text-dim); margin-bottom:24px; }
+  .score-display { font-weight:600; color:var(--accent); }
+  .question-card { background:var(--surface); border-radius:var(--radius); padding:28px 24px; border:1px solid var(--surface2); animation:fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .question-number { font-size:0.82rem; font-weight:600; color:var(--accent); }
+  .question-type { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:20px; background:var(--accent-glow); color:var(--accent); }
+  .section-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:10px; background:var(--surface2); }
+  .question-stem { font-size:1.05rem; font-weight:500; line-height:1.65; margin-bottom:22px; color:#f1f5f9; }
+  .choices { display:flex; flex-direction:column; gap:10px; }
+  .choice-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:2px solid var(--surface2); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s ease; background:transparent; user-select:none; -webkit-user-select:none; }
+  .choice-card:hover:not(.disabled) { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.selected { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.disabled { cursor:default; pointer-events:none; }
+  .choice-card.correct-answer { border-color:var(--correct)!important; background:var(--correct-bg)!important; }
+  .choice-card.incorrect-answer { border-color:var(--incorrect)!important; background:var(--incorrect-bg)!important; }
+  .choice-card.missed-correct { border-color:var(--correct)!important; background:var(--correct-bg)!important; opacity:0.7; }
+  .choice-indicator { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; font-size:0.7rem; font-weight:700; }
+  .choice-card.selected .choice-indicator { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+  .checkbox-indicator { border-radius:4px!important; }
+  .choice-card.correct-answer .choice-indicator { border-color:var(--correct); background:var(--correct); color:var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color:var(--incorrect); background:var(--incorrect); color:var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color:var(--correct); background:transparent; color:var(--correct); }
+  .choice-text { font-size:0.95rem; line-height:1.5; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:12px 28px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s ease; gap:8px; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#818cf8); color:var(--bg); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text); }
+  .btn-secondary:hover { background:var(--border); }
+  .button-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .explanation { margin-top:20px; padding:20px; border-radius:var(--radius-sm); border-left:4px solid var(--correct); background:rgba(74,222,128,0.06); animation:fadeIn 0.35s ease; }
+  .explanation.wrong { border-left-color:var(--incorrect); background:rgba(248,113,113,0.06); }
+  .explanation-title { font-weight:700; font-size:0.9rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .explanation-title.right { color:var(--correct); }
+  .explanation-title.wrong { color:var(--incorrect); }
+  .explanation-body { font-size:0.9rem; color:var(--text-dim); line-height:1.7; }
+  .explanation-body strong { color:var(--text); }
+  .results-screen { animation:fadeIn 0.4s ease; }
+  .results-header { text-align:center; margin-bottom:32px; }
+  .results-score { font-size:3.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .results-percent { font-size:1.2rem; color:var(--text-dim); margin-top:4px; }
+  .results-message { font-size:1rem; margin-top:12px; color:var(--text); font-weight:500; }
+  .missed-list { margin-top:24px; }
+  .missed-list h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--incorrect); }
+  .missed-item { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin-bottom:14px; border:1px solid var(--surface2); border-left:4px solid var(--incorrect); }
+  .missed-item-q { font-weight:600; font-size:0.92rem; margin-bottom:8px; color:#f1f5f9; }
+  .missed-item-detail { font-size:0.85rem; color:var(--text-dim); line-height:1.6; }
+  .missed-item-detail strong { color:var(--text); }
+  .start-screen { text-align:center; padding:40px 20px; }
+  .start-screen h2 { font-size:1.6rem; font-weight:800; margin-bottom:12px; color:#f1f5f9; }
+  .start-screen p { color:var(--text-dim); margin-bottom:8px; font-size:0.95rem; }
+  .start-details { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin:24px 0; border:1px solid var(--surface2); text-align:left; }
+  .start-details li { margin-bottom:6px; color:var(--text-dim); font-size:0.9rem; list-style:none; padding-left:20px; position:relative; }
+  .start-details li::before { content:"\2022"; position:absolute; left:4px; color:var(--accent); font-weight:bold; }
+  .hidden { display:none!important; }
+  @media(max-width:600px) {
+    .container{padding:14px 10px 40px} .quiz-header h1{font-size:1.2rem} .question-card{padding:20px 16px}
+    .question-stem{font-size:0.98rem} .choice-card{padding:12px 14px} .choice-text{font-size:0.9rem}
+    .btn{padding:12px 20px;font-size:0.9rem;width:100%} .button-row{flex-direction:column} .results-score{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Chapter 10 Endocrine &mdash; Warm-Up Quiz</h1>
+    <div class="subtitle">Rapid-fire fundamentals &bull; Diabetes, Thyroid, Adrenal &bull; 25 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 25</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  // ── DIABETES (1-9) ──
+  {
+    id:1, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which pancreatic cell type produces insulin?",
+    choices:["Alpha cells","Beta cells","Delta cells","Epsilon cells"],
+    correct:[1],
+    explanation:"<strong>Beta cells.</strong> Beta cells in the islets of Langerhans produce insulin when blood glucose rises. Alpha cells produce glucagon (raises glucose). Delta cells produce somatostatin. Epsilon cells produce ghrelin."
+  },
+  {
+    id:2, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What is the primary function of insulin?",
+    choices:["Raise blood glucose by releasing stored glycogen","Allow glucose to enter cells, lowering blood glucose","Stimulate fat breakdown for energy","Increase urine output to remove excess glucose"],
+    correct:[1],
+    explanation:"<strong>Allow glucose to enter cells, lowering blood glucose.</strong> Insulin is the \u201ckey\u201d that unlocks cells (liver, muscle, adipose) so glucose can enter. Without insulin, glucose stays trapped in the bloodstream. Glucagon does the opposite \u2014 it raises blood glucose."
+  },
+  {
+    id:3, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The \u201c3 Polys\u201d of diabetes are polydipsia, polyuria, and:",
+    choices:["Polycythemia","Polyphagia","Polyarthritis","Polyneuropathy"],
+    correct:[1],
+    explanation:"<strong>Polyphagia (excessive hunger).</strong> Cells can\u2019t access glucose without insulin, so they send \u201cfeed me\u201d signals even though blood sugar is high. Polydipsia = excessive thirst. Polyuria = excessive urination from osmotic diuresis."
+  },
+  {
+    id:4, section:"Diabetes", type:"tf", typeLabel:"True / False",
+    stem:"Type 1 diabetes is caused by autoimmune destruction of the pancreatic beta cells.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> In Type 1, the immune system attacks and destroys the beta cells. This results in an absolute lack of insulin. The patient must have exogenous insulin injections to survive. Usually childhood onset, abrupt presentation."
+  },
+  {
+    id:5, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Type 2 diabetes is primarily caused by:",
+    choices:["Autoimmune destruction of beta cells","Insulin resistance \u2014 cells don\u2019t respond to insulin normally","A viral infection of the pancreas","Excess glucagon production"],
+    correct:[1],
+    explanation:"<strong>Insulin resistance.</strong> In Type 2, cells resist insulin\u2019s signal. The pancreas compensates by producing more insulin, but eventually burns out. Strongly linked to obesity, physical inactivity, and genetics. Accounts for ~90-95% of all diabetes."
+  },
+  {
+    id:6, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"An HbA1C of 6.5% or higher indicates:",
+    choices:["Normal blood glucose","Prediabetes","Diabetes mellitus","Hypoglycemia"],
+    correct:[2],
+    explanation:"<strong>Diabetes mellitus.</strong> HbA1C reflects average blood glucose over the past 2\u20133 months. Normal: below 5.7%. Prediabetes: 5.7\u20136.4%. Diabetes: 6.5% or higher. It\u2019s more reliable than a single fingerstick."
+  },
+  {
+    id:7, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"DKA (diabetic ketoacidosis) is most associated with which type of diabetes?",
+    choices:["Type 1","Type 2","Gestational diabetes","Prediabetes"],
+    correct:[0],
+    explanation:"<strong>Type 1.</strong> In DKA, there is absolutely no insulin, so cells burn fat for energy \u2192 ketones accumulate \u2192 metabolic acidosis. Type 1 patients have no insulin production, making them vulnerable to DKA. Type 2\u2019s emergency is HHNK."
+  },
+  {
+    id:8, section:"Diabetes", type:"tf", typeLabel:"True / False",
+    stem:"In DKA, the treatment priority is insulin first. In HHNK, the treatment priority is fluids first.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> DKA\u2019s core problem is no insulin \u2192 give insulin to stop ketone production. HHNK\u2019s core problem is severe dehydration \u2192 give fluids to restore circulating volume. Matching the treatment to the underlying problem is critical."
+  },
+  {
+    id:9, section:"Diabetes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A diabetic patient is shaky, sweaty, and confused with a blood glucose of 52 mg/dL. This is:",
+    choices:["Hyperglycemia","Hypoglycemia","DKA","HHNK"],
+    correct:[1],
+    explanation:"<strong>Hypoglycemia.</strong> Blood glucose below 70 mg/dL is hypoglycemia. Shaking, sweating, and confusion are classic signs \u2014 the sympathetic nervous system fires in response to low glucose. Treat with the Rule of 15: give 15g fast-acting carbs, recheck in 15 minutes. This kills faster than hyperglycemia \u2014 always treat hypo FIRST."
+  },
+
+  // ── THYROID (10-17) ──
+  {
+    id:10, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The two main thyroid hormones that regulate metabolism are:",
+    choices:["TSH and TRH","T3 and T4","Calcitonin and PTH","Cortisol and aldosterone"],
+    correct:[1],
+    explanation:"<strong>T3 and T4.</strong> T3 (triiodothyronine) is the more active form. T4 (thyroxine) is produced in greater quantity. Both regulate cellular metabolism, growth, and development. TSH and TRH are pituitary/hypothalamic hormones that control the thyroid, not thyroid hormones themselves."
+  },
+  {
+    id:11, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"In the thyroid axis, what does elevated TSH with low T4 indicate?",
+    choices:["Hyperthyroidism","Hypothyroidism","Normal thyroid function","Pituitary failure"],
+    correct:[1],
+    explanation:"<strong>Hypothyroidism.</strong> The thyroid is underperforming (low T4), so the pituitary cranks up TSH to try to stimulate it. High TSH + low T4 = the thyroid is failing and the pituitary is compensating. This is primary hypothyroidism."
+  },
+  {
+    id:12, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The most common cause of hypothyroidism is:",
+    choices:["Iodine deficiency","Graves\u2019 disease","Hashimoto\u2019s thyroiditis","Thyroid cancer"],
+    correct:[2],
+    explanation:"<strong>Hashimoto\u2019s thyroiditis.</strong> Hashimoto\u2019s is an autoimmune condition where the body attacks and destroys thyroid tissue. This is the #1 cause of hypothyroidism in the US. Iodine deficiency is the #1 cause worldwide but rare in the US due to iodized salt."
+  },
+  {
+    id:13, section:"Thyroid", type:"tf", typeLabel:"True / False",
+    stem:"Hypothyroidism causes weight gain, cold intolerance, and bradycardia because everything slows down.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Hypothyroidism = low thyroid = SLOW. Metabolism drops \u2192 weight gain despite decreased appetite, cold intolerance (less heat produced), bradycardia (heart slows), constipation (GI slows), fatigue, depression. Think: everything in slow motion."
+  },
+  {
+    id:14, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The most common cause of hyperthyroidism is:",
+    choices:["Hashimoto\u2019s thyroiditis","Graves\u2019 disease","Thyroid cancer","Iodine excess"],
+    correct:[1],
+    explanation:"<strong>Graves\u2019 disease.</strong> An autoimmune condition where antibodies mimic TSH and overstimulate the thyroid gland. The hallmark sign is exophthalmos (bulging eyes). Hashimoto\u2019s causes the opposite \u2014 hypothyroidism."
+  },
+  {
+    id:15, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which finding is specific to Graves\u2019 disease and not seen in other causes of hyperthyroidism?",
+    choices:["Tachycardia","Weight loss","Exophthalmos (bulging eyes)","Heat intolerance"],
+    correct:[2],
+    explanation:"<strong>Exophthalmos (bulging eyes).</strong> Tachycardia, weight loss, and heat intolerance can occur in any hyperthyroid state. Exophthalmos is unique to Graves\u2019 \u2014 caused by autoimmune inflammation and swelling of the tissue behind the eyes. Important: it may NOT resolve even after treatment."
+  },
+  {
+    id:16, section:"Thyroid", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Thyroid storm is a life-threatening emergency involving:",
+    choices:["Severe hypothyroidism with coma","A sudden, dangerous surge of thyroid hormones","Thyroid cancer metastasis","Iodine toxicity"],
+    correct:[1],
+    explanation:"<strong>A sudden, dangerous surge of thyroid hormones.</strong> Thyroid storm (thyrotoxicosis) presents with extreme fever, severe tachycardia, hypertension, agitation, and confusion. Often triggered by infection or stress in a hyperthyroid patient. Requires emergency antithyroid treatment and beta blockers."
+  },
+  {
+    id:17, section:"Thyroid", type:"tf", typeLabel:"True / False",
+    stem:"Myxedema coma is the hypothyroid emergency, while thyroid storm is the hyperthyroid emergency.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> They are opposite emergencies: Myxedema = everything LOW and SLOW (hypotension, hypothermia, respiratory depression, coma). Thyroid storm = everything HIGH and FAST (fever, tachycardia, hypertension, agitation). Both can be fatal."
+  },
+
+  // ── ADRENAL (18-25) ──
+  {
+    id:18, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Cortisol is a glucocorticoid. What are its main functions?",
+    choices:["Retains sodium and excretes potassium","Raises blood glucose, suppresses inflammation, and manages stress response","Stimulates the fight-or-flight response via epinephrine","Regulates calcium absorption in the bones"],
+    correct:[1],
+    explanation:"<strong>Raises blood glucose, suppresses inflammation, and manages stress response.</strong> Cortisol = sugar, inflammation, stress. Aldosterone handles sodium/potassium. Epinephrine comes from the adrenal medulla. Calcium is regulated by calcitonin and parathyroid hormone."
+  },
+  {
+    id:19, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Aldosterone causes the kidneys to retain sodium and water. What happens to potassium?",
+    choices:["Potassium is also retained","Potassium is excreted, so blood K\u207a falls","Potassium is unaffected","Potassium moves into bone"],
+    correct:[1],
+    explanation:"<strong>Potassium is excreted, so blood K\u207a falls.</strong> Aldosterone swaps Na\u207a for K\u207a in the kidneys: retain sodium, excrete potassium. This Na/K relationship is the key to understanding Cushing\u2019s and Addison\u2019s electrolyte patterns."
+  },
+  {
+    id:20, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Cushing\u2019s syndrome is caused by:",
+    choices:["Too little cortisol","Too much cortisol","Too little aldosterone","Too much epinephrine"],
+    correct:[1],
+    explanation:"<strong>Too much cortisol.</strong> Cushing\u2019s = excess cortisol. The #1 cause is iatrogenic \u2014 long-term use of glucocorticoid medications like prednisone. Classic appearance: moon face, buffalo hump, truncal obesity, purple striae, hyperglycemia."
+  },
+  {
+    id:21, section:"Adrenal", type:"tf", typeLabel:"True / False",
+    stem:"The most common cause of Cushing\u2019s syndrome is long-term use of glucocorticoid medications (like prednisone), not tumors.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Iatrogenic Cushing\u2019s (from exogenous steroids) is far more common than tumor-caused Cushing\u2019s. Always ask about steroid medication history. Other causes include pituitary tumors (Cushing\u2019s disease), adrenal tumors, and ectopic ACTH from cancers."
+  },
+  {
+    id:22, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Addison\u2019s disease is caused by:",
+    choices:["Excess cortisol and aldosterone","Deficiency of cortisol and aldosterone","Excess epinephrine","Overproduction of ACTH by the adrenal glands"],
+    correct:[1],
+    explanation:"<strong>Deficiency of cortisol and aldosterone.</strong> Addison\u2019s = the adrenal cortex is failing. Without cortisol: hypoglycemia, fatigue, can\u2019t handle stress. Without aldosterone: lose sodium and water (hypotension), retain potassium (hyperkalemia \u2014 heart risk)."
+  },
+  {
+    id:23, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Bronze skin hyperpigmentation is a hallmark sign of:",
+    choices:["Cushing\u2019s syndrome","Addison\u2019s disease","Hyperthyroidism","Type 2 diabetes"],
+    correct:[1],
+    explanation:"<strong>Addison\u2019s disease.</strong> When cortisol is low, the pituitary produces excess ACTH trying to stimulate the adrenals. ACTH stimulates melanocytes, causing dark/bronze skin discoloration. This does NOT occur in Cushing\u2019s (cortisol is high, ACTH is suppressed)."
+  },
+  {
+    id:24, section:"Adrenal", type:"tf", typeLabel:"True / False",
+    stem:"You should NEVER abruptly stop long-term steroid therapy because the adrenal glands may have atrophied and can\u2019t resume cortisol production immediately.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Long-term exogenous steroids suppress the HPA axis through negative feedback. The adrenal glands shrink from disuse. Abrupt withdrawal = sudden cortisol deficiency = adrenal crisis = potentially fatal cardiovascular collapse. Always taper gradually."
+  },
+  {
+    id:25, section:"Adrenal", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The electrolyte pattern in Addison\u2019s disease is:",
+    choices:["High sodium, low potassium","Low sodium, high potassium","High calcium, low phosphate","Normal electrolytes with high glucose"],
+    correct:[1],
+    explanation:"<strong>Low sodium, high potassium.</strong> Without aldosterone: kidneys can\u2019t retain Na\u207a (sodium drops) and can\u2019t excrete K\u207a (potassium rises). This is the OPPOSITE of Cushing\u2019s (high Na\u207a, low K\u207a). The high K\u207a is the most immediately dangerous value \u2014 cardiac dysrhythmia risk."
+  }
+];
+
+// ── QUIZ ENGINE ──
+let currentQ=0, score=0, answered=0, userAnswers=[], results=[];
+const main=document.getElementById('mainContent'), progressArea=document.getElementById('progressArea'),
+  progressBar=document.getElementById('progressBar'), progressText=document.getElementById('progressText'),
+  scoreDisplay=document.getElementById('scoreDisplay');
+
+function init(){userAnswers=questions.map(()=>[]);results=[];score=0;answered=0;currentQ=0;showStart()}
+function showStart(){
+  progressArea.classList.add('hidden');
+  main.innerHTML=`<div class="start-screen"><h2>Endocrine Warm-Up Quiz</h2>
+    <p>25 rapid-fire questions &mdash; test your fundamentals</p>
+    <div class="start-details"><ul>
+      <li>Covers all of Chapter 10: Diabetes, Thyroid, Adrenal</li>
+      <li>Short, direct questions &mdash; no long clinical scenarios</li>
+      <li>Great for building confidence before the advanced quizzes</li>
+      <li>Brief explanations after every question</li>
+    </ul></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Begin Warm-Up</button></div>`;
+}
+function startQuiz(){progressArea.classList.remove('hidden');showQuestion()}
+function showQuestion(){
+  const q=questions[currentQ], pct=(currentQ/questions.length)*100;
+  progressBar.style.width=pct+'%';
+  progressText.textContent=`Question ${currentQ+1} of ${questions.length}`;
+  scoreDisplay.textContent=answered>0?`Score: ${score}/${answered}`:'Score: 0/0';
+  const isCB=(q.type==='sata'), ic=isCB?'choice-indicator checkbox-indicator':'choice-indicator';
+  let ch=q.choices.map((c,i)=>{const l=String.fromCharCode(65+i);return`<div class="choice-card" data-index="${i}" onclick="toggleChoice(${i},${isCB})"><div class="${ic}">${l}</div><div class="choice-text">${c}</div></div>`}).join('');
+  main.innerHTML=`<div class="question-card"><div class="question-meta"><span class="question-number">Question ${q.id} of ${questions.length}</span><span class="question-type">${q.typeLabel}</span>${q.section?`<span class="section-label">${q.section}</span>`:''}</div><div class="question-stem">${q.stem}</div><div class="choices" id="choicesContainer">${ch}</div><div class="button-row" id="buttonRow"><button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button></div><div id="explanationArea"></div></div>`;
+}
+function toggleChoice(i,cb){
+  const cards=document.querySelectorAll('.choice-card');if(cards[0].classList.contains('disabled'))return;
+  if(cb){cards[i].classList.toggle('selected')}else{cards.forEach(c=>c.classList.remove('selected'));cards[i].classList.add('selected')}
+  document.getElementById('submitBtn').disabled=!document.querySelector('.choice-card.selected');
+}
+function submitAnswer(){
+  const q=questions[currentQ],cards=document.querySelectorAll('.choice-card'),sel=[];
+  cards.forEach((c,i)=>{if(c.classList.contains('selected'))sel.push(i)});
+  userAnswers[currentQ]=sel;
+  const cs=new Set(q.correct),ss=new Set(sel);
+  let ok=cs.size===ss.size&&[...cs].every(v=>ss.has(v));
+  results.push({qIndex:currentQ,correct:ok});answered++;if(ok)score++;
+  cards.forEach((c,i)=>{c.classList.add('disabled');const ws=ss.has(i),ir=cs.has(i);
+    if(ws&&ir){c.classList.remove('selected');c.classList.add('correct-answer');c.querySelector('.choice-indicator').innerHTML='&#10003;'}
+    else if(ws&&!ir){c.classList.remove('selected');c.classList.add('incorrect-answer');c.querySelector('.choice-indicator').innerHTML='&#10007;'}
+    else if(!ws&&ir){c.classList.add('missed-correct');c.querySelector('.choice-indicator').innerHTML='&#10003;'}});
+  document.getElementById('explanationArea').innerHTML=`<div class="explanation ${ok?'':'wrong'}"><div class="explanation-title ${ok?'right':'wrong'}">${ok?'&#10003; Correct!':'&#10007; Incorrect'}</div><div class="explanation-body">${q.explanation}</div></div>`;
+  scoreDisplay.textContent=`Score: ${score}/${answered}`;
+  const br=document.getElementById('buttonRow');
+  br.innerHTML=currentQ<questions.length-1?`<button class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>`:`<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+}
+function nextQuestion(){currentQ++;showQuestion();window.scrollTo({top:0,behavior:'smooth'})}
+function showResults(){
+  progressBar.style.width='100%';progressText.textContent='Quiz Complete';
+  scoreDisplay.textContent=`Final: ${score}/${questions.length}`;
+  const pct=Math.round((score/questions.length)*100);
+  let msg='';
+  if(pct>=90)msg='Excellent! You have a solid foundation in endocrine pathophysiology.';
+  else if(pct>=80)msg='Great work! Review the ones you missed and you\u2019re ready for the advanced quizzes.';
+  else if(pct>=70)msg='Good start! Revisit the review decks for the topics you missed.';
+  else if(pct>=60)msg='You\u2019re building your base. Review the explanations and try again.';
+  else msg='Spend some time with the review decks first, then come back and retake this warm-up.';
+  const missed=results.filter(r=>!r.correct);
+  let mh='';
+  if(missed.length>0){mh=`<div class="missed-list"><h3>Review Missed Questions (${missed.length})</h3>${missed.map(m=>{const q=questions[m.qIndex],cl=q.correct.map(c=>String.fromCharCode(65+c)).join(', '),ul=userAnswers[m.qIndex].map(c=>String.fromCharCode(65+c)).join(', ')||'None';return`<div class="missed-item"><div class="missed-item-q">Q${q.id} (${q.section}): ${q.stem.replace(/<[^>]*>/g,'')}</div><div class="missed-item-detail"><strong>Your answer:</strong> ${ul}<br><strong>Correct:</strong> ${cl}<br><br>${q.explanation}</div></div>`}).join('')}</div>`}
+  main.innerHTML=`<div class="results-screen"><div class="results-header"><div class="results-score">${score}/${questions.length}</div><div class="results-percent">${pct}%</div><div class="results-message">${msg}</div></div><div class="button-row" style="justify-content:center;margin-bottom:24px"><button class="btn btn-primary" onclick="init()">Retake Quiz</button>${missed.length>0?`<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>`:''}</div>${mh}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+init();
+</script>
+</body>
+</html>

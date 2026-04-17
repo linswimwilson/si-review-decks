@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chapter 9 GI Warm-Up Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --text-dim: #94a3b8; --accent: #38bdf8;
+    --accent-glow: rgba(56,189,248,0.15); --correct: #4ade80;
+    --correct-bg: rgba(74,222,128,0.12); --incorrect: #f87171;
+    --incorrect-bg: rgba(248,113,113,0.12); --warning: #fbbf24;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .container { max-width:820px; margin:0 auto; padding:20px 16px 60px; }
+  .quiz-header { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--surface2); }
+  .quiz-header h1 { font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .quiz-header .subtitle { font-size:0.85rem; color:var(--text-dim); }
+  .quiz-header .authors { font-size:0.78rem; color:var(--text-dim); margin-top:2px; font-style:italic; }
+  .progress-wrap { background:var(--surface); border-radius:20px; height:10px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:20px; transition:width 0.4s ease; width:0%; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--text-dim); margin-bottom:24px; }
+  .score-display { font-weight:600; color:var(--accent); }
+  .question-card { background:var(--surface); border-radius:var(--radius); padding:28px 24px; border:1px solid var(--surface2); animation:fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .question-number { font-size:0.82rem; font-weight:600; color:var(--accent); }
+  .question-type { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:20px; background:var(--accent-glow); color:var(--accent); }
+  .section-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:10px; background:var(--surface2); }
+  .question-stem { font-size:1.05rem; font-weight:500; line-height:1.65; margin-bottom:22px; color:#f1f5f9; }
+  .choices { display:flex; flex-direction:column; gap:10px; }
+  .choice-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:2px solid var(--surface2); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s ease; background:transparent; user-select:none; -webkit-user-select:none; }
+  .choice-card:hover:not(.disabled) { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.selected { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.disabled { cursor:default; pointer-events:none; }
+  .choice-card.correct-answer { border-color:var(--correct)!important; background:var(--correct-bg)!important; }
+  .choice-card.incorrect-answer { border-color:var(--incorrect)!important; background:var(--incorrect-bg)!important; }
+  .choice-card.missed-correct { border-color:var(--correct)!important; background:var(--correct-bg)!important; opacity:0.7; }
+  .choice-indicator { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; font-size:0.7rem; font-weight:700; }
+  .choice-card.selected .choice-indicator { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+  .checkbox-indicator { border-radius:4px!important; }
+  .choice-card.correct-answer .choice-indicator { border-color:var(--correct); background:var(--correct); color:var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color:var(--incorrect); background:var(--incorrect); color:var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color:var(--correct); background:transparent; color:var(--correct); }
+  .choice-text { font-size:0.95rem; line-height:1.5; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:12px 28px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s ease; gap:8px; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#818cf8); color:var(--bg); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text); }
+  .btn-secondary:hover { background:var(--border); }
+  .button-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .explanation { margin-top:20px; padding:20px; border-radius:var(--radius-sm); border-left:4px solid var(--correct); background:rgba(74,222,128,0.06); animation:fadeIn 0.35s ease; }
+  .explanation.wrong { border-left-color:var(--incorrect); background:rgba(248,113,113,0.06); }
+  .explanation-title { font-weight:700; font-size:0.9rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .explanation-title.right { color:var(--correct); }
+  .explanation-title.wrong { color:var(--incorrect); }
+  .explanation-body { font-size:0.9rem; color:var(--text-dim); line-height:1.7; }
+  .explanation-body strong { color:var(--text); }
+  .results-screen { animation:fadeIn 0.4s ease; }
+  .results-header { text-align:center; margin-bottom:32px; }
+  .results-score { font-size:3.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .results-percent { font-size:1.2rem; color:var(--text-dim); margin-top:4px; }
+  .results-message { font-size:1rem; margin-top:12px; color:var(--text); font-weight:500; }
+  .missed-list { margin-top:24px; }
+  .missed-list h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--incorrect); }
+  .missed-item { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin-bottom:14px; border:1px solid var(--surface2); border-left:4px solid var(--incorrect); }
+  .missed-item-q { font-weight:600; font-size:0.92rem; margin-bottom:8px; color:#f1f5f9; }
+  .missed-item-detail { font-size:0.85rem; color:var(--text-dim); line-height:1.6; }
+  .missed-item-detail strong { color:var(--text); }
+  .start-screen { text-align:center; padding:40px 20px; }
+  .start-screen h2 { font-size:1.6rem; font-weight:800; margin-bottom:12px; color:#f1f5f9; }
+  .start-screen p { color:var(--text-dim); margin-bottom:8px; font-size:0.95rem; }
+  .start-details { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin:24px 0; border:1px solid var(--surface2); text-align:left; }
+  .start-details li { margin-bottom:6px; color:var(--text-dim); font-size:0.9rem; list-style:none; padding-left:20px; position:relative; }
+  .start-details li::before { content:"\2022"; position:absolute; left:4px; color:var(--accent); font-weight:bold; }
+  .hidden { display:none!important; }
+  @media(max-width:600px) {
+    .container{padding:14px 10px 40px} .quiz-header h1{font-size:1.2rem} .question-card{padding:20px 16px}
+    .question-stem{font-size:0.98rem} .choice-card{padding:12px 14px} .choice-text{font-size:0.9rem}
+    .btn{padding:12px 20px;font-size:0.9rem;width:100%} .button-row{flex-direction:column} .results-score{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Chapter 9 GI &mdash; Warm-Up Quiz</h1>
+    <div class="subtitle">Rapid-fire fundamentals &bull; Upper GI, Lower GI, Liver &bull; 25 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 25</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  // ── UPPER GI (1-9) ──
+  {
+    id:1, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What is the PRIMARY structural problem in GERD?",
+    choices:["Overproduction of stomach acid","Incompetent lower esophageal sphincter (LES)","Narrowing of the esophagus","Excess bile reflux from the duodenum"],
+    correct:[1],
+    explanation:"<strong>Incompetent LES.</strong> GERD is caused by a weak or relaxed LES that allows gastric acid to reflux into the esophagus. The issue is acid going where it shouldn\u2019t, not overproduction."
+  },
+  {
+    id:2, section:"Upper GI", type:"tf", typeLabel:"True / False",
+    stem:"Barrett\u2019s esophagus is a precancerous condition caused by chronic acid exposure.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Barrett\u2019s is metaplasia \u2014 squamous cells replaced by columnar cells in response to chronic GERD. These metaplastic cells can progress to dysplasia and eventually esophageal adenocarcinoma. Requires regular surveillance."
+  },
+  {
+    id:3, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which bacteria is a major cause of peptic ulcer disease?",
+    choices:["E. coli","C. difficile","Helicobacter pylori","Staphylococcus aureus"],
+    correct:[2],
+    explanation:"<strong>Helicobacter pylori.</strong> H. pylori burrows into the gastric mucosa, disrupts the protective barrier, and allows acid to erode the lining. It\u2019s a major cause of both gastric and duodenal ulcers."
+  },
+  {
+    id:4, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"How do NSAIDs (like ibuprofen) cause peptic ulcers?",
+    choices:["They increase hydrochloric acid production","They inhibit prostaglandins that protect the gastric mucosa","They directly burn the stomach lining on contact","They promote H. pylori colonization"],
+    correct:[1],
+    explanation:"<strong>They inhibit prostaglandins that protect the gastric mucosa.</strong> NSAIDs block COX enzymes, which reduces prostaglandin production. Prostaglandins normally stimulate mucus and bicarbonate secretion and maintain mucosal blood flow."
+  },
+  {
+    id:5, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Coffee-ground emesis is a sign of:",
+    choices:["Lower GI bleeding","Upper GI bleeding where blood has been partially digested by gastric acid","Biliary obstruction","Food poisoning"],
+    correct:[1],
+    explanation:"<strong>Upper GI bleeding where blood has been partially digested.</strong> When blood sits in the stomach, gastric acid partially digests it, turning it dark and granular \u2014 resembling coffee grounds. Bright red hematemesis indicates more active, acute bleeding."
+  },
+  {
+    id:6, section:"Upper GI", type:"tf", typeLabel:"True / False",
+    stem:"Melena (black, tarry stools) indicates bleeding from the lower GI tract.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> Melena indicates <strong>upper</strong> GI bleeding. Blood from the upper GI tract is digested as it passes through the intestines, oxidizing the iron in hemoglobin and turning stool black and tarry. Lower GI bleeding typically produces bright red or maroon-colored stool (hematochezia)."
+  },
+  {
+    id:7, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Prolonged vomiting causes which acid-base imbalance?",
+    choices:["Metabolic acidosis","Metabolic alkalosis","Respiratory acidosis","Respiratory alkalosis"],
+    correct:[1],
+    explanation:"<strong>Metabolic alkalosis.</strong> Vomiting removes HCl (acid) from the stomach. Losing acid makes the blood more alkaline. Remember: <strong>vomiting = losing acid = alkalosis. Diarrhea = losing base = acidosis.</strong>"
+  },
+  {
+    id:8, section:"Upper GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A rigid, board-like abdomen with rebound tenderness in a PUD patient most likely indicates:",
+    choices:["Gastric outlet obstruction","Perforation with peritonitis","Gastritis flare","Esophageal stricture"],
+    correct:[1],
+    explanation:"<strong>Perforation with peritonitis.</strong> When an ulcer erodes through the full wall thickness, gastric contents leak into the peritoneal cavity causing severe inflammation. Board-like rigidity and rebound tenderness are hallmark signs. This is a surgical emergency."
+  },
+  {
+    id:9, section:"Upper GI", type:"tf", typeLabel:"True / False",
+    stem:"In adults, projectile vomiting can indicate increased intracranial pressure, not just a GI problem.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> The vomiting center is in the medulla. Increased ICP (brain tumors, meningitis, hydrocephalus) can directly stimulate it, causing forceful vomiting without preceding nausea. Always consider neuro causes in adults with projectile vomiting."
+  },
+
+  // ── LOWER GI (10-17) ──
+  {
+    id:10, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What is the most dangerous complication of severe diarrhea?",
+    choices:["Constipation rebound","Dehydration and electrolyte imbalance","Bowel perforation","Liver failure"],
+    correct:[1],
+    explanation:"<strong>Dehydration and electrolyte imbalance.</strong> Diarrhea causes rapid loss of water, sodium, potassium, and bicarbonate. This can lead to hypovolemia, cardiac dysrhythmias (from K\u207a loss), and metabolic acidosis (from bicarb loss)."
+  },
+  {
+    id:11, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Prolonged diarrhea causes which acid-base imbalance?",
+    choices:["Metabolic alkalosis","Metabolic acidosis","Respiratory alkalosis","Respiratory acidosis"],
+    correct:[1],
+    explanation:"<strong>Metabolic acidosis.</strong> Lower GI secretions are rich in bicarbonate (a base). Diarrhea flushes out bicarb, leaving the blood more acidic. Opposite of vomiting: <strong>diarrhea = losing base = acidosis.</strong>"
+  },
+  {
+    id:12, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which type of inflammatory bowel disease can affect ANY part of the GI tract from mouth to anus?",
+    choices:["Ulcerative colitis","Crohn\u2019s disease","Irritable bowel syndrome","Diverticulitis"],
+    correct:[1],
+    explanation:"<strong>Crohn\u2019s disease.</strong> Crohn\u2019s can occur anywhere from mouth to anus and affects the full thickness of the bowel wall (transmural). Ulcerative colitis is limited to the colon and rectum and only affects the mucosal layer."
+  },
+  {
+    id:13, section:"Lower GI", type:"tf", typeLabel:"True / False",
+    stem:"Ulcerative colitis only affects the colon and rectum.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> UC is limited to the large intestine (colon and rectum) and only involves the mucosal/submucosal layers. It typically starts at the rectum and extends upward in a continuous pattern. Crohn\u2019s, by contrast, can affect any part of the GI tract."
+  },
+  {
+    id:14, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What is the hallmark pattern of Crohn\u2019s disease that distinguishes it from ulcerative colitis?",
+    choices:["Continuous inflammation starting at the rectum","Skip lesions with healthy bowel between diseased segments","Inflammation only in the mucosal layer","Pseudopolyps throughout the colon"],
+    correct:[1],
+    explanation:"<strong>Skip lesions.</strong> Crohn\u2019s produces patchy, segmental inflammation with healthy bowel in between (skip lesions). UC spreads continuously from the rectum upward with no gaps."
+  },
+  {
+    id:15, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Diverticulosis refers to:",
+    choices:["Infected, inflamed pouches in the colon wall","The presence of small outpouchings (diverticula) in the colon wall, often without symptoms","A malignant growth in the sigmoid colon","Obstruction of the colon by hardened stool"],
+    correct:[1],
+    explanation:"<strong>The presence of diverticula, often without symptoms.</strong> Diverticulosis = the pouches exist (usually asymptomatic, very common with age). Diverticulitis = those pouches become inflamed or infected. The \u201c-osis\u201d is the condition; the \u201c-itis\u201d is the inflammation."
+  },
+  {
+    id:16, section:"Lower GI", type:"tf", typeLabel:"True / False",
+    stem:"A bowel obstruction always requires immediate surgery.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> Not all obstructions require surgery. Partial obstructions and some functional (paralytic ileus) obstructions can be managed with NPO status, NG tube decompression, and IV fluids. Surgery is needed for complete mechanical obstructions or when complications like strangulation, perforation, or necrosis develop."
+  },
+  {
+    id:17, section:"Lower GI", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which type of bowel obstruction involves a twisting of the intestine on itself?",
+    choices:["Adhesion","Intussusception","Volvulus","Hernia"],
+    correct:[2],
+    explanation:"<strong>Volvulus.</strong> Volvulus = twisting. Intussusception = one segment telescopes into another. Adhesions = scar tissue bands that kink the bowel. Hernias = bowel protrudes through a weakness in the abdominal wall."
+  },
+
+  // ── LIVER (18-25) ──
+  {
+    id:18, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which type of hepatitis is spread through the fecal-oral route (contaminated food/water)?",
+    choices:["Hepatitis A","Hepatitis B","Hepatitis C","Hepatitis D"],
+    correct:[0],
+    explanation:"<strong>Hepatitis A.</strong> Hep A is transmitted fecal-orally \u2014 contaminated food, water, or close contact. It does NOT become chronic. Hep B and C are transmitted through blood and body fluids and CAN become chronic."
+  },
+  {
+    id:19, section:"Liver", type:"tf", typeLabel:"True / False",
+    stem:"Hepatitis B and C are transmitted through blood and body fluids and can become chronic infections.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Hep B and C spread through blood, sexual contact, and perinatal transmission. Both can progress to chronic hepatitis, which can lead to cirrhosis and hepatocellular carcinoma. Hep A does NOT become chronic."
+  },
+  {
+    id:20, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Jaundice (yellow skin and sclera) is caused by elevated levels of:",
+    choices:["Albumin","Bilirubin","Ammonia","Bile salts"],
+    correct:[1],
+    explanation:"<strong>Bilirubin.</strong> Bilirubin is a yellow pigment from the breakdown of red blood cells. When the liver can\u2019t conjugate and excrete it (due to liver damage or biliary obstruction), bilirubin builds up in the blood and deposits in tissues, turning skin and sclera yellow."
+  },
+  {
+    id:21, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Cirrhosis is BEST described as:",
+    choices:["Acute viral infection of the liver","Irreversible scarring and fibrosis of the liver from chronic damage","A benign fatty deposit in the liver","Inflammation of the gallbladder"],
+    correct:[1],
+    explanation:"<strong>Irreversible scarring and fibrosis of the liver from chronic damage.</strong> Cirrhosis is the end stage of chronic liver disease. Functional liver cells are replaced by scar tissue, which distorts the liver architecture and impairs all liver functions. Common causes: chronic alcohol use, chronic hepatitis B/C, and fatty liver disease."
+  },
+  {
+    id:22, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Portal hypertension in cirrhosis occurs because:",
+    choices:["The heart pumps too much blood to the liver","Scar tissue in the liver obstructs blood flow through the portal vein","The kidneys retain too much fluid","Hepatic arteries become dilated"],
+    correct:[1],
+    explanation:"<strong>Scar tissue obstructs blood flow through the portal vein.</strong> The portal vein carries blood from the GI tract through the liver. When cirrhosis replaces functional tissue with fibrosis, blood flow is obstructed, and pressure backs up \u2014 causing portal hypertension. This leads to varices, ascites, and splenomegaly."
+  },
+  {
+    id:23, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Esophageal varices are a dangerous complication of portal hypertension because they can:",
+    choices:["Cause difficulty swallowing","Rupture and cause life-threatening hemorrhage","Lead to esophageal cancer","Obstruct the airway"],
+    correct:[1],
+    explanation:"<strong>Rupture and cause life-threatening hemorrhage.</strong> Portal hypertension forces blood into collateral veins, including those in the esophagus. These thin-walled veins become engorged (varices) and can rupture, causing massive, potentially fatal upper GI bleeding."
+  },
+  {
+    id:24, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Ascites (fluid accumulation in the abdomen) in liver disease is primarily caused by:",
+    choices:["Increased albumin production","Low albumin (decreased oncotic pressure) plus portal hypertension","Kidney failure","Excess dietary sodium alone"],
+    correct:[1],
+    explanation:"<strong>Low albumin plus portal hypertension.</strong> The damaged liver can\u2019t produce enough albumin, so oncotic pressure drops and fluid leaks out of vessels. Portal hypertension adds hydrostatic pressure that pushes fluid into the peritoneal cavity. Both forces together produce ascites."
+  },
+  {
+    id:25, section:"Liver", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Hepatic encephalopathy (confusion, asterixis) in liver failure is caused by buildup of:",
+    choices:["Bilirubin","Glucose","Ammonia","Potassium"],
+    correct:[2],
+    explanation:"<strong>Ammonia.</strong> The liver normally converts ammonia (a toxic byproduct of protein metabolism) into urea for kidney excretion. When the liver fails, ammonia accumulates and crosses the blood-brain barrier, causing confusion, personality changes, asterixis (flapping tremor), and eventually coma. Treatment includes lactulose to help excrete ammonia through the bowel."
+  }
+];
+
+// ── QUIZ ENGINE ──
+let currentQ=0, score=0, answered=0, userAnswers=[], results=[];
+const main=document.getElementById('mainContent'), progressArea=document.getElementById('progressArea'),
+  progressBar=document.getElementById('progressBar'), progressText=document.getElementById('progressText'),
+  scoreDisplay=document.getElementById('scoreDisplay');
+
+function init(){userAnswers=questions.map(()=>[]);results=[];score=0;answered=0;currentQ=0;showStart()}
+function showStart(){
+  progressArea.classList.add('hidden');
+  main.innerHTML=`<div class="start-screen"><h2>GI Warm-Up Quiz</h2>
+    <p>25 rapid-fire questions &mdash; test your fundamentals</p>
+    <div class="start-details"><ul>
+      <li>Covers all of Chapter 9: Upper GI, Lower GI, Liver</li>
+      <li>Short, direct questions &mdash; no long clinical scenarios</li>
+      <li>Great for building confidence before the advanced quizzes</li>
+      <li>Brief explanations after every question</li>
+    </ul></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Begin Warm-Up</button></div>`;
+}
+function startQuiz(){progressArea.classList.remove('hidden');showQuestion()}
+function showQuestion(){
+  const q=questions[currentQ], pct=(currentQ/questions.length)*100;
+  progressBar.style.width=pct+'%';
+  progressText.textContent=`Question ${currentQ+1} of ${questions.length}`;
+  scoreDisplay.textContent=answered>0?`Score: ${score}/${answered}`:'Score: 0/0';
+  const isCB=(q.type==='sata'), ic=isCB?'choice-indicator checkbox-indicator':'choice-indicator';
+  let ch=q.choices.map((c,i)=>{const l=String.fromCharCode(65+i);return`<div class="choice-card" data-index="${i}" onclick="toggleChoice(${i},${isCB})"><div class="${ic}">${l}</div><div class="choice-text">${c}</div></div>`}).join('');
+  main.innerHTML=`<div class="question-card"><div class="question-meta"><span class="question-number">Question ${q.id} of ${questions.length}</span><span class="question-type">${q.typeLabel}</span>${q.section?`<span class="section-label">${q.section}</span>`:''}</div><div class="question-stem">${q.stem}</div><div class="choices" id="choicesContainer">${ch}</div><div class="button-row" id="buttonRow"><button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button></div><div id="explanationArea"></div></div>`;
+}
+function toggleChoice(i,cb){
+  const cards=document.querySelectorAll('.choice-card');if(cards[0].classList.contains('disabled'))return;
+  if(cb){cards[i].classList.toggle('selected')}else{cards.forEach(c=>c.classList.remove('selected'));cards[i].classList.add('selected')}
+  document.getElementById('submitBtn').disabled=!document.querySelector('.choice-card.selected');
+}
+function submitAnswer(){
+  const q=questions[currentQ],cards=document.querySelectorAll('.choice-card'),sel=[];
+  cards.forEach((c,i)=>{if(c.classList.contains('selected'))sel.push(i)});
+  userAnswers[currentQ]=sel;
+  const cs=new Set(q.correct),ss=new Set(sel);
+  let ok=cs.size===ss.size&&[...cs].every(v=>ss.has(v));
+  results.push({qIndex:currentQ,correct:ok});answered++;if(ok)score++;
+  cards.forEach((c,i)=>{c.classList.add('disabled');const ws=ss.has(i),ir=cs.has(i);
+    if(ws&&ir){c.classList.remove('selected');c.classList.add('correct-answer');c.querySelector('.choice-indicator').innerHTML='&#10003;'}
+    else if(ws&&!ir){c.classList.remove('selected');c.classList.add('incorrect-answer');c.querySelector('.choice-indicator').innerHTML='&#10007;'}
+    else if(!ws&&ir){c.classList.add('missed-correct');c.querySelector('.choice-indicator').innerHTML='&#10003;'}});
+  document.getElementById('explanationArea').innerHTML=`<div class="explanation ${ok?'':'wrong'}"><div class="explanation-title ${ok?'right':'wrong'}">${ok?'&#10003; Correct!':'&#10007; Incorrect'}</div><div class="explanation-body">${q.explanation}</div></div>`;
+  scoreDisplay.textContent=`Score: ${score}/${answered}`;
+  const br=document.getElementById('buttonRow');
+  br.innerHTML=currentQ<questions.length-1?`<button class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>`:`<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+}
+function nextQuestion(){currentQ++;showQuestion();window.scrollTo({top:0,behavior:'smooth'})}
+function showResults(){
+  progressBar.style.width='100%';progressText.textContent='Quiz Complete';
+  scoreDisplay.textContent=`Final: ${score}/${questions.length}`;
+  const pct=Math.round((score/questions.length)*100);
+  let msg='';
+  if(pct>=90)msg='Excellent! You have a solid foundation in GI pathophysiology.';
+  else if(pct>=80)msg='Great work! Review the ones you missed and you\u2019re ready for the advanced quizzes.';
+  else if(pct>=70)msg='Good start! Revisit the review decks for the topics you missed.';
+  else if(pct>=60)msg='You\u2019re building your base. Review the explanations and try again.';
+  else msg='Spend some time with the review decks first, then come back and retake this warm-up.';
+  const missed=results.filter(r=>!r.correct);
+  let mh='';
+  if(missed.length>0){mh=`<div class="missed-list"><h3>Review Missed Questions (${missed.length})</h3>${missed.map(m=>{const q=questions[m.qIndex],cl=q.correct.map(c=>String.fromCharCode(65+c)).join(', '),ul=userAnswers[m.qIndex].map(c=>String.fromCharCode(65+c)).join(', ')||'None';return`<div class="missed-item"><div class="missed-item-q">Q${q.id} (${q.section}): ${q.stem.replace(/<[^>]*>/g,'')}</div><div class="missed-item-detail"><strong>Your answer:</strong> ${ul}<br><strong>Correct:</strong> ${cl}<br><br>${q.explanation}</div></div>`}).join('')}</div>`}
+  main.innerHTML=`<div class="results-screen"><div class="results-header"><div class="results-score">${score}/${questions.length}</div><div class="results-percent">${pct}%</div><div class="results-message">${msg}</div></div><div class="button-row" style="justify-content:center;margin-bottom:24px"><button class="btn btn-primary" onclick="init()">Retake Quiz</button>${missed.length>0?`<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>`:''}</div>${mh}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+init();
+</script>
+</body>
+</html>
