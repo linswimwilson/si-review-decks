@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diabetes Mellitus Quiz — Type 1, Type 2, DKA, HHNK, Complications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.15);
+    --correct: #4ade80;
+    --correct-bg: rgba(74, 222, 128, 0.12);
+    --incorrect: #f87171;
+    --incorrect-bg: rgba(248, 113, 113, 0.12);
+    --warning: #fbbf24;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .quiz-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .quiz-header .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .quiz-header .authors {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  .progress-wrap {
+    background: var(--surface);
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .score-display { font-weight: 600; color: var(--accent); }
+
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--surface2);
+    animation: fadeIn 0.35s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .question-number { font-size: 0.82rem; font-weight: 600; color: var(--accent); }
+  .question-type {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 10px; border-radius: 20px;
+    background: var(--accent-glow); color: var(--accent);
+  }
+
+  .question-stem {
+    font-size: 1.05rem; font-weight: 500; line-height: 1.65;
+    margin-bottom: 22px; color: #f1f5f9;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-card {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px; border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: all 0.2s ease; background: transparent;
+    user-select: none; -webkit-user-select: none;
+  }
+  .choice-card:hover:not(.disabled) { border-color: var(--accent); background: var(--accent-glow); }
+  .choice-card.selected { border-color: var(--accent); background: var(--accent-glow); }
+  .choice-card.disabled { cursor: default; pointer-events: none; }
+  .choice-card.correct-answer { border-color: var(--correct) !important; background: var(--correct-bg) !important; }
+  .choice-card.incorrect-answer { border-color: var(--incorrect) !important; background: var(--incorrect-bg) !important; }
+  .choice-card.missed-correct { border-color: var(--correct) !important; background: var(--correct-bg) !important; opacity: 0.7; }
+
+  .choice-indicator {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; font-size: 0.7rem; font-weight: 700;
+  }
+  .choice-card.selected .choice-indicator { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+  .checkbox-indicator { border-radius: 4px !important; }
+  .choice-card.correct-answer .choice-indicator { border-color: var(--correct); background: var(--correct); color: var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color: var(--incorrect); background: var(--incorrect); color: var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color: var(--correct); background: transparent; color: var(--correct); }
+
+  .choice-text { font-size: 0.95rem; line-height: 1.5; flex: 1; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 28px; border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 0.95rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s ease; gap: 8px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #818cf8); color: var(--bg); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary { background: var(--surface2); color: var(--text); }
+  .btn-secondary:hover { background: var(--border); }
+
+  .button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+  .explanation {
+    margin-top: 20px; padding: 20px; border-radius: var(--radius-sm);
+    border-left: 4px solid var(--correct); background: rgba(74, 222, 128, 0.06);
+    animation: fadeIn 0.35s ease;
+  }
+  .explanation.wrong { border-left-color: var(--incorrect); background: rgba(248, 113, 113, 0.06); }
+  .explanation-title {
+    font-weight: 700; font-size: 0.9rem; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .explanation-title.right { color: var(--correct); }
+  .explanation-title.wrong { color: var(--incorrect); }
+  .explanation-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; }
+  .explanation-body strong { color: var(--text); }
+
+  .results-screen { animation: fadeIn 0.4s ease; }
+  .results-header { text-align: center; margin-bottom: 32px; }
+  .results-score {
+    font-size: 3.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .results-percent { font-size: 1.2rem; color: var(--text-dim); margin-top: 4px; }
+  .results-message { font-size: 1rem; margin-top: 12px; color: var(--text); font-weight: 500; }
+
+  .missed-list { margin-top: 24px; }
+  .missed-list h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--incorrect); }
+  .missed-item {
+    background: var(--surface); border-radius: var(--radius-sm);
+    padding: 20px; margin-bottom: 14px;
+    border: 1px solid var(--surface2); border-left: 4px solid var(--incorrect);
+  }
+  .missed-item-q { font-weight: 600; font-size: 0.92rem; margin-bottom: 8px; color: #f1f5f9; }
+  .missed-item-detail { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
+  .missed-item-detail strong { color: var(--text); }
+
+  .start-screen { text-align: center; padding: 40px 20px; }
+  .start-screen h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; color: #f1f5f9; }
+  .start-screen p { color: var(--text-dim); margin-bottom: 8px; font-size: 0.95rem; }
+  .start-details {
+    background: var(--surface); border-radius: var(--radius-sm);
+    padding: 20px; margin: 24px 0; border: 1px solid var(--surface2); text-align: left;
+  }
+  .start-details li {
+    margin-bottom: 6px; color: var(--text-dim); font-size: 0.9rem;
+    list-style: none; padding-left: 20px; position: relative;
+  }
+  .start-details li::before {
+    content: "\2022"; position: absolute; left: 4px;
+    color: var(--accent); font-weight: bold;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .container { padding: 14px 10px 40px; }
+    .quiz-header h1 { font-size: 1.2rem; }
+    .question-card { padding: 20px 16px; }
+    .question-stem { font-size: 0.98rem; }
+    .choice-card { padding: 12px 14px; }
+    .choice-text { font-size: 0.9rem; }
+    .btn { padding: 12px 20px; font-size: 0.9rem; width: 100%; }
+    .button-row { flex-direction: column; }
+    .results-score { font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Supplemental Instructor Review &mdash; Diabetes Mellitus Quiz</h1>
+    <div class="subtitle">Type 1, Type 2, DKA, HHNK, Hypoglycemia, Chronic Complications &bull; 10 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 10</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A nursing student asks why a patient with Type 1 diabetes cannot simply take insulin in pill form instead of injections. Which of the following is the BEST explanation?",
+    choices: [
+      "Oral insulin would cause severe hypoglycemia because it is absorbed too quickly",
+      "Insulin is a protein hormone that would be destroyed by digestive enzymes in the GI tract before reaching the bloodstream",
+      "The liver would convert oral insulin into glucagon, raising blood sugar instead",
+      "Oral medications only work for insulin resistance, and Type 1 patients have no resistance"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Insulin is a protein hormone that would be destroyed by digestive enzymes in the GI tract before reaching the bloodstream.</strong><br><br>Insulin is a <strong>protein</strong>. Like all proteins, it would be broken down by <strong>pepsin in the stomach</strong> and <strong>pancreatic proteases in the small intestine</strong> before it could ever be absorbed into the blood. This is why insulin must be given by <strong>injection</strong> (subcutaneous, IV, or insulin pump) \u2014 to bypass the digestive system entirely.<br><br><strong>Why the others are wrong:</strong><br>A) The issue isn\u2019t absorption speed \u2014 the insulin would never make it to the bloodstream intact in the first place.<br>C) The liver does not convert insulin into glucagon. These are completely different hormones produced by different cell types (beta vs. alpha cells).<br>D) While oral hypoglycemic agents do work on resistance mechanisms, the reason insulin can\u2019t be taken orally is biochemical (protein digestion), not related to the mechanism of action."
+  },
+  {
+    id: 2,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A patient presents to the clinic with new-onset diabetes symptoms. Which of the following findings would the nurse associate with the classic \u201c3 Polys\u201d of diabetes mellitus? <strong>Select all that apply.</strong>",
+    choices: [
+      "Polydipsia \u2014 excessive thirst",
+      "Polyarthritis \u2014 joint inflammation",
+      "Polyuria \u2014 excessive urination",
+      "Polyphagia \u2014 excessive hunger",
+      "Polycythemia \u2014 excess red blood cells"
+    ],
+    correct: [0, 2, 3],
+    explanation: "<strong>Correct: Polydipsia (excessive thirst), polyuria (excessive urination), and polyphagia (excessive hunger).</strong><br><br>These are the <strong>3 Polys</strong> \u2014 the classic triad of diabetes mellitus. They all stem from hyperglycemia:<br><br>\u2022 <strong>Polyuria</strong> \u2014 excess glucose spills into the urine and pulls water with it via osmotic diuresis. The patient urinates large volumes frequently.<br>\u2022 <strong>Polydipsia</strong> \u2014 the fluid loss from polyuria triggers the thirst center. The hyperosmolar blood also signals thirst.<br>\u2022 <strong>Polyphagia</strong> \u2014 cells can\u2019t access glucose (no insulin or insulin resistance), so they send \u201cfeed me\u201d signals despite blood sugar being high. This is the diabetes paradox: blood is swimming in glucose, but cells are starving.<br><br><strong>Why the others are wrong:</strong><br>B) Polyarthritis (joint inflammation) is not one of the 3 Polys \u2014 it\u2019s a musculoskeletal condition.<br>E) Polycythemia (excess RBCs) is a hematologic condition, not related to the diabetes triad."
+  },
+  {
+    id: 3,
+    type: "tf",
+    typeLabel: "True / False",
+    stem: "Insulin is required for glucose to enter the brain, red blood cells, and kidneys.",
+    choices: [
+      "True",
+      "False"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: FALSE.</strong><br><br>Insulin is <strong>NOT required</strong> for glucose uptake in the <strong>brain, red blood cells, kidneys, or the lens of the eye</strong>. These tissues have insulin-independent glucose transporters \u2014 glucose enters freely without insulin\u2019s help.<br><br>Insulin IS required for glucose to enter:<br>\u2022 <strong>Liver cells</strong><br>\u2022 <strong>Muscle cells</strong><br>\u2022 <strong>Adipose (fat) cells</strong><br><br>This is clinically important because:<br>\u2022 The <strong>brain</strong> doesn\u2019t need insulin for glucose entry, but it absolutely DOES need a constant glucose supply. This is why hypoglycemia is so dangerous \u2014 if blood glucose drops, the brain starves.<br>\u2022 In uncontrolled diabetes, the brain, kidneys, RBCs, and lens are continuously bathed in excess glucose, which is why they\u2019re vulnerable to chronic damage (retinopathy, nephropathy)."
+  },
+  {
+    id: 4,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 19-year-old patient with Type 1 diabetes presents to the ED with blood glucose of 450 mg/dL, fruity-smelling breath, rapid deep respirations, and abdominal pain. ABG shows pH 7.22 and HCO\u2083\u207b 12 mEq/L. Which of the following BEST explains the Kussmaul respirations?",
+    choices: [
+      "The patient is hyperventilating due to anxiety from the high blood sugar",
+      "The lungs are attempting to compensate for metabolic acidosis by blowing off CO\u2082",
+      "Ketones are directly irritating the respiratory center, causing bronchospasm",
+      "Dehydration has triggered the renin-angiotensin system to increase respiratory rate"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: The lungs are attempting to compensate for metabolic acidosis by blowing off CO\u2082.</strong><br><br>This is <strong>DKA (Diabetic Ketoacidosis)</strong>. Here\u2019s the cascade:<br>1. No insulin \u2192 cells can\u2019t use glucose \u2192 body burns <strong>fat</strong> for energy<br>2. Fat breakdown produces <strong>ketones</strong> (acidic molecules)<br>3. Ketones accumulate faster than the body can buffer them \u2192 <strong>metabolic acidosis</strong> (pH 7.22, HCO\u2083\u207b 12)<br>4. The lungs try to compensate by breathing rapidly and deeply (<strong>Kussmaul respirations</strong>) to blow off CO\u2082 \u2014 removing acid from the body<br>5. Acetone (a ketone) is exhaled \u2192 <strong>fruity breath</strong><br><br><strong>Why the others are wrong:</strong><br>A) This is not anxiety-driven hyperventilation \u2014 it\u2019s a physiological compensatory mechanism for acidosis. The pattern (deep AND rapid) is specific to metabolic compensation.<br>C) Ketones don\u2019t cause bronchospasm. The respiratory center responds to the <strong>low pH</strong>, not direct ketone irritation.<br>D) The renin-angiotensin system affects blood pressure and fluid balance, not respiratory rate."
+  },
+  {
+    id: 5,
+    type: "except",
+    typeLabel: "All EXCEPT",
+    stem: "All of the following are risk factors for developing Type 2 diabetes <strong>EXCEPT</strong>:",
+    choices: [
+      "Obesity (BMI > 30)",
+      "Autoimmune destruction of pancreatic beta cells",
+      "Family history of Type 2 diabetes",
+      "Physical inactivity and sedentary lifestyle"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Autoimmune destruction of pancreatic beta cells is NOT a risk factor for Type 2 \u2014 it is the CAUSE of Type 1.</strong><br><br>Type 2 diabetes is driven by <strong>insulin resistance</strong>, not autoimmune destruction. The beta cells are initially intact and producing insulin \u2014 the problem is that the cells won\u2019t respond to it. Over time, the overworked beta cells burn out and insulin production eventually declines.<br><br><strong>Why the others ARE Type 2 risk factors:</strong><br>A) <strong>Obesity</strong> \u2014 ~90% of Type 2 patients are obese. Excess adipose tissue releases free fatty acids that disrupt insulin receptors on liver, muscle, and fat cells.<br>C) <strong>Family history</strong> \u2014 strong genetic component. Having a first-degree relative with Type 2 significantly increases risk.<br>D) <strong>Physical inactivity</strong> \u2014 exercise increases insulin sensitivity and glucose uptake by muscles. Sedentary lifestyle removes this protective effect."
+  },
+  {
+    id: 6,
+    type: "priority",
+    typeLabel: "Priority / First Action",
+    stem: "A nurse is caring for a diabetic patient who becomes shaky, diaphoretic, confused, and has a blood glucose of 54 mg/dL. The patient is conscious and able to swallow. What is the nurse\u2019s FIRST action?",
+    choices: [
+      "Administer the patient\u2019s scheduled insulin dose to normalize glucose metabolism",
+      "Give 15\u201320 grams of a fast-acting carbohydrate (juice, glucose tablets) and recheck in 15 minutes",
+      "Call the provider and request a stat HbA1C level",
+      "Start an IV of normal saline and prepare a glucagon injection"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Give 15\u201320 grams of a fast-acting carbohydrate and recheck in 15 minutes.</strong><br><br>This is <strong>hypoglycemia</strong> \u2014 the most immediately life-threatening diabetes emergency. The brain needs constant glucose, and at 54 mg/dL this patient is already symptomatic (shaky, sweaty, confused).<br><br>The <strong>Rule of 15</strong>:<br>1. Give <strong>15\u201320g fast-acting carbs</strong> (4 oz juice, glucose tablets, regular soda)<br>2. <strong>Recheck glucose in 15 minutes</strong><br>3. Repeat if still below 70 mg/dL<br>4. Follow with a protein snack once stable<br><br>The patient is conscious and can swallow, so oral glucose is the fastest and safest intervention.<br><br><strong>Why the others are wrong:</strong><br>A) Giving insulin to a hypoglycemic patient would drop their glucose further \u2014 this could cause seizures, coma, or death. NEVER give insulin during hypoglycemia.<br>C) HbA1C is a 3-month average \u2014 completely useless in an acute emergency. Treat NOW.<br>D) Glucagon injection is for patients who are <strong>unconscious or cannot swallow</strong>. This patient can swallow \u2014 oral carbs are faster and more appropriate. IV access is not the first priority here."
+  },
+  {
+    id: 7,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 62-year-old obese patient with Type 2 diabetes is found confused at home. Blood glucose is 820 mg/dL. Urinalysis shows <strong>no ketones</strong>. The patient is severely dehydrated with poor skin turgor. Which condition does this presentation represent, and what is the treatment PRIORITY?",
+    choices: [
+      "DKA \u2014 priority is insulin administration",
+      "HHNK (Hyperglycemic Hyperosmolar Nonketotic Syndrome) \u2014 priority is aggressive IV fluid resuscitation",
+      "Hypoglycemia \u2014 priority is oral glucose administration",
+      "DKA \u2014 priority is sodium bicarbonate to correct acidosis"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: HHNK \u2014 priority is aggressive IV fluid resuscitation.</strong><br><br>This is <strong>HHNK</strong> (Hyperglycemic Hyperosmolar Nonketotic Syndrome), the acute emergency of Type 2 diabetes. The clues:<br>\u2022 <strong>Extremely high glucose (820)</strong> \u2014 often >600 mg/dL in HHNK<br>\u2022 <strong>No ketones</strong> \u2014 the patient has SOME insulin (enough to prevent fat breakdown/ketone production)<br>\u2022 <strong>Severe dehydration</strong> \u2014 the hallmark problem of HHNK<br>\u2022 <strong>Elderly, obese, Type 2</strong> \u2014 classic HHNK demographics<br>\u2022 <strong>Confusion</strong> \u2014 from hyperosmolarity and poor cerebral perfusion<br><br>Treatment priority is <strong>FLUIDS FIRST</strong>. The patient is critically dehydrated \u2014 the extremely high glucose has pulled massive amounts of water into the urine via osmotic diuresis. Rehydration improves perfusion, cardiac output, and renal function. Insulin and electrolyte correction come after fluid resuscitation begins.<br><br><strong>Key comparison:</strong> DKA = insulin first. HHNK = fluids first.<br><br><strong>Why the others are wrong:</strong><br>A) DKA has ketones and acidosis \u2014 this patient has NO ketones.<br>C) Glucose of 820 is dangerously HIGH, not low.<br>D) Sodium bicarbonate is rarely used even in DKA, and this isn\u2019t DKA."
+  },
+  {
+    id: 8,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A nurse is educating a newly diagnosed diabetic patient about chronic complications of uncontrolled blood glucose. Which of the following are recognized chronic complications? <strong>Select all that apply.</strong>",
+    choices: [
+      "Retinopathy \u2014 leading cause of adult blindness",
+      "Nephropathy \u2014 leading cause of kidney failure requiring dialysis",
+      "Peripheral neuropathy \u2014 numbness and tingling in the feet",
+      "Thyroid storm \u2014 surge of thyroid hormones",
+      "Coronary artery disease and increased risk of heart attack",
+      "Delayed wound healing and increased amputation risk"
+    ],
+    correct: [0, 1, 2, 4, 5],
+    explanation: "<strong>Correct: Retinopathy, nephropathy, peripheral neuropathy, coronary artery disease, and delayed wound healing/amputation risk.</strong><br><br>Chronic hyperglycemia (glucose >120 mg/dL) damages everything it touches over time:<br><br><strong>Microvascular (small vessel) damage:</strong><br>\u2022 <strong>Retinopathy</strong> \u2014 damage to retinal blood vessels; #1 cause of adult blindness<br>\u2022 <strong>Nephropathy</strong> \u2014 damage to kidney glomeruli; #1 cause of end-stage renal disease<br><br><strong>Macrovascular (large vessel) damage:</strong><br>\u2022 <strong>Coronary artery disease</strong> \u2014 accelerated atherosclerosis \u2192 MI risk<br>\u2022 <strong>Peripheral vascular disease</strong> \u2192 poor circulation to extremities<br><br><strong>Neuropathic damage:</strong><br>\u2022 <strong>Peripheral neuropathy</strong> \u2014 numbness in feet means patients can\u2019t feel injuries<br>\u2022 <strong>Delayed healing + neuropathy + poor circulation = AMPUTATION risk</strong><br><br><strong>Why D is wrong:</strong><br>Thyroid storm is an emergency of <strong>hyperthyroidism</strong> (Graves\u2019 disease), not a diabetes complication. These are completely different endocrine disorders."
+  },
+  {
+    id: 9,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A patient\u2019s HbA1C result comes back at 9.2%. Which of the following is the CORRECT interpretation?",
+    choices: [
+      "The patient\u2019s blood glucose has been well-controlled over the past 3 months",
+      "The patient\u2019s blood glucose has been poorly controlled over the past 3 months, with an average well above normal",
+      "The test only reflects glucose from the past 24 hours and needs to be repeated",
+      "This is a normal HbA1C value for a diabetic patient"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: The patient\u2019s blood glucose has been poorly controlled over the past 3 months.</strong><br><br><strong>HbA1C (glycosylated hemoglobin)</strong> measures the percentage of hemoglobin molecules that have glucose attached to them. Since red blood cells live ~120 days (3 months), the HbA1C reflects the <strong>average blood glucose over the past 2\u20133 months</strong> \u2014 much more informative than a single fingerstick.<br><br><strong>Key numbers to know:</strong><br>\u2022 <strong>Normal:</strong> below 5.7%<br>\u2022 <strong>Prediabetes:</strong> 5.7\u20136.4%<br>\u2022 <strong>Diabetes diagnosis:</strong> \u2265 6.5%<br>\u2022 <strong>Goal for diabetics:</strong> generally < 7%<br><br>At <strong>9.2%</strong>, this patient is significantly above target. This indicates chronic hyperglycemia and increased risk of complications. The care plan needs adjustment \u2014 medication changes, diet counseling, and/or exercise modifications.<br><br><strong>Why the others are wrong:</strong><br>A) 9.2% is far above the target of <7% \u2014 this is NOT well-controlled.<br>C) HbA1C reflects 3 months, not 24 hours. A single fingerstick glucose shows one moment; HbA1C shows the big picture.<br>D) 9.2% is not acceptable for any patient. The goal is to keep HbA1C as close to normal as safely possible."
+  },
+  {
+    id: 10,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A nurse is comparing DKA and HHNK to determine the correct emergency treatment. Which of the following BEST distinguishes the treatment priority for each condition?",
+    choices: [
+      "DKA: fluids first, then insulin. HHNK: insulin first, then fluids.",
+      "DKA: insulin first (the problem is no insulin). HHNK: fluids first (the problem is severe dehydration).",
+      "Both conditions require identical treatment: insulin and fluids are given simultaneously with equal priority.",
+      "DKA: sodium bicarbonate first to correct acidosis. HHNK: potassium replacement first to prevent arrhythmia."
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: DKA = insulin first. HHNK = fluids first.</strong><br><br>Understanding WHY tells you the treatment:<br><br><strong>DKA (Type 1 emergency):</strong><br>\u2022 The fundamental problem is <strong>NO insulin</strong><br>\u2022 Without insulin, cells burn fat \u2192 ketones \u2192 acidosis<br>\u2022 <strong>Give insulin</strong> to stop the ketone production cascade<br>\u2022 Fluids, electrolytes, and monitoring follow<br><br><strong>HHNK (Type 2 emergency):</strong><br>\u2022 The fundamental problem is <strong>severe dehydration</strong><br>\u2022 Some insulin IS present (enough to prevent ketosis)<br>\u2022 Extremely high glucose pulls water into urine \u2192 massive fluid loss<br>\u2022 <strong>Give fluids</strong> to restore circulating volume, perfusion, and renal function<br>\u2022 Potassium, magnesium, and insulin follow<br><br><strong>Why the others are wrong:</strong><br>A) This reverses the priorities \u2014 DKA needs insulin first, not fluids first.<br>C) While both need insulin and fluids, the <strong>priority</strong> is different because the underlying problem is different. Knowing which comes first can be life-saving.<br>D) Sodium bicarbonate is rarely used in DKA (it can worsen hypokalemia and paradoxical CNS acidosis). Potassium is important in HHNK but is not the FIRST priority \u2014 fluids are."
+  }
+];
+
+// ============================================================
+//  QUIZ ENGINE
+// ============================================================
+let currentQ = 0;
+let score = 0;
+let answered = 0;
+let userAnswers = [];
+let results = [];
+
+const main = document.getElementById('mainContent');
+const progressArea = document.getElementById('progressArea');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const scoreDisplay = document.getElementById('scoreDisplay');
+
+function init() {
+  userAnswers = questions.map(() => []);
+  results = [];
+  score = 0;
+  answered = 0;
+  currentQ = 0;
+  showStart();
+}
+
+function showStart() {
+  progressArea.classList.add('hidden');
+  main.innerHTML = `
+    <div class="start-screen">
+      <h2>Diabetes Mellitus Pathophysiology</h2>
+      <p>10-question diabetes mellitus quiz</p>
+      <div class="start-details">
+        <ul>
+          <li>Insulin &amp; glucose &mdash; pancreatic function, feedback loops</li>
+          <li>Type 1 vs. Type 2 &mdash; pathophysiology, onset, treatment</li>
+          <li>Acute complications &mdash; hypoglycemia, DKA, HHNK</li>
+          <li>Chronic complications &mdash; retinopathy, nephropathy, neuropathy, cardiovascular</li>
+          <li>Diagnostic values &mdash; HbA1C, fasting glucose, random glucose</li>
+          <li>Question types: Multiple Choice, Select All That Apply, True/False, All EXCEPT</li>
+          <li>SATA questions are scored all-or-nothing</li>
+          <li>Detailed explanations after every question</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()">Begin Quiz</button>
+    </div>`;
+}
+
+function startQuiz() {
+  progressArea.classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[currentQ];
+  const pct = (currentQ / questions.length) * 100;
+  progressBar.style.width = pct + '%';
+  progressText.textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  scoreDisplay.textContent = answered > 0 ? `Score: ${score}/${answered}` : 'Score: 0/0';
+
+  const isCheckbox = (q.type === 'sata');
+  const indicatorClass = isCheckbox ? 'choice-indicator checkbox-indicator' : 'choice-indicator';
+
+  let choicesHTML = q.choices.map((ch, i) => {
+    const letter = String.fromCharCode(65 + i);
+    return `
+      <div class="choice-card" data-index="${i}" onclick="toggleChoice(${i}, ${isCheckbox})">
+        <div class="${indicatorClass}">${letter}</div>
+        <div class="choice-text">${ch}</div>
+      </div>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="question-card">
+      <div class="question-meta">
+        <span class="question-number">Question ${q.id} of ${questions.length}</span>
+        <span class="question-type">${q.typeLabel}</span>
+      </div>
+      <div class="question-stem">${q.stem}</div>
+      <div class="choices" id="choicesContainer">${choicesHTML}</div>
+      <div class="button-row" id="buttonRow">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button>
+      </div>
+      <div id="explanationArea"></div>
+    </div>`;
+}
+
+function toggleChoice(index, isCheckbox) {
+  const cards = document.querySelectorAll('.choice-card');
+  if (cards[0].classList.contains('disabled')) return;
+
+  if (isCheckbox) {
+    cards[index].classList.toggle('selected');
+  } else {
+    cards.forEach(c => c.classList.remove('selected'));
+    cards[index].classList.add('selected');
+  }
+
+  const anySelected = document.querySelector('.choice-card.selected');
+  document.getElementById('submitBtn').disabled = !anySelected;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const cards = document.querySelectorAll('.choice-card');
+  const selected = [];
+  cards.forEach((c, i) => { if (c.classList.contains('selected')) selected.push(i); });
+
+  userAnswers[currentQ] = selected;
+
+  const correctSet = new Set(q.correct);
+  const selectedSet = new Set(selected);
+  let isCorrect = correctSet.size === selectedSet.size && [...correctSet].every(v => selectedSet.has(v));
+
+  results.push({ qIndex: currentQ, correct: isCorrect });
+  answered++;
+  if (isCorrect) score++;
+
+  cards.forEach((c, i) => {
+    c.classList.add('disabled');
+    const wasSelected = selectedSet.has(i);
+    const isRight = correctSet.has(i);
+
+    if (wasSelected && isRight) {
+      c.classList.remove('selected');
+      c.classList.add('correct-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    } else if (wasSelected && !isRight) {
+      c.classList.remove('selected');
+      c.classList.add('incorrect-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10007;';
+    } else if (!wasSelected && isRight) {
+      c.classList.add('missed-correct');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    }
+  });
+
+  const expArea = document.getElementById('explanationArea');
+  expArea.innerHTML = `
+    <div class="explanation ${isCorrect ? '' : 'wrong'}">
+      <div class="explanation-title ${isCorrect ? 'right' : 'wrong'}">
+        ${isCorrect ? '&#10003; Correct!' : '&#10007; Incorrect'}
+      </div>
+      <div class="explanation-body">${q.explanation}</div>
+    </div>`;
+
+  scoreDisplay.textContent = `Score: ${score}/${answered}`;
+
+  const btnRow = document.getElementById('buttonRow');
+  if (currentQ < questions.length - 1) {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="nextQuestion()">Next Question &rarr;</button>`;
+  } else {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+  }
+}
+
+function nextQuestion() {
+  currentQ++;
+  showQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  progressBar.style.width = '100%';
+  progressText.textContent = 'Quiz Complete';
+  scoreDisplay.textContent = `Final: ${score}/${questions.length}`;
+
+  const pct = Math.round((score / questions.length) * 100);
+
+  let message = '';
+  if (pct >= 90) message = 'Outstanding work! You have a strong command of diabetes mellitus pathophysiology.';
+  else if (pct >= 80) message = 'Great job! Review the missed questions to solidify your understanding.';
+  else if (pct >= 70) message = 'Good effort! Focus on the topics where you missed questions.';
+  else if (pct >= 60) message = 'You are building a foundation. Review the explanations carefully and try again.';
+  else message = 'This material is challenging. Review the chapter content and explanations, then retake the quiz.';
+
+  const missed = results.filter(r => !r.correct);
+
+  let missedHTML = '';
+  if (missed.length > 0) {
+    missedHTML = `
+      <div class="missed-list">
+        <h3>Review Missed Questions (${missed.length})</h3>
+        ${missed.map(m => {
+          const q = questions[m.qIndex];
+          const correctLetters = q.correct.map(c => String.fromCharCode(65 + c)).join(', ');
+          const userLetters = userAnswers[m.qIndex].map(c => String.fromCharCode(65 + c)).join(', ') || 'None';
+          return `
+            <div class="missed-item">
+              <div class="missed-item-q">Q${q.id}: ${q.stem.replace(/<[^>]*>/g, '')}</div>
+              <div class="missed-item-detail">
+                <strong>Your answer:</strong> ${userLetters}<br>
+                <strong>Correct answer:</strong> ${correctLetters}<br><br>
+                ${q.explanation}
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  main.innerHTML = `
+    <div class="results-screen">
+      <div class="results-header">
+        <div class="results-score">${score}/${questions.length}</div>
+        <div class="results-percent">${pct}%</div>
+        <div class="results-message">${message}</div>
+      </div>
+      <div class="button-row" style="justify-content:center; margin-bottom: 24px;">
+        <button class="btn btn-primary" onclick="init()">Retake Quiz</button>
+        ${missed.length > 0 ? `<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>` : ''}
+      </div>
+      ${missedHTML}
+    </div>`;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+init();
+</script>
+</body>
+</html>

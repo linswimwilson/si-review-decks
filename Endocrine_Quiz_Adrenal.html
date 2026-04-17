@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adrenal Disorders Quiz — Cushing's, Addison's, Cortisol, Aldosterone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.15);
+    --correct: #4ade80;
+    --correct-bg: rgba(74, 222, 128, 0.12);
+    --incorrect: #f87171;
+    --incorrect-bg: rgba(248, 113, 113, 0.12);
+    --warning: #fbbf24;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .quiz-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .quiz-header .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .quiz-header .authors {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  .progress-wrap {
+    background: var(--surface);
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .score-display { font-weight: 600; color: var(--accent); }
+
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--surface2);
+    animation: fadeIn 0.35s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .question-number { font-size: 0.82rem; font-weight: 600; color: var(--accent); }
+  .question-type {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 3px 10px; border-radius: 20px;
+    background: var(--accent-glow); color: var(--accent);
+  }
+
+  .question-stem {
+    font-size: 1.05rem; font-weight: 500; line-height: 1.65;
+    margin-bottom: 22px; color: #f1f5f9;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-card {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px; border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: all 0.2s ease; background: transparent;
+    user-select: none; -webkit-user-select: none;
+  }
+  .choice-card:hover:not(.disabled) { border-color: var(--accent); background: var(--accent-glow); }
+  .choice-card.selected { border-color: var(--accent); background: var(--accent-glow); }
+  .choice-card.disabled { cursor: default; pointer-events: none; }
+  .choice-card.correct-answer { border-color: var(--correct) !important; background: var(--correct-bg) !important; }
+  .choice-card.incorrect-answer { border-color: var(--incorrect) !important; background: var(--incorrect-bg) !important; }
+  .choice-card.missed-correct { border-color: var(--correct) !important; background: var(--correct-bg) !important; opacity: 0.7; }
+
+  .choice-indicator {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; font-size: 0.7rem; font-weight: 700;
+  }
+  .choice-card.selected .choice-indicator { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+  .checkbox-indicator { border-radius: 4px !important; }
+  .choice-card.correct-answer .choice-indicator { border-color: var(--correct); background: var(--correct); color: var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color: var(--incorrect); background: var(--incorrect); color: var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color: var(--correct); background: transparent; color: var(--correct); }
+
+  .choice-text { font-size: 0.95rem; line-height: 1.5; flex: 1; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 28px; border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 0.95rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s ease; gap: 8px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #818cf8); color: var(--bg); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary { background: var(--surface2); color: var(--text); }
+  .btn-secondary:hover { background: var(--border); }
+
+  .button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+  .explanation {
+    margin-top: 20px; padding: 20px; border-radius: var(--radius-sm);
+    border-left: 4px solid var(--correct); background: rgba(74, 222, 128, 0.06);
+    animation: fadeIn 0.35s ease;
+  }
+  .explanation.wrong { border-left-color: var(--incorrect); background: rgba(248, 113, 113, 0.06); }
+  .explanation-title {
+    font-weight: 700; font-size: 0.9rem; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .explanation-title.right { color: var(--correct); }
+  .explanation-title.wrong { color: var(--incorrect); }
+  .explanation-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; }
+  .explanation-body strong { color: var(--text); }
+
+  .results-screen { animation: fadeIn 0.4s ease; }
+  .results-header { text-align: center; margin-bottom: 32px; }
+  .results-score {
+    font-size: 3.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .results-percent { font-size: 1.2rem; color: var(--text-dim); margin-top: 4px; }
+  .results-message { font-size: 1rem; margin-top: 12px; color: var(--text); font-weight: 500; }
+
+  .missed-list { margin-top: 24px; }
+  .missed-list h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--incorrect); }
+  .missed-item {
+    background: var(--surface); border-radius: var(--radius-sm);
+    padding: 20px; margin-bottom: 14px;
+    border: 1px solid var(--surface2); border-left: 4px solid var(--incorrect);
+  }
+  .missed-item-q { font-weight: 600; font-size: 0.92rem; margin-bottom: 8px; color: #f1f5f9; }
+  .missed-item-detail { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
+  .missed-item-detail strong { color: var(--text); }
+
+  .start-screen { text-align: center; padding: 40px 20px; }
+  .start-screen h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; color: #f1f5f9; }
+  .start-screen p { color: var(--text-dim); margin-bottom: 8px; font-size: 0.95rem; }
+  .start-details {
+    background: var(--surface); border-radius: var(--radius-sm);
+    padding: 20px; margin: 24px 0; border: 1px solid var(--surface2); text-align: left;
+  }
+  .start-details li {
+    margin-bottom: 6px; color: var(--text-dim); font-size: 0.9rem;
+    list-style: none; padding-left: 20px; position: relative;
+  }
+  .start-details li::before {
+    content: "\2022"; position: absolute; left: 4px;
+    color: var(--accent); font-weight: bold;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .container { padding: 14px 10px 40px; }
+    .quiz-header h1 { font-size: 1.2rem; }
+    .question-card { padding: 20px 16px; }
+    .question-stem { font-size: 0.98rem; }
+    .choice-card { padding: 12px 14px; }
+    .choice-text { font-size: 0.9rem; }
+    .btn { padding: 12px 20px; font-size: 0.9rem; width: 100%; }
+    .button-row { flex-direction: column; }
+    .results-score { font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Supplemental Instructor Review &mdash; Adrenal Disorders Quiz</h1>
+    <div class="subtitle">Cushing&rsquo;s, Addison&rsquo;s, Cortisol, Aldosterone, Adrenal Crisis &bull; 10 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 10</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A nurse is reviewing the function of aldosterone with a student. Which of the following BEST describes the primary action of aldosterone?",
+    choices: [
+      "Raises blood glucose by stimulating gluconeogenesis in the liver",
+      "Causes the kidneys to retain sodium and water while excreting potassium",
+      "Suppresses the immune system and reduces inflammation",
+      "Stimulates the fight-or-flight response via catecholamine release"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Causes the kidneys to retain sodium and water while excreting potassium.</strong><br><br>Aldosterone is a <strong>mineralocorticoid</strong> produced by the adrenal cortex. Its primary job is to regulate fluid and electrolyte balance:<br>\u2022 <strong>Retains Na\u207a and water</strong> \u2192 increases intravascular volume and blood pressure<br>\u2022 <strong>Excretes K\u207a</strong> in urine \u2192 blood potassium falls<br><br>Remember: <strong>Aldosterone = salt, water, potassium.</strong><br><br><strong>Why the others are wrong:</strong><br>A) Raising blood glucose through gluconeogenesis is the function of <strong>cortisol</strong> (a glucocorticoid), not aldosterone.<br>C) Immune suppression and anti-inflammatory effects are also <strong>cortisol</strong> functions.<br>D) Catecholamine release (epinephrine and norepinephrine) is the function of the adrenal <strong>medulla</strong>, not the cortex where aldosterone is made."
+  },
+  {
+    id: 2,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A nurse is assessing a patient with suspected Cushing\u2019s syndrome. Which of the following findings are consistent with excess cortisol? <strong>Select all that apply.</strong>",
+    choices: [
+      "Truncal obesity with thin extremities",
+      "Hypotension and orthostatic dizziness",
+      "Moon face and buffalo hump",
+      "Purple striae on the abdomen",
+      "Hyperglycemia (blood glucose 245 mg/dL)",
+      "Bronze skin hyperpigmentation"
+    ],
+    correct: [0, 2, 3, 4],
+    explanation: "<strong>Correct: Truncal obesity, moon face/buffalo hump, purple striae, and hyperglycemia.</strong><br><br>Cushing\u2019s syndrome = <strong>excess cortisol</strong>. Too much of everything cortisol does:<br>\u2022 <strong>Truncal obesity with thin extremities</strong> \u2014 cortisol causes abnormal fat redistribution to the trunk<br>\u2022 <strong>Moon face and buffalo hump</strong> \u2014 fat deposits on the face and upper back (Think: does Santa have Cushing\u2019s?)<br>\u2022 <strong>Purple striae</strong> \u2014 the skin becomes thin and fragile, and stretching tears the subcutaneous tissue<br>\u2022 <strong>Hyperglycemia</strong> \u2014 cortisol raises blood sugar (can cause steroid-induced diabetes)<br><br><strong>Why the others are wrong:</strong><br>B) Cushing\u2019s causes <strong>HYPERtension</strong>, not hypotension. Cortisol has aldosterone-like effects (Na/H\u2082O retention \u2192 increased BP). Hypotension is an Addison\u2019s sign.<br>F) Bronze skin hyperpigmentation is a hallmark of <strong>Addison\u2019s disease</strong>, not Cushing\u2019s. It occurs because excess ACTH stimulates melanocytes."
+  },
+  {
+    id: 3,
+    type: "tf",
+    typeLabel: "True / False",
+    stem: "The most common cause of Cushing\u2019s syndrome is an adrenal tumor that secretes excess cortisol.",
+    choices: [
+      "True",
+      "False"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: FALSE.</strong><br><br>The #1 cause of Cushing\u2019s syndrome is <strong>iatrogenic</strong> \u2014 taking exogenous glucocorticoid medications (prednisone, dexamethasone) for chronic inflammatory conditions like asthma, rheumatoid arthritis, lupus, or IBD.<br><br>When a patient takes glucocorticoids long-term, the exogenous cortisol creates the same effects as if the body were overproducing it: hyperglycemia, weight gain, moon face, buffalo hump, thin skin, immunosuppression, osteoporosis.<br><br>Other causes include:<br>\u2022 Pituitary tumors secreting excess ACTH (Cushing\u2019s <em>disease</em> specifically)<br>\u2022 Adrenal tumors (less common)<br>\u2022 Ectopic ACTH from cancers (e.g., small cell lung cancer)<br><br><strong>Key point:</strong> Always ask about steroid medication history when assessing for Cushing\u2019s."
+  },
+  {
+    id: 4,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A 34-year-old male presents to the ED with profound fatigue, blood pressure 78/50, blood glucose 52 mg/dL, and dark bronze skin discoloration. Labs show Na\u207a 128 mEq/L and K\u207a 6.1 mEq/L. He reports salt cravings and a 20-lb unintentional weight loss. What is the most likely diagnosis?",
+    choices: [
+      "Cushing\u2019s syndrome from an adrenal tumor",
+      "Addison\u2019s disease (primary adrenal insufficiency)",
+      "Hypothyroidism with myxedema",
+      "Pheochromocytoma"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Addison\u2019s disease (primary adrenal insufficiency).</strong><br><br>This patient has every hallmark of Addison\u2019s \u2014 the body is deficient in both cortisol and aldosterone:<br>\u2022 <strong>Hypotension (78/50)</strong> \u2014 no aldosterone to retain sodium/water<br>\u2022 <strong>Hypoglycemia (52)</strong> \u2014 no cortisol to raise blood glucose<br>\u2022 <strong>Hyponatremia (Na\u207a 128)</strong> \u2014 kidneys losing sodium without aldosterone<br>\u2022 <strong>Hyperkalemia (K\u207a 6.1)</strong> \u2014 kidneys can\u2019t excrete potassium without aldosterone<br>\u2022 <strong>Bronze skin</strong> \u2014 excess ACTH stimulates melanocytes<br>\u2022 <strong>Salt cravings</strong> \u2014 body\u2019s attempt to compensate for sodium loss<br>\u2022 <strong>Weight loss and fatigue</strong> \u2014 cortisol deficiency<br><br><strong>Why the others are wrong:</strong><br>A) Cushing\u2019s is the OPPOSITE \u2014 high glucose, high BP, high sodium, low potassium, weight gain.<br>C) Hypothyroidism causes fatigue but doesn\u2019t cause this electrolyte pattern or bronze skin.<br>D) Pheochromocytoma causes severe HYPERtension (adrenal medulla tumor releasing catecholamines), not hypotension."
+  },
+  {
+    id: 5,
+    type: "except",
+    typeLabel: "All EXCEPT",
+    stem: "All of the following are expected findings in a patient with Addison\u2019s disease <strong>EXCEPT</strong>:",
+    choices: [
+      "Hyperkalemia",
+      "Hyponatremia",
+      "Hypertension with edema",
+      "Hypoglycemia"
+    ],
+    correct: [2],
+    explanation: "<strong>Correct: Hypertension with edema is NOT an Addison\u2019s finding \u2014 it is a CUSHING\u2019S finding.</strong><br><br>Addison\u2019s = deficient cortisol and aldosterone. Without aldosterone, the kidneys <strong>lose sodium and water</strong>, causing <strong>HYPOtension</strong> and dehydration \u2014 the exact opposite of hypertension with edema.<br><br><strong>Why the others ARE Addison\u2019s findings:</strong><br>A) <strong>Hyperkalemia</strong> \u2014 without aldosterone, the kidneys cannot excrete K\u207a, so potassium rises. This is the most immediately dangerous lab value (cardiac dysrhythmia risk).<br>B) <strong>Hyponatremia</strong> \u2014 without aldosterone, the kidneys cannot retain Na\u207a, so sodium drops. Low sodium is a brain concern (confusion, seizures).<br>D) <strong>Hypoglycemia</strong> \u2014 without cortisol, the body cannot maintain blood glucose through gluconeogenesis.<br><br><strong>Remember the pattern:</strong> Addison\u2019s = low everything (low glucose, low Na\u207a, low BP). Cushing\u2019s = high everything (high glucose, high Na\u207a, high BP). The only thing HIGH in Addison\u2019s is K\u207a."
+  },
+  {
+    id: 6,
+    type: "priority",
+    typeLabel: "Priority / First Action",
+    stem: "A patient with known Addison\u2019s disease is admitted with a severe respiratory infection. The patient\u2019s blood pressure is 72/48, heart rate 128, and they appear confused and diaphoretic. The nurse recognizes this as adrenal crisis. What is the PRIORITY nursing action?",
+    choices: [
+      "Administer oral fludrocortisone and encourage increased sodium intake",
+      "Obtain a cortisol level and wait for the endocrinologist consult",
+      "Initiate IV fluids and prepare to administer IV hydrocortisone (stress-dose steroids)",
+      "Place the patient on a low-potassium diet and restrict fluids"
+    ],
+    correct: [2],
+    explanation: "<strong>Correct: Initiate IV fluids and prepare to administer IV hydrocortisone (stress-dose steroids).</strong><br><br>This is <strong>adrenal crisis</strong> \u2014 a life-threatening emergency. The patient\u2019s body cannot mount a stress response to the infection because the adrenal glands cannot produce adequate cortisol. The cascade: sodium drops, potassium spikes, blood pressure crashes, kidneys shut down, vascular collapse.<br><br>Priority interventions:<br>1. <strong>IV fluids</strong> \u2014 aggressive volume resuscitation for the severe hypotension/dehydration<br>2. <strong>IV hydrocortisone</strong> \u2014 emergency cortisol replacement (stress-dose steroids)<br>3. <strong>Continuous cardiac monitoring</strong> \u2014 hyperkalemia can cause fatal dysrhythmias<br>4. Correct electrolytes, treat the underlying infection<br><br><strong>Why the others are wrong:</strong><br>A) Oral medications are inadequate in a crisis \u2014 the patient needs IV access and IV steroids. Also, they may not be able to take oral meds if confused.<br>B) Waiting for labs or a consult in adrenal crisis is dangerous \u2014 this is a treat-now, confirm-later situation. The clinical picture is clear.<br>D) Fluid RESTRICTION would worsen the dehydration and hypotension. The patient needs fluid REPLACEMENT, not restriction."
+  },
+  {
+    id: 7,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A patient has been taking prednisone 40 mg daily for 3 years for lupus and asks if they can stop the medication due to unpleasant side effects. Which of the following is the BEST explanation for why abrupt discontinuation is dangerous?",
+    choices: [
+      "The lupus will immediately flare without anti-inflammatory coverage",
+      "The liver has become dependent on prednisone for glucose production",
+      "Long-term exogenous steroids suppress the adrenal glands, which cannot immediately resume cortisol production \u2014 abrupt withdrawal can cause adrenal crisis",
+      "Prednisone causes physical addiction similar to opioids, requiring gradual weaning to prevent withdrawal seizures"
+    ],
+    correct: [2],
+    explanation: "<strong>Correct: Long-term exogenous steroids suppress the adrenal glands, which cannot immediately resume cortisol production \u2014 abrupt withdrawal can cause adrenal crisis.</strong><br><br>When a patient takes exogenous glucocorticoids long-term, the <strong>HPA axis</strong> (hypothalamus \u2192 pituitary \u2192 adrenal) is suppressed through negative feedback. The high cortisol levels tell the hypothalamus and pituitary to stop making CRH and ACTH. Over time, the adrenal glands <strong>atrophy</strong> \u2014 they literally shrink from disuse.<br><br>If you suddenly remove the exogenous steroids, the adrenals cannot immediately \u201cwake up\u201d and start producing cortisol. The result: <strong>acute cortisol deficiency</strong> \u2192 adrenal crisis \u2192 cardiovascular collapse \u2192 potentially death.<br><br>The solution is <strong>GRADUAL tapering</strong> \u2014 slowly reducing the dose to give the adrenals time to resume function.<br><br><strong>Why the others are wrong:</strong><br>A) Lupus flare is a concern, but the life-threatening issue is adrenal crisis, not disease flare.<br>B) The liver doesn\u2019t become dependent on prednisone \u2014 the issue is adrenal gland suppression.<br>D) Steroids don\u2019t cause opioid-like addiction. The risk is physiological (adrenal atrophy), not neurological dependence."
+  },
+  {
+    id: 8,
+    type: "sata",
+    typeLabel: "Select All That Apply",
+    stem: "A nurse is providing discharge education to a patient with Addison\u2019s disease. Which of the following instructions should be included? <strong>Select all that apply.</strong>",
+    choices: [
+      "Wear a medical alert bracelet at all times",
+      "Follow a low-sodium, high-potassium diet",
+      "Increase steroid doses during illness, surgery, or significant stress",
+      "Take lifelong hormone replacement therapy (hydrocortisone and fludrocortisone)",
+      "Carry extra medication at all times",
+      "Report signs of infection promptly \u2014 the body\u2019s stress response is impaired"
+    ],
+    correct: [0, 2, 3, 4, 5],
+    explanation: "<strong>Correct: Medical alert bracelet, stress dosing, lifelong replacement, carry extra meds, and report infections.</strong><br><br>\u2022 <strong>Medical alert bracelet</strong> \u2014 emergency responders must know the patient has Addison\u2019s so they can administer steroids if the patient is unresponsive<br>\u2022 <strong>Stress dosing</strong> \u2014 any illness, surgery, trauma, or significant stress requires INCREASED steroid doses because the adrenals can\u2019t mount a normal stress response<br>\u2022 <strong>Lifelong replacement</strong> \u2014 hydrocortisone replaces cortisol; fludrocortisone replaces aldosterone. These are never discontinued.<br>\u2022 <strong>Carry extra medication</strong> \u2014 if the patient vomits their dose or faces an unexpected stressor, extra medication can prevent crisis<br>\u2022 <strong>Report infections</strong> \u2014 infection is a major trigger for adrenal crisis in Addison\u2019s patients<br><br><strong>Why B is wrong:</strong><br>The diet for Addison\u2019s is the OPPOSITE \u2014 <strong>INCREASE sodium</strong> (they lose Na\u207a) and <strong>DECREASE potassium</strong> (they retain K\u207a). A low-sodium, high-potassium diet would worsen the hyponatremia and hyperkalemia \u2014 potentially dangerous."
+  },
+  {
+    id: 9,
+    type: "mc",
+    typeLabel: "Multiple Choice",
+    stem: "A nurse is comparing lab values for two patients. Patient A has Na\u207a 152, K\u207a 3.0, glucose 248, and BP 168/96. Patient B has Na\u207a 126, K\u207a 6.2, glucose 54, and BP 76/48. Which of the following is the correct interpretation?",
+    choices: [
+      "Patient A has Addison\u2019s disease; Patient B has Cushing\u2019s syndrome",
+      "Patient A has Cushing\u2019s syndrome; Patient B has Addison\u2019s disease",
+      "Both patients have Cushing\u2019s syndrome at different stages",
+      "Patient A has hyperthyroidism; Patient B has hypothyroidism"
+    ],
+    correct: [1],
+    explanation: "<strong>Correct: Patient A has Cushing\u2019s syndrome; Patient B has Addison\u2019s disease.</strong><br><br><strong>Patient A (Cushing\u2019s = EXCESS cortisol):</strong><br>\u2022 Na\u207a 152 (HIGH \u2014 cortisol retains sodium)<br>\u2022 K\u207a 3.0 (LOW \u2014 potassium is excreted)<br>\u2022 Glucose 248 (HIGH \u2014 cortisol raises blood sugar)<br>\u2022 BP 168/96 (HIGH \u2014 Na/water retention increases volume)<br><br><strong>Patient B (Addison\u2019s = DEFICIENT cortisol/aldosterone):</strong><br>\u2022 Na\u207a 126 (LOW \u2014 no aldosterone to retain sodium)<br>\u2022 K\u207a 6.2 (HIGH \u2014 no aldosterone to excrete potassium)<br>\u2022 Glucose 54 (LOW \u2014 no cortisol to maintain glucose)<br>\u2022 BP 76/48 (LOW \u2014 fluid and sodium loss)<br><br><strong>The pattern is OPPOSITE in every single value.</strong> This is the single most important comparison for exams: Cushing\u2019s = everything high (except K\u207a). Addison\u2019s = everything low (except K\u207a).<br><br><strong>Note:</strong> Patient B\u2019s K\u207a of 6.2 is an immediate cardiac concern \u2014 this patient needs cardiac monitoring and urgent potassium correction."
+  },
+  {
+    id: 10,
+    type: "tf",
+    typeLabel: "True / False",
+    stem: "A patient with Addison\u2019s disease who is scheduled for elective surgery should receive increased glucocorticoid doses (stress dosing) before, during, and after the procedure.",
+    choices: [
+      "True",
+      "False"
+    ],
+    correct: [0],
+    explanation: "<strong>Correct: TRUE.</strong><br><br>Patients with Addison\u2019s disease <strong>cannot mount a normal stress response</strong>. In a healthy person, the adrenal glands respond to the stress of surgery by dramatically increasing cortisol output \u2014 sometimes 5\u201310 times the normal daily production. An Addison\u2019s patient\u2019s adrenals cannot do this.<br><br>Without <strong>stress dosing</strong> (supplemental glucocorticoids), the patient faces:<br>\u2022 Cardiovascular collapse (severe hypotension)<br>\u2022 Adrenal crisis<br>\u2022 Potentially death during or after surgery<br><br>Stress dosing is required for:<br>\u2022 Surgery (even minor procedures)<br>\u2022 Acute illness or infection<br>\u2022 Significant physical or emotional stress<br>\u2022 Trauma<br><br>The healthcare team must communicate the need for stress dosing clearly across all providers involved in the patient\u2019s care."
+  }
+];
+
+// ============================================================
+//  QUIZ ENGINE
+// ============================================================
+let currentQ = 0;
+let score = 0;
+let answered = 0;
+let userAnswers = [];
+let results = [];
+
+const main = document.getElementById('mainContent');
+const progressArea = document.getElementById('progressArea');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const scoreDisplay = document.getElementById('scoreDisplay');
+
+function init() {
+  userAnswers = questions.map(() => []);
+  results = [];
+  score = 0;
+  answered = 0;
+  currentQ = 0;
+  showStart();
+}
+
+function showStart() {
+  progressArea.classList.add('hidden');
+  main.innerHTML = `
+    <div class="start-screen">
+      <h2>Adrenal Disorders Pathophysiology</h2>
+      <p>10-question adrenal disorders quiz</p>
+      <div class="start-details">
+        <ul>
+          <li>Adrenal anatomy &mdash; cortex vs. medulla, cortisol, aldosterone</li>
+          <li>Cushing&rsquo;s syndrome &mdash; excess cortisol, classic appearance, metabolic effects</li>
+          <li>Addison&rsquo;s disease &mdash; cortisol/aldosterone deficiency, electrolyte patterns</li>
+          <li>Adrenal crisis &mdash; recognition and emergency management</li>
+          <li>Steroid therapy &mdash; tapering, stress dosing</li>
+          <li>Question types: Multiple Choice, Select All That Apply, True/False, All EXCEPT, Priority</li>
+          <li>SATA questions are scored all-or-nothing</li>
+          <li>Detailed explanations after every question</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()">Begin Quiz</button>
+    </div>`;
+}
+
+function startQuiz() {
+  progressArea.classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[currentQ];
+  const pct = (currentQ / questions.length) * 100;
+  progressBar.style.width = pct + '%';
+  progressText.textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  scoreDisplay.textContent = answered > 0 ? `Score: ${score}/${answered}` : 'Score: 0/0';
+
+  const isCheckbox = (q.type === 'sata');
+  const indicatorClass = isCheckbox ? 'choice-indicator checkbox-indicator' : 'choice-indicator';
+
+  let choicesHTML = q.choices.map((ch, i) => {
+    const letter = String.fromCharCode(65 + i);
+    return `
+      <div class="choice-card" data-index="${i}" onclick="toggleChoice(${i}, ${isCheckbox})">
+        <div class="${indicatorClass}">${letter}</div>
+        <div class="choice-text">${ch}</div>
+      </div>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="question-card">
+      <div class="question-meta">
+        <span class="question-number">Question ${q.id} of ${questions.length}</span>
+        <span class="question-type">${q.typeLabel}</span>
+      </div>
+      <div class="question-stem">${q.stem}</div>
+      <div class="choices" id="choicesContainer">${choicesHTML}</div>
+      <div class="button-row" id="buttonRow">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button>
+      </div>
+      <div id="explanationArea"></div>
+    </div>`;
+}
+
+function toggleChoice(index, isCheckbox) {
+  const cards = document.querySelectorAll('.choice-card');
+  if (cards[0].classList.contains('disabled')) return;
+
+  if (isCheckbox) {
+    cards[index].classList.toggle('selected');
+  } else {
+    cards.forEach(c => c.classList.remove('selected'));
+    cards[index].classList.add('selected');
+  }
+
+  const anySelected = document.querySelector('.choice-card.selected');
+  document.getElementById('submitBtn').disabled = !anySelected;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const cards = document.querySelectorAll('.choice-card');
+  const selected = [];
+  cards.forEach((c, i) => { if (c.classList.contains('selected')) selected.push(i); });
+
+  userAnswers[currentQ] = selected;
+
+  const correctSet = new Set(q.correct);
+  const selectedSet = new Set(selected);
+  let isCorrect = correctSet.size === selectedSet.size && [...correctSet].every(v => selectedSet.has(v));
+
+  results.push({ qIndex: currentQ, correct: isCorrect });
+  answered++;
+  if (isCorrect) score++;
+
+  cards.forEach((c, i) => {
+    c.classList.add('disabled');
+    const wasSelected = selectedSet.has(i);
+    const isRight = correctSet.has(i);
+
+    if (wasSelected && isRight) {
+      c.classList.remove('selected');
+      c.classList.add('correct-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    } else if (wasSelected && !isRight) {
+      c.classList.remove('selected');
+      c.classList.add('incorrect-answer');
+      c.querySelector('.choice-indicator').innerHTML = '&#10007;';
+    } else if (!wasSelected && isRight) {
+      c.classList.add('missed-correct');
+      c.querySelector('.choice-indicator').innerHTML = '&#10003;';
+    }
+  });
+
+  const expArea = document.getElementById('explanationArea');
+  expArea.innerHTML = `
+    <div class="explanation ${isCorrect ? '' : 'wrong'}">
+      <div class="explanation-title ${isCorrect ? 'right' : 'wrong'}">
+        ${isCorrect ? '&#10003; Correct!' : '&#10007; Incorrect'}
+      </div>
+      <div class="explanation-body">${q.explanation}</div>
+    </div>`;
+
+  scoreDisplay.textContent = `Score: ${score}/${answered}`;
+
+  const btnRow = document.getElementById('buttonRow');
+  if (currentQ < questions.length - 1) {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="nextQuestion()">Next Question &rarr;</button>`;
+  } else {
+    btnRow.innerHTML = `<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+  }
+}
+
+function nextQuestion() {
+  currentQ++;
+  showQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  progressBar.style.width = '100%';
+  progressText.textContent = 'Quiz Complete';
+  scoreDisplay.textContent = `Final: ${score}/${questions.length}`;
+
+  const pct = Math.round((score / questions.length) * 100);
+
+  let message = '';
+  if (pct >= 90) message = 'Outstanding work! You have a strong command of adrenal disorder pathophysiology.';
+  else if (pct >= 80) message = 'Great job! Review the missed questions to solidify your understanding.';
+  else if (pct >= 70) message = 'Good effort! Focus on the topics where you missed questions.';
+  else if (pct >= 60) message = 'You are building a foundation. Review the explanations carefully and try again.';
+  else message = 'This material is challenging. Review the chapter content and explanations, then retake the quiz.';
+
+  const missed = results.filter(r => !r.correct);
+
+  let missedHTML = '';
+  if (missed.length > 0) {
+    missedHTML = `
+      <div class="missed-list">
+        <h3>Review Missed Questions (${missed.length})</h3>
+        ${missed.map(m => {
+          const q = questions[m.qIndex];
+          const correctLetters = q.correct.map(c => String.fromCharCode(65 + c)).join(', ');
+          const userLetters = userAnswers[m.qIndex].map(c => String.fromCharCode(65 + c)).join(', ') || 'None';
+          return `
+            <div class="missed-item">
+              <div class="missed-item-q">Q${q.id}: ${q.stem.replace(/<[^>]*>/g, '')}</div>
+              <div class="missed-item-detail">
+                <strong>Your answer:</strong> ${userLetters}<br>
+                <strong>Correct answer:</strong> ${correctLetters}<br><br>
+                ${q.explanation}
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  main.innerHTML = `
+    <div class="results-screen">
+      <div class="results-header">
+        <div class="results-score">${score}/${questions.length}</div>
+        <div class="results-percent">${pct}%</div>
+        <div class="results-message">${message}</div>
+      </div>
+      <div class="button-row" style="justify-content:center; margin-bottom: 24px;">
+        <button class="btn btn-primary" onclick="init()">Retake Quiz</button>
+        ${missed.length > 0 ? `<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>` : ''}
+      </div>
+      ${missedHTML}
+    </div>`;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+init();
+</script>
+</body>
+</html>
