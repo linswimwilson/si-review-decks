@@ -3,854 +3,774 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Chapter 9 Section 3: Lower GI Pathophysiology Review</title>
+<title>Chapter 9: GI — Lower GI Disorders Review</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg-dark: #0f172a;
-  --bg-card: #1e293b;
-  --blue: #38bdf8;
-  --yellow: #f59e0b;
-  --red: #ef4444;
-  --purple: #a78bfa;
-  --teal: #22d3ee;
-  --green: #34d399;
-  --text: #f1f5f9;
-  --text-dim: #94a3b8;
-  --text-muted: #64748b;
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
 }
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
 
-html, body {
-  height: 100%;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-dark);
-  color: var(--text);
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-}
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
 
-/* ── SCROLLBAR STYLING ── */
-.slide::-webkit-scrollbar { width: 6px; }
-.slide::-webkit-scrollbar-track { background: transparent; }
-.slide::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 3px; }
-.slide::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.5); }
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
 
-/* ── PROGRESS BAR ── */
-#progress-bar {
-  position: fixed; top: 0; left: 0; height: 4px;
-  background: linear-gradient(90deg, var(--blue), var(--purple));
-  transition: width 0.4s ease;
-  z-index: 1000;
-}
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── SLIDE COUNTER ── */
-#slide-counter {
-  position: fixed; bottom: 18px; right: 24px;
-  font-size: 0.85rem; color: var(--text-muted);
-  z-index: 1000; font-variant-numeric: tabular-nums;
-}
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
 
-/* ── NAV BUTTONS ── */
-.nav-btn {
-  position: fixed; top: 50%; transform: translateY(-50%);
-  background: rgba(30,41,59,0.85); border: 1px solid rgba(56,189,248,0.2);
-  color: var(--text-dim); width: 44px; height: 44px;
-  border-radius: 50%; font-size: 1.3rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; transition: all 0.2s;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}
-.nav-btn:hover { background: rgba(56,189,248,0.15); color: var(--blue); border-color: var(--blue); }
-#prev-btn { left: 16px; }
-#next-btn { right: 16px; }
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
 
-/* ── SLIDES ── */
-.slide {
-  display: none; flex-direction: column; justify-content: center; align-items: center;
-  position: absolute; inset: 0; overflow-y: auto;
-  padding: 48px 60px 80px 60px;
-  animation: fadeIn 0.35s ease;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148,163,184,0.3) transparent;
-}
-.slide.active { display: flex; }
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.2rem;color:var(--text-dim);max-width:700px;line-height:1.6}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:flex-start;max-width:960px;margin:0 auto}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:28px;width:100%}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.slide.narrative ul{list-style:none;width:100%}
+.slide.narrative ul li{padding:10px 0 10px 28px;position:relative;font-size:1.05rem;line-height:1.55}
+.slide.narrative ul li::before{content:'';position:absolute;left:0;top:18px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
 
-/* ── SLIDE TYPE: TITLE ── */
-.slide.title { text-align: center; }
-.slide.title h1 {
-  font-size: 3rem; font-weight: 900;
-  background: linear-gradient(135deg, var(--blue), var(--purple));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; line-height: 1.15; margin-bottom: 12px;
-}
-.slide.title .subtitle {
-  font-size: 1.15rem; color: var(--text-dim); margin-bottom: 28px; font-weight: 400;
-}
-.slide.title .meta {
-  font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;
-}
-
-/* ── SLIDE TYPE: ANCHOR ── */
-.slide.anchor { text-align: center; }
-.slide.anchor h2 {
-  font-size: 2.8rem; font-weight: 900; line-height: 1.15; margin-bottom: 18px;
-}
-.slide.anchor .subline {
-  font-size: 1.2rem; color: var(--text-dim); max-width: 700px; line-height: 1.6;
-}
-
-/* ── SLIDE TYPE: NARRATIVE ── */
-.slide.narrative { align-items: flex-start; max-width: 960px; margin: 0 auto; }
-.slide.narrative h3 {
-  font-size: 1.6rem; font-weight: 700; margin-bottom: 28px; width: 100%;
-}
-.slide.narrative ul { list-style: none; width: 100%; }
-.slide.narrative ul li {
-  padding: 10px 0 10px 28px; position: relative;
-  font-size: 1.05rem; line-height: 1.55; color: var(--text);
-}
-.slide.narrative ul li::before {
-  content: ''; position: absolute; left: 0; top: 18px;
-  width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
-}
-
-/* ── SLIDE TYPE: FLOW ── */
-.slide.flow { text-align: center; }
-.slide.flow h3 {
-  font-size: 1.5rem; font-weight: 700; margin-bottom: 36px;
-}
-.flow-chain {
-  display: flex; align-items: center; justify-content: center;
-  flex-wrap: nowrap; gap: 0; overflow-x: auto; max-width: 100%;
-  padding: 10px 0;
-}
-.flow-step {
-  background: var(--bg-card); border: 1px solid rgba(56,189,248,0.25);
-  border-radius: 12px; padding: 14px 20px;
-  font-size: 0.95rem; font-weight: 500; white-space: nowrap;
-  min-width: fit-content;
-}
-.flow-arrow {
-  font-size: 1.4rem; color: var(--blue); margin: 0 6px; flex-shrink: 0;
-}
-
-/* ── SLIDE TYPE: COMPARE ── */
-.slide.compare { text-align: center; }
-.slide.compare h3 {
-  font-size: 1.5rem; font-weight: 700; margin-bottom: 32px;
-}
-.compare-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
-  max-width: 880px; width: 100%;
-}
-.compare-col {
-  background: var(--bg-card); border-radius: 16px; padding: 28px;
-  text-align: left; border-top: 4px solid var(--blue);
-}
-.compare-col.col-danger { border-top-color: var(--red); }
-.compare-col h4 {
-  font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;
-}
-.compare-col ul { list-style: none; }
-.compare-col ul li {
-  padding: 6px 0 6px 20px; position: relative;
-  font-size: 0.95rem; line-height: 1.5; color: var(--text-dim);
-}
-.compare-col ul li::before {
-  content: ''; position: absolute; left: 0; top: 13px;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
-}
-.compare-col.col-danger ul li::before { background: var(--red); }
-
-/* ── SLIDE TYPE: CHECK ── */
-.slide.check { text-align: center; }
-.slide.check h3 {
-  font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;
-  color: var(--purple);
-}
-.slide.check .check-label {
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--purple); margin-bottom: 8px; font-weight: 600;
-}
-.check-question {
-  font-size: 1.15rem; color: var(--text); max-width: 720px;
-  line-height: 1.6; margin-bottom: 28px;
-}
-.check-options {
-  display: flex; flex-direction: column; gap: 12px;
-  max-width: 560px; width: 100%;
-}
-.check-option {
-  background: var(--bg-card); border: 1px solid rgba(167,139,250,0.25);
-  border-radius: 12px; padding: 14px 20px;
-  font-size: 1rem; cursor: pointer; transition: all 0.2s;
-  text-align: left; color: var(--text);
-}
-.check-option:hover { border-color: var(--purple); background: rgba(167,139,250,0.08); }
-.check-option.correct {
-  border-color: var(--green) !important; background: rgba(52,211,153,0.1) !important;
-}
-.check-option.incorrect {
-  border-color: var(--red) !important; background: rgba(239,68,68,0.08) !important;
-  opacity: 0.7;
-}
-.check-explanation {
-  display: none; margin-top: 22px; padding: 18px 24px;
-  background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);
-  border-radius: 12px; max-width: 620px;
-  font-size: 0.95rem; line-height: 1.6; color: var(--text-dim);
-  text-align: left;
-}
-.check-explanation.visible { display: block; }
-
-/* ── SLIDE TYPE: CASE ── */
-.slide.case { text-align: center; }
-.slide.case h3 {
-  font-size: 1.4rem; font-weight: 700; color: var(--teal); margin-bottom: 6px;
-}
-.slide.case .case-label {
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--teal); margin-bottom: 8px; font-weight: 600;
-}
-.case-scenario {
-  background: var(--bg-card); border: 1px solid rgba(34,211,238,0.2);
-  border-radius: 16px; padding: 24px 32px; max-width: 680px;
-  font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;
-  text-align: left; color: var(--text);
-}
-.case-scenario strong { color: var(--teal); }
-.case-reveal-btn {
-  background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.3);
-  color: var(--teal); padding: 12px 32px; border-radius: 10px;
-  font-size: 1rem; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; font-family: 'Inter', sans-serif;
-}
-.case-reveal-btn:hover { background: rgba(34,211,238,0.2); }
-.case-answer {
-  display: none; margin-top: 22px; padding: 20px 28px;
-  background: rgba(34,211,238,0.06); border: 1px solid rgba(34,211,238,0.15);
-  border-radius: 12px; max-width: 640px;
-  font-size: 0.95rem; line-height: 1.65; color: var(--text-dim);
-  text-align: left;
-}
-.case-answer.visible { display: block; }
-
-/* ── SLIDE TYPE: SECTION-DIVIDER ── */
-.slide.section-divider { text-align: center; }
-.slide.section-divider h2 {
-  font-size: 2.4rem; font-weight: 900;
-  background: linear-gradient(135deg, var(--yellow), var(--red));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; margin-bottom: 12px;
-}
-.slide.section-divider .divider-sub {
-  font-size: 1.1rem; color: var(--text-muted);
-}
-
-/* ── COLOR CARDS ── */
-.color-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  max-width: 820px; width: 100%;
-}
-.color-card {
-  display: flex; align-items: center; gap: 16px;
-  background: var(--bg-card); border-radius: 12px; padding: 14px 18px;
-  border-left: 5px solid;
-}
-.color-card .swatch {
-  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
-}
-.color-card .card-text {
-  font-size: 0.92rem; line-height: 1.45;
-}
-.color-card .card-text strong {
-  display: block; font-size: 0.95rem; margin-bottom: 2px;
-}
+/* ── COLUMNS LAYOUT ── */
+.content.cols{display:flex;gap:28px;width:100%}
+.content.cols .col{flex:1}
+.content.cols .col ul{list-style:none}
+.content.cols .col ul li{padding:8px 0 8px 20px;position:relative;font-size:0.98rem;line-height:1.5}
+.content.cols .col ul li::before{content:'';position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
 
 /* ── HIGHLIGHT HELPERS ── */
-.hl-blue { color: var(--blue); font-weight: 600; }
-.hl-yellow { color: var(--yellow); font-weight: 600; }
-.hl-red { color: var(--red); font-weight: 600; }
-.hl-green { color: var(--green); font-weight: 600; }
-.hl-purple { color: var(--purple); font-weight: 600; }
-.hl-teal { color: var(--teal); font-weight: 600; }
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)}
 
-.badge {
-  display: inline-block; padding: 3px 10px; border-radius: 6px;
-  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
-.badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
-.badge-blue { background: rgba(56,189,248,0.15); color: var(--blue); }
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:860px}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:36px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:32px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:28px 24px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.15rem;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.compare-col ul li{font-size:0.95rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.5}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK (QUIZ) ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.1rem,2vw,1.5rem);font-weight:700;max-width:800px;line-height:1.4;margin-bottom:32px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:750px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:18px 20px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.05rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:24px 28px;max-width:750px;text-align:left;font-size:1.05rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:700;max-width:750px;line-height:1.4;margin-bottom:24px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CUSTOM: CELL CARDS (with optional bullet-list content) ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:740px;width:100%}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.cell-card .cell-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── CUSTOM: STOOL COLOR GUIDE ── */
+.color-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:740px;width:100%}
+.color-card{display:flex;align-items:center;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.color-card .swatch{width:38px;height:38px;border-radius:8px;flex-shrink:0;border:1px solid rgba(148,163,184,0.15)}
+.color-card .card-text{font-size:0.9rem;line-height:1.4;color:var(--text-dim)}
+.color-card .card-text strong{display:block;font-size:0.96rem;margin-bottom:2px}
 
 /* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .slide { padding: 56px 20px 80px 20px; padding-top: calc(env(safe-area-inset-top, 0px) + 56px); justify-content: flex-start; }
-
-  /* Typography */
-  .slide.title h1 { font-size: 1.8rem; }
-  .slide.anchor h2 { font-size: 1.6rem; }
-  .slide.section-divider h2 { font-size: 1.6rem; }
-  .slide.narrative h3,
-  .slide.flow h3,
-  .slide.compare h3,
-  .slide.check h3,
-  .slide.case h3 { font-size: 1.2rem; }
-  .slide.narrative ul li,
-  .slide p,
-  .check-question,
-  .check-option,
-  .case-scenario,
-  .case-answer,
-  .check-explanation,
-  .compare-col ul li,
-  .subline,
-  .divider-sub { font-size: 0.9rem; }
-
-  /* Grids: stack to single column */
-  .compare-grid { grid-template-columns: 1fr; gap: 16px; }
-  .color-cards { grid-template-columns: 1fr; }
-  .check-options { gap: 8px; }
-
-  /* Reduce card/box padding */
-  .compare-col { padding: 18px; }
-  .case-scenario { padding: 16px 20px; }
-  .check-explanation { padding: 14px 18px; }
-  .color-card { padding: 10px 14px; gap: 12px; }
-  .color-card .swatch { width: 28px; height: 28px; }
-
-  /* Flow chains: stack vertical */
-  .flow-chain {
-    flex-direction: column; align-items: center;
-    overflow-x: visible; gap: 0; padding: 10px 0;
-  }
-  .flow-step {
-    padding: 10px 18px; font-size: 0.85rem;
-    white-space: normal; text-align: center; width: 80%;
-  }
-  .flow-arrow {
-    transform: rotate(90deg); margin: 4px 0;
-  }
-
-  /* Nav buttons: smaller, tighter to edges */
-  .nav-btn { width: 40px; height: 40px; font-size: 1.1rem; }
-  #prev-btn { left: 8px; }
-  #next-btn { right: 8px; }
-
-  /* Slide counter */
-  #slide-counter { bottom: 12px; right: 16px; font-size: 0.75rem; }
-}
-
-/* ── TOUCH HINT ── */
-.start-hint {
-  font-size: 0.8rem; color: var(--text-muted); margin-top: 28px;
-  opacity: 0.7;
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide.narrative ul li,.slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .content.cols{flex-direction:column;gap:20px}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.color-cards{grid-template-columns:1fr}
+  .flow-chain{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0} .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%} .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
 }
 </style>
 </head>
 <body>
 
-<!-- Progress Bar -->
-<div id="progress-bar" style="width: 0%;"></div>
-
-<!-- Slide Counter -->
+<div id="progress-bar" style="width:0%"></div>
 <div id="slide-counter">1 / 24</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
 
-<!-- Nav Buttons -->
-<button class="nav-btn" id="prev-btn" aria-label="Previous slide">&#8592;</button>
-<button class="nav-btn" id="next-btn" aria-label="Next slide">&#8594;</button>
-
-<!-- ============================================================ -->
-<!--  SLIDE 1 — TITLE                                            -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 1: TITLE ════════ -->
 <div class="slide title active">
-  <h1>Lower GI Pathophysiology</h1>
-  <div class="subtitle">Chapter 9 &middot; Section 3 &mdash; Large Intestine, Diarrhea, Constipation &amp; Diverticular Disease</div>
-  <div class="meta">
-    Lindsay Wilson &amp; Claude Code<br>
-    Supplemental Instructor Review
-  </div>
+  <h1>GI &mdash; Lower GI Disorders</h1>
+  <div class="subtitle">Chapter 9 &middot; Section 2 &mdash; Large bowel anatomy, diarrhea, constipation, and diverticular disease</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
   <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 2 — SECTION DIVIDER: Lower GI Anatomy                -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 2: SECTION — Lower GI Anatomy ════════ -->
 <div class="slide section-divider">
-  <h2>Lower GI Anatomy</h2>
-  <div class="divider-sub">Where water gets absorbed and waste takes shape</div>
+  <div class="section-num">Section A</div>
+  <h2>Lower GI <em>Anatomy</em></h2>
+  <div class="divider-sub">The large bowel&rsquo;s job is to absorb water &mdash; transit time is everything</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 3 — NARRATIVE: Large Bowel Path                      -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">The Large Bowel Path</span></h3>
-  <ul>
-    <li><span class="hl-yellow">Ileocecal valve</span> = gateway from small intestine &rarr; large intestine. Waste is very liquid here.</li>
-    <li><strong>Ascending</strong> colon (right side) &mdash; liquid stool</li>
-    <li><strong>Hepatic flexure</strong> &rarr; <strong>Transverse</strong> colon &mdash; toothpaste consistency</li>
-    <li><strong>Splenic flexure</strong> &rarr; <strong>Descending</strong> colon (left side) &mdash; becoming solid</li>
-    <li><strong>Sigmoid</strong> (S-curve) &rarr; <strong>Rectum</strong> &rarr; <strong>Anus</strong></li>
-    <li>Primary job: <span class="hl-blue">absorb water</span>. Normal transit = 36&ndash;48 hrs. Brown color from <span class="hl-yellow">bile pigment</span>.</li>
-  </ul>
+<!-- ════════ SLIDE 3: Large Bowel Path (anatomical map) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Anatomy</div>
+  <h3 style="text-align:center;">The Large Bowel <em>Path</em> &mdash; Follow the Stool</h3>
+  <div style="width:100%;max-width:820px;margin:0 auto;">
+    <svg viewBox="0 0 820 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="colonMapTitle" style="width:100%;height:auto;display:block;">
+      <title id="colonMapTitle">Anatomical path of the large bowel from ileocecal valve (liquid stool) clockwise through ascending, transverse, descending, sigmoid colon, rectum, and anus (solid stool).</title>
+
+      <!-- Colon tube — segments colored to show consistency gradient watery → solid -->
+      <g stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="28">
+        <!-- Cecum + Ascending (liquid, blue) -->
+        <path d="M 150,420 L 150,150" stroke="#38bdf8" opacity="0.85"/>
+        <!-- Hepatic flexure + Transverse + Splenic flexure (toothpaste, yellow) -->
+        <path d="M 150,150 Q 150,110 190,110 L 650,110 Q 690,110 690,150" stroke="#f59e0b" opacity="0.85"/>
+        <!-- Descending (becoming solid, amber) -->
+        <path d="M 690,150 L 690,400" stroke="#b45309" opacity="0.9"/>
+        <!-- Sigmoid S-curve (solid, brown) -->
+        <path d="M 690,400 C 690,430 640,445 600,443 C 550,440 510,420 470,448 L 420,475" stroke="#78350f" opacity="0.9"/>
+        <!-- Rectum + Anus (exit) -->
+        <path d="M 420,475 L 420,510" stroke="#451a03" opacity="0.95"/>
+      </g>
+
+      <!-- Ileocecal valve marker (blue circle) -->
+      <circle cx="150" cy="425" r="10" fill="#38bdf8" stroke="#0f172a" stroke-width="2.5"/>
+
+      <!-- Flow direction arrowheads along path -->
+      <g fill="#f1f5f9" opacity="0.7">
+        <polygon points="138,280 162,280 150,265"/>     <!-- up on ascending -->
+        <polygon points="410,98 410,122 425,110"/>       <!-- right on transverse -->
+        <polygon points="678,275 702,275 690,290"/>      <!-- down on descending -->
+      </g>
+
+      <!-- Water droplet + central annotation -->
+      <g transform="translate(410, 230)">
+        <text x="0" y="0" font-size="26" text-anchor="middle">&#128167;</text>
+        <text x="0" y="26" fill="#38bdf8" font-size="12" font-weight="700" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1.5">WATER ABSORBED</text>
+        <text x="0" y="42" fill="#94a3b8" font-size="10" font-family="Inter, sans-serif" text-anchor="middle">Transit 36&ndash;48 hrs &middot; brown from bile pigment</text>
+      </g>
+
+      <!-- LABELS -->
+
+      <!-- Ileocecal valve (left of cecum) -->
+      <g font-family="Inter, sans-serif">
+        <line x1="30" y1="420" x2="135" y2="420" stroke="#38bdf8" stroke-width="1" opacity="0.4" stroke-dasharray="3,3"/>
+        <text x="20" y="416" fill="#38bdf8" font-size="13" font-weight="700" text-anchor="start">Ileocecal valve</text>
+        <text x="20" y="430" fill="#94a3b8" font-size="10" text-anchor="start">gateway &mdash; liquid in</text>
+      </g>
+
+      <!-- Cecum -->
+      <g font-family="Inter, sans-serif">
+        <text x="20" y="472" fill="#60a5fa" font-size="11" font-weight="600" text-anchor="start">Cecum + appendix</text>
+        <text x="20" y="486" fill="#94a3b8" font-size="9.5" text-anchor="start">(lower RIGHT quadrant)</text>
+      </g>
+
+      <!-- Ascending colon (left side of image = patient's right) -->
+      <g font-family="Inter, sans-serif">
+        <text x="20" y="280" fill="#22d3ee" font-size="13" font-weight="700" text-anchor="start">Ascending colon</text>
+        <text x="20" y="294" fill="#94a3b8" font-size="10" text-anchor="start">liquid stool</text>
+        <text x="20" y="308" fill="#64748b" font-size="9" text-anchor="start">(patient&rsquo;s right)</text>
+      </g>
+
+      <!-- Hepatic flexure -->
+      <g font-family="Inter, sans-serif">
+        <text x="78" y="80" fill="#f59e0b" font-size="10" font-weight="600" text-anchor="start">Hepatic flexure &darr;</text>
+      </g>
+
+      <!-- Transverse colon -->
+      <g font-family="Inter, sans-serif">
+        <text x="410" y="66" fill="#f59e0b" font-size="14" font-weight="700" text-anchor="middle">Transverse colon</text>
+        <text x="410" y="82" fill="#94a3b8" font-size="10" text-anchor="middle">toothpaste consistency</text>
+      </g>
+
+      <!-- Splenic flexure -->
+      <g font-family="Inter, sans-serif">
+        <text x="742" y="80" fill="#eab308" font-size="10" font-weight="600" text-anchor="end">&darr; Splenic flexure</text>
+      </g>
+
+      <!-- Descending colon (right side of image = patient's left) -->
+      <g font-family="Inter, sans-serif">
+        <text x="800" y="280" fill="#b45309" font-size="13" font-weight="700" text-anchor="end">Descending colon</text>
+        <text x="800" y="294" fill="#94a3b8" font-size="10" text-anchor="end">becoming solid</text>
+        <text x="800" y="308" fill="#64748b" font-size="9" text-anchor="end">(patient&rsquo;s left)</text>
+      </g>
+
+      <!-- Sigmoid -->
+      <g font-family="Inter, sans-serif">
+        <line x1="800" y1="440" x2="700" y2="440" stroke="#78350f" stroke-width="1" opacity="0.4" stroke-dasharray="3,3"/>
+        <text x="810" y="436" fill="#92400e" font-size="13" font-weight="700" text-anchor="end">Sigmoid (S-curve)</text>
+        <text x="810" y="450" fill="#94a3b8" font-size="10" text-anchor="end">solid stool &middot; LLQ pain</text>
+      </g>
+
+      <!-- Rectum + Anus -->
+      <g font-family="Inter, sans-serif">
+        <text x="420" y="532" fill="#d4d4d8" font-size="12" font-weight="700" text-anchor="middle">Rectum &rarr; Anus</text>
+      </g>
+    </svg>
+  </div>
+  <div class="callout info" style="max-width:820px;margin-top:8px;">
+    Primary job = <span class="hl-blue">absorb water</span>. Content enters as <strong>liquid</strong> at the ileocecal valve and exits as <strong>solid</strong> stool. Too fast = diarrhea (not enough time to absorb). Too slow = constipation (absorbs too much).
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 4 — NARRATIVE: Clinical Landmarks                    -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">Clinical Landmarks to Know</span></h3>
-  <ul>
-    <li><span class="hl-yellow">Appendix</span> attached to cecum &mdash; lower <span class="hl-red">RIGHT</span> quadrant</li>
-    <li>Pain lower RIGHT = could be <span class="hl-red">appendix</span> or small bowel (ileocecal area)</li>
-    <li>Pain lower LEFT = <span class="hl-blue">large intestine</span> (sigmoid/descending)</li>
-    <li>Can live without any part of large bowel (ostomy) &mdash; but liquid stool + need more water</li>
-    <li>Need minimum <span class="hl-red">12 inches of small bowel</span> to survive &mdash; otherwise IV nutrition (TPN)</li>
-    <li>Gas = methane, a normal by-product of digestion</li>
-  </ul>
+<!-- ════════ SLIDE 4: Clinical Landmarks (anatomical order: small bowel → right → left → large bowel) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Anatomy</div>
+  <h3 style="text-align:center;">Clinical <em>Landmarks</em></h3>
+  <div class="cell-cards" style="grid-template-columns:1fr;max-width:620px;">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">12&Prime;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Small Bowel Minimum</strong>
+        <ul>
+          <li>Need &ge; 12 inches to survive</li>
+          <li>Less &rarr; TPN (IV nutrition)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">R</div>
+      <div class="cell-text"><strong style="color:var(--red);">Lower RIGHT Quadrant</strong>
+        <ul>
+          <li>Appendix (attached to cecum)</li>
+          <li>Ileocecal valve / small bowel junction</li>
+          <li>Pain &rarr; think appendicitis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">L</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Lower LEFT Quadrant</strong>
+        <ul>
+          <li>Sigmoid / descending colon</li>
+          <li>Pain &rarr; think diverticulitis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#9878;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Large Bowel Is Optional</strong>
+        <ul>
+          <li>Can live without any part (ostomy)</li>
+          <li>Tradeoff: liquid stool, more water needs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 5 — QUICK CHECK: Anatomy                             -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 5: CHECK — Anatomy ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Lower GI Anatomy</h3>
-  <div class="check-question">
-    A patient has pain in the <strong>lower LEFT quadrant</strong>. Which part of the GI tract is most likely involved?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Appendix</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">B. Ascending colon</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">C. Sigmoid / Descending colon</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Ileocecal valve</div>
-  </div>
-  <div class="check-explanation">
-    <strong>C. Sigmoid / Descending colon.</strong> Lower LEFT quadrant pain maps to the sigmoid and descending colon. The appendix and ileocecal valve are lower RIGHT. The ascending colon is on the right side.
+  <div class="question">A patient has pain in the <strong>lower LEFT quadrant</strong>. Which part of the GI tract is most likely involved?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Appendix
+      <div class="explanation">No &mdash; appendix is lower RIGHT (attached to cecum).</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Ascending colon
+      <div class="explanation">No &mdash; ascending colon is on the right side.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Sigmoid / descending colon
+      <div class="explanation">Correct! Lower LEFT pain maps to the sigmoid and descending colon &mdash; and is the classic location of diverticulitis.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Ileocecal valve
+      <div class="explanation">No &mdash; the ileocecal valve is in the lower RIGHT.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 6 — SECTION DIVIDER: Diarrhea                        -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 6: SECTION — Diarrhea ════════ -->
 <div class="slide section-divider">
-  <h2>Diarrhea</h2>
-  <div class="divider-sub">When transit is too fast, water can't be absorbed</div>
+  <div class="section-num">Section B</div>
+  <h2><em>Diarrhea</em></h2>
+  <div class="divider-sub">When transit is too fast, water can&rsquo;t be absorbed</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 7 — ANCHOR: Diarrhea                                 -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 7: ANCHOR — Diarrhea ════════ -->
 <div class="slide anchor">
-  <h2 style="color: var(--yellow);">Too Fast = Water Not Absorbed</h2>
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Too Fast = <em class="yellow">Water Not Absorbed</em></h2>
   <div class="subline">Content moves through the large bowel too quickly for water reabsorption. Result: watery stool, electrolyte loss, and dehydration.</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 8 — NARRATIVE: Diarrhea Causes                       -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-yellow">Common Causes of Diarrhea</span></h3>
-  <ul>
-    <li><span class="hl-red">Viruses &amp; bacteria</span> &mdash; NOT influenza (flu is respiratory!)</li>
-    <li><strong>Certain foods:</strong> high fat + sugar move fast = "dumping syndrome"</li>
-    <li>Excess sugar &rarr; hyperosmolar &rarr; pulls water into GI lumen &rarr; diarrhea</li>
-    <li>Laxative overuse</li>
-    <li><span class="hl-blue">Inflammatory bowel disease</span> &mdash; Crohn's (small bowel) vs UC (large bowel)</li>
-  </ul>
-</div>
-
-<!-- ============================================================ -->
-<!--  SLIDE 9 — NARRATIVE: What You Lose (KEY TEACHING POINT)    -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-red">What You Lose With Diarrhea</span> <span class="badge badge-red">High Yield</span></h3>
-  <ul>
-    <li>You lose: <span class="hl-blue">Water</span>, <span class="hl-yellow">K+ (potassium)</span>, <span class="hl-green">HCO3&minus; (bicarbonate)</span></li>
-    <li>Result: <span class="hl-red">Metabolic ACIDOSIS</span> with <span class="hl-red">LOW potassium</span></li>
-    <li><span class="badge badge-yellow">Exception</span> &mdash; Usually acidosis pairs with HIGH K+, but diarrhea = acidosis + LOW K+</li>
-    <li>Low K+ &rarr; concerned about the <span class="hl-red">heart</span> (dysrhythmias)</li>
-    <li>Young children + very old = earliest onset of dehydration</li>
-  </ul>
-</div>
-
-<!-- ============================================================ -->
-<!--  SLIDE 10 — STOOL COLOR GUIDE (Color Cards)                 -->
-<!-- ============================================================ -->
-<div class="slide narrative" style="align-items: center;">
-  <h3 style="text-align: center; width: 100%;"><span class="hl-blue">Stool Color Guide</span></h3>
-  <div class="color-cards">
-    <div class="color-card" style="border-left-color: #ef4444;">
-      <div class="swatch" style="background: #dc2626;"></div>
-      <div class="card-text">
-        <strong style="color: #ef4444;">Bright Red (Frank Blood)</strong>
-        Lower GI bleed &mdash; rectum/sigmoid. Active bleeding.
+<!-- ════════ SLIDE 8: Diarrhea Causes ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Diarrhea</div>
+  <h3 style="text-align:center;">Common <em>Causes</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129440;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Infection</strong>
+        <ul>
+          <li>Viruses &amp; bacteria</li>
+          <li>NOT influenza (flu is respiratory!)</li>
+        </ul>
       </div>
     </div>
-    <div class="color-card" style="border-left-color: #7f1d1d;">
-      <div class="swatch" style="background: linear-gradient(135deg, #7f1d1d, #4a1010);"></div>
-      <div class="card-text">
-        <strong style="color: #f87171;">Maroon</strong>
-        Upper descending / transverse bleed. Blood has been in GI a while.
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#127858;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Dietary</strong>
+        <ul>
+          <li>High fat + sugar &rarr; &ldquo;dumping&rdquo;</li>
+          <li>Excess sugar &rarr; hyperosmolar pull</li>
+        </ul>
       </div>
     </div>
-    <div class="color-card" style="border-left-color: #1e1e1e;">
-      <div class="swatch" style="background: linear-gradient(135deg, #1a1a1a, #0a0a0a); border: 1px solid #333;"></div>
-      <div class="card-text">
-        <strong style="color: #a1a1aa;">Black / Tarry (Melena)</strong>
-        Upper GI (stomach/duodenum). Fully digested blood. Terrible odor.
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Medications</strong>
+        <ul>
+          <li>Laxative overuse</li>
+          <li>Some antibiotics (C. diff risk)</li>
+        </ul>
       </div>
     </div>
-    <div class="color-card" style="border-left-color: #d4c9a8;">
-      <div class="swatch" style="background: linear-gradient(135deg, #e8dcc8, #c9b896);"></div>
-      <div class="card-text">
-        <strong style="color: #e8dcc8;">Clay / Pale</strong>
-        Liver problem &mdash; no bile pigment reaching stool.
-      </div>
-    </div>
-    <div class="color-card" style="border-left-color: var(--yellow); grid-column: 1 / -1;">
-      <div class="swatch" style="background: linear-gradient(135deg, #78716c, #57534e);"></div>
-      <div class="card-text">
-        <strong style="color: var(--yellow);">Occult (Hidden Blood)</strong>
-        Not visible &mdash; found by lab testing. Could indicate bowel cancer or slow bleed. "Straining" to evacuate is NOT normal.
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">IBD</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Inflammatory Bowel</strong>
+        <ul>
+          <li>Crohn&rsquo;s (small bowel)</li>
+          <li>Ulcerative colitis (large bowel)</li>
+        </ul>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 11 — QUICK CHECK: Diarrhea Acid-Base                 -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 9: What You Lose With Diarrhea ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Diarrhea</div>
+  <h3 style="text-align:center;">What You <em class="red">Lose</em> <span class="badge badge-red">High Yield</span></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">H&#8322;O</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Water</strong>
+        <ul>
+          <li>Dehydration</li>
+          <li>Kids &amp; elderly dehydrate fastest</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">K&#8314;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Potassium</strong>
+        <ul>
+          <li>Hypokalemia</li>
+          <li>Cardiac dysrhythmia risk</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">HCO&#8323;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Bicarbonate</strong>
+        <ul>
+          <li>Lose the body&rsquo;s base buffer</li>
+          <li>&rarr; Metabolic acidosis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">!</div>
+      <div class="cell-text"><strong style="color:var(--red);">The Exception</strong>
+        <ul>
+          <li>Usually: acidosis + HIGH K&#8314;</li>
+          <li>Diarrhea: acidosis + <em class="red">LOW</em> K&#8314;</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger" style="max-width:740px;">
+    <strong>Remember the pair:</strong> diarrhea = metabolic acidosis + hypokalemia. Vomiting = metabolic alkalosis + hypokalemia (lost HCl and K&#8314;).
+  </div>
+</div>
+
+<!-- ════════ SLIDE 10: Stool Color Guide (anatomical order: liver → upper → mid → lower → occult) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Diarrhea / GI Bleed</div>
+  <h3 style="text-align:center;width:100%;">Stool Color <em>Guide</em> &mdash; Where Is the Bleed?</h3>
+  <div class="color-cards" style="grid-template-columns:1fr;max-width:620px;">
+    <div class="color-card" style="border-left-color:#d4c9a8;">
+      <div class="swatch" style="background:linear-gradient(135deg,#e8dcc8,#c9b896);"></div>
+      <div class="card-text"><strong style="color:#e8dcc8;">Clay / Pale &mdash; Liver</strong>No bile pigment reaching stool. Liver can&rsquo;t process or release bile.</div>
+    </div>
+    <div class="color-card" style="border-left-color:#1e1e1e;">
+      <div class="swatch" style="background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid #333;"></div>
+      <div class="card-text"><strong style="color:#a1a1aa;">Black / Tarry (Melena) &mdash; Upper GI</strong>Stomach / duodenum bleed. Fully digested blood. Terrible odor.</div>
+    </div>
+    <div class="color-card" style="border-left-color:#7f1d1d;">
+      <div class="swatch" style="background:linear-gradient(135deg,#7f1d1d,#4a1010);"></div>
+      <div class="card-text"><strong style="color:#f87171;">Maroon &mdash; Mid Colon</strong>Upper descending / transverse bleed. Blood has been in GI a while.</div>
+    </div>
+    <div class="color-card" style="border-left-color:#ef4444;">
+      <div class="swatch" style="background:#dc2626;"></div>
+      <div class="card-text"><strong style="color:#ef4444;">Bright Red (Frank Blood) &mdash; Lower GI</strong>Rectum / sigmoid bleed. Active bleeding, no time to digest.</div>
+    </div>
+    <div class="color-card" style="border-left-color:var(--yellow);">
+      <div class="swatch" style="background:linear-gradient(135deg,#78716c,#57534e);"></div>
+      <div class="card-text"><strong style="color:var(--yellow);">Occult (Hidden Blood) &mdash; Anywhere</strong>Not visible &mdash; found by lab testing. Could indicate bowel cancer or slow bleed. Straining to evacuate is NOT normal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 11: CHECK — Diarrhea Acid-Base ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Diarrhea &amp; Acid-Base</h3>
-  <div class="check-question">
-    A patient with chronic diarrhea has a pH of <strong>7.29</strong>. What acid-base imbalance is present, and why?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Metabolic alkalosis from K+ loss</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Metabolic acidosis from HCO3&minus; loss</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Respiratory acidosis from hypoventilation</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Metabolic alkalosis from HCl loss</div>
-  </div>
-  <div class="check-explanation">
-    <strong>B. Metabolic acidosis from HCO3&minus; loss.</strong> pH 7.29 is acidotic (below 7.35). Diarrhea flushes out bicarbonate (the body's base buffer), causing metabolic acidosis. Remember: diarrhea = acidosis + low K+ (the exception to the usual acidosis-high K+ pairing). HCl loss from vomiting causes alkalosis, not acidosis.
+  <div class="question">A patient with chronic diarrhea has a pH of <strong>7.29</strong> (normal 7.35&ndash;7.45). What acid-base imbalance is present, and why?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Metabolic alkalosis from K&#8314; loss
+      <div class="explanation">No &mdash; pH 7.29 is acidotic, not alkalotic. K&#8314; loss itself doesn&rsquo;t change pH this way.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Metabolic acidosis from HCO&#8323;&minus; loss
+      <div class="explanation">Correct! pH 7.29 is acidotic. Diarrhea flushes out bicarbonate &mdash; the body&rsquo;s base buffer. Expect hypokalemia too (the exception to the usual acidosis + high K&#8314; pairing).</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Respiratory acidosis from hypoventilation
+      <div class="explanation">No &mdash; the source is GI (bicarb loss), not respiratory. Respiratory acidosis would be driven by CO&#8322; retention.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Metabolic alkalosis from HCl loss
+      <div class="explanation">That&rsquo;s what vomiting causes (lost stomach acid). Diarrhea does the opposite &mdash; lose base, end up acidotic.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 12 — NARRATIVE: Diarrhea Treatment                   -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 12: Diarrhea Treatment ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-green">Diarrhea &mdash; Treatment</span></h3>
+  <div class="section-label">Diarrhea</div>
+  <h3>Treatment &mdash; <em class="green">Find &amp; Replace</em></h3>
   <ul>
     <li><span class="hl-blue">Find the cause</span> &mdash; infection? medication? diet?</li>
     <li>Fasting from solid food initially; advance to bland diet</li>
     <li>High-electrolyte fluids (oral rehydration solutions)</li>
     <li>Antidiarrheals (OTC or Rx) as appropriate</li>
-    <li>Monitor <span class="hl-yellow">K+</span> and fluid balance closely</li>
-    <li><span class="hl-green">Dietary fiber</span> prevents diarrhea AND constipation (whole grains, oatmeal, fruit/veggie peels, beans, bran)</li>
+    <li>Monitor <span class="hl-yellow">K&#8314;</span> and fluid balance closely</li>
+    <li><span class="hl-green">Dietary fiber</span> prevents BOTH diarrhea and constipation (whole grains, oatmeal, fruit/veggie peels, beans, bran)</li>
   </ul>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 13 — SECTION DIVIDER: Constipation                   -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 13: SECTION — Constipation ════════ -->
 <div class="slide section-divider">
-  <h2>Constipation</h2>
+  <div class="section-num">Section C</div>
+  <h2><em>Constipation</em></h2>
   <div class="divider-sub">When transit is too slow, too much water is absorbed</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 14 — ANCHOR: Constipation                            -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 14: ANCHOR — Constipation ════════ -->
 <div class="slide anchor">
-  <h2 style="color: var(--blue);">Too Slow = Too Much Water Absorbed</h2>
-  <div class="subline">Stool sits in the colon too long. Water keeps getting pulled out. Result: hard, dry stool that's difficult to pass.</div>
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Too Slow = <em class="blue">Too Much Water Absorbed</em></h2>
+  <div class="subline">Stool sits in the colon too long. Water keeps getting pulled out. Result: hard, dry stool that&rsquo;s difficult to pass.</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 15 — NARRATIVE: Constipation Causes                  -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">Constipation &mdash; Causes</span></h3>
-  <ul>
-    <li><span class="hl-yellow">Medications</span> that slow peristalsis: opioids, iron, calcium channel blockers</li>
-    <li>Sedentary lifestyle / ignoring urge to defecate</li>
-    <li>Laxative overuse &rarr; bowel dependency</li>
-    <li>Low fiber, low fluid intake</li>
-    <li>Colon cancer can physically block transit</li>
-    <li>Eating non-food items (<span class="hl-red">pica</span>) &rarr; constipation / obstruction</li>
-  </ul>
+<!-- ════════ SLIDE 15: Constipation Causes ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Constipation</div>
+  <h3 style="text-align:center;">Common <em>Causes</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Medications</strong>
+        <ul>
+          <li>Opioids</li>
+          <li>Iron, calcium channel blockers</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128106;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Lifestyle</strong>
+        <ul>
+          <li>Sedentary / ignoring urge</li>
+          <li>Low fiber, low fluid</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9888;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Mechanical</strong>
+        <ul>
+          <li>Colon cancer (physical block)</li>
+          <li>Pica (non-food items)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128165;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Iatrogenic</strong>
+        <ul>
+          <li>Laxative overuse &rarr; dependency</li>
+          <li>Bowel stops working on its own</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 16 — NARRATIVE: Constipation Complications + Tx      -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-red">Complications &amp; Treatment</span></h3>
-  <ul>
-    <li><span class="hl-red">Fissures</span> from straining (tears in anal tissue)</li>
-    <li><span class="hl-red">Hemorrhoids</span> &mdash; bulging veins that itch + bleed</li>
-    <li>Bowel sounds: <span class="hl-yellow">hypoactive</span> (sluggish gut)</li>
-  </ul>
-  <h3 style="margin-top: 28px;"><span class="hl-green">Treatment Ladder</span></h3>
-  <ul>
-    <li>&uarr; Fiber, &uarr; Water, &uarr; Activity</li>
-    <li>Stool softeners (hold water in stool)</li>
-    <li>Laxatives &rarr; Enema &rarr; Digital removal (last resort)</li>
-  </ul>
+<!-- ════════ SLIDE 16: Constipation Complications & Treatment ════════ -->
+<div class="slide compare">
+  <h3>Complications <em class="yellow">&amp;</em> Treatment Ladder</h3>
+  <div class="compare-grid">
+    <div class="compare-col col-red">
+      <h4>Complications</h4>
+      <ul>
+        <li><strong>Anal fissures</strong> from straining (tears in anal tissue)</li>
+        <li><strong>Hemorrhoids</strong> &mdash; bulging veins that itch and bleed</li>
+        <li><strong>Hypoactive bowel sounds</strong> (sluggish gut)</li>
+        <li><strong>Fecal impaction</strong> if severe</li>
+      </ul>
+    </div>
+    <div class="compare-col col-green">
+      <h4>Treatment Ladder (least &rarr; most invasive)</h4>
+      <ul>
+        <li><strong>1.</strong> &uarr; Fiber, &uarr; Water, &uarr; Activity</li>
+        <li><strong>2.</strong> Stool softeners (hold water in stool)</li>
+        <li><strong>3.</strong> Laxatives</li>
+        <li><strong>4.</strong> Enema</li>
+        <li><strong>5.</strong> Digital removal (last resort)</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 17 — QUICK CHECK: Diarrhea vs Constipation           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 17: CHECK — Diarrhea vs Constipation ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Diarrhea vs. Constipation</h3>
-  <div class="check-question">
-    A post-op patient on opioid pain management reports no bowel movement for 4 days. Bowel sounds are hypoactive. Which intervention is MOST appropriate to try first?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Administer an enema</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Increase fluids, fiber, and encourage ambulation</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Digital removal of stool</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Administer antidiarrheals</div>
-  </div>
-  <div class="check-explanation">
-    <strong>B. Increase fluids, fiber, and encourage ambulation.</strong> Opioids slow peristalsis, causing constipation. Start with the least invasive interventions first: fluids, fiber, and movement. Enema and digital removal are later steps. Antidiarrheals would make it worse!
+  <div class="question">A post-op patient on opioid pain management reports no bowel movement for 4 days. Bowel sounds are hypoactive. Which intervention is MOST appropriate to try FIRST?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Administer an enema
+      <div class="explanation">Too invasive for first-line. Enema is step 4 on the ladder &mdash; try less invasive options first.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Increase fluids, fiber, and encourage ambulation
+      <div class="explanation">Correct! Opioids slow peristalsis, causing constipation. Always start with the least invasive intervention: fluids, fiber, movement.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Digital removal of stool
+      <div class="explanation">Last resort only. Skip it as a first step.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Administer antidiarrheals
+      <div class="explanation">Opposite direction &mdash; that would make constipation worse.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 18 — SECTION DIVIDER: Diverticular Disease           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 18: SECTION — Diverticular Disease ════════ -->
 <div class="slide section-divider">
-  <h2>Diverticular Disease</h2>
+  <div class="section-num">Section D</div>
+  <h2>Diverticular <em>Disease</em></h2>
   <div class="divider-sub">Quiet pouches vs. angry pouches &mdash; know the difference</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 19 — COMPARE: Diverticulosis vs Diverticulitis       -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 19: COMPARE — Diverticulosis vs Diverticulitis ════════ -->
 <div class="slide compare">
-  <h3>Diverticulosis <span class="hl-yellow">vs.</span> Diverticulitis</h3>
+  <h3>Diverticulosis <em class="yellow">vs.</em> Diverticulitis</h3>
   <div class="compare-grid">
-    <div class="compare-col">
-      <h4 style="color: var(--blue);">Diverticulosis (Quiet)</h4>
+    <div class="compare-col col-blue">
+      <h4>Diverticulosis (Quiet)</h4>
       <ul>
-        <li>Pouches PRESENT but <strong>asymptomatic</strong></li>
+        <li><strong>Pouches PRESENT</strong> but asymptomatic</li>
         <li>Common in adults &gt; 60</li>
         <li>Usually an incidental finding</li>
-        <li>Caused by low fiber + increased intraluminal pressure</li>
+        <li>Caused by low fiber + chronic straining</li>
       </ul>
     </div>
-    <div class="compare-col col-danger">
-      <h4 style="color: var(--red);">Diverticulitis (Inflamed)</h4>
+    <div class="compare-col col-red">
+      <h4>Diverticulitis (Inflamed)</h4>
       <ul>
-        <li>Pouches <strong>INFLAMED / INFECTED</strong></li>
+        <li><strong>Pouches INFLAMED / INFECTED</strong></li>
         <li>Feces trapped &rarr; rots &rarr; inflammation</li>
-        <li>LLQ pain, fever, &uarr;WBC, blood in stool</li>
-        <li>Can <span class="hl-red">PERFORATE</span> &rarr; peritonitis (fatal) or hemorrhage &rarr; shock</li>
+        <li>LLQ pain, fever, &uarr; WBC, blood in stool</li>
+        <li>Can <strong>PERFORATE</strong> &rarr; peritonitis or hemorrhage</li>
       </ul>
     </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 20 — FLOW: How Pouches Form                          -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 20: FLOW — How Pouches Form (true cascade) ════════ -->
 <div class="slide flow">
-  <h3><span class="hl-yellow">How Diverticular Pouches Form</span></h3>
+  <h3>How Diverticular Pouches <em class="yellow">Form</em></h3>
   <div class="flow-chain">
-    <div class="flow-step">Low-fiber diet +<br>chronic straining</div>
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Low-fiber diet +<small>chronic straining</small></div>
     <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step">&uarr; Intraluminal<br>pressure</div>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">&uarr; Intraluminal<small>pressure</small></div>
     <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step">Mucosa herniates<br>through weak spots</div>
+    <div class="flow-step" style="border-color:rgba(56,189,248,0.4);color:var(--blue);">Mucosa herniates<small>through weak spots</small></div>
     <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step">Feces trapped<br>in pouch</div>
-    <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step" style="border-color: rgba(239,68,68,0.4); color: var(--red);">Inflammation<br>&amp; Infection</div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">Feces trapped<small>in pouch</small></div>
+    <span class="flow-arrow" style="color:var(--red);">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.5);color:var(--red);background:rgba(239,68,68,0.06);">Inflammation +<small>infection</small></div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 21 — NARRATIVE: What to Recognize                    -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 21: Diverticulitis Recognition ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-red">Diverticulitis &mdash; What to Recognize</span></h3>
+  <div class="section-label">Diverticulitis</div>
+  <h3>What to <em class="red">Recognize</em></h3>
   <ul>
     <li><span class="hl-red">LLQ tenderness</span> (sigmoid colon territory)</li>
     <li>Low-grade fever, &uarr; WBC</li>
     <li>Blood in stool, abdominal distension</li>
     <li><span class="hl-blue">CT abdomen = gold standard</span> for diagnosis</li>
-    <li><span class="hl-red">NOT colonoscopy during acute episode</span> &mdash; perforation risk! Scope AFTER resolution.</li>
+    <li><span class="hl-red">NOT colonoscopy during acute episode</span> &mdash; perforation risk. Scope AFTER resolution.</li>
   </ul>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 22 — NARRATIVE: Diverticulitis Treatment              -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 22: Diverticulitis Treatment ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-green">Diverticulitis &mdash; Treatment</span></h3>
+  <div class="section-label">Diverticulitis</div>
+  <h3>Treatment &mdash; <em class="green">Rest &amp; Antibiotics</em></h3>
   <ul>
     <li><strong>Acute:</strong> bowel rest (NPO), IV fluids, IV antibiotics &mdash; 3&ndash;6 days, often hospitalized</li>
     <li><strong>Prevention:</strong> high fiber, hydration, avoid prolonged sitting on toilet</li>
     <li><strong>Recurrent:</strong> surgical removal of segment &rarr; possible ostomy</li>
-    <li><span class="badge badge-red">Emergency</span> Rigid abdomen + rebound tenderness + fever spike = <span class="hl-red">perforation</span> &rarr; surgical emergency</li>
   </ul>
+  <div class="callout danger">
+    <strong>Emergency signs:</strong> rigid abdomen + rebound tenderness + fever spike = <span class="hl-red">perforation</span> &rarr; surgical emergency. Peritonitis is potentially fatal.
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 23 — CASE: Dorothy                                   -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 23: CASE — Dorothy ════════ -->
 <div class="slide case">
   <div class="case-label">Clinical Scenario</div>
-  <h3>Meet Dorothy</h3>
   <div class="case-scenario">
-    <strong>Dorothy, 68 years old</strong>, presents to the ED with <strong>LLQ pain</strong> that began 2 days ago and has worsened. She has a <strong>low-grade fever of 38.8&deg;C</strong>, <strong>WBC 14,200</strong>, and reports <strong>blood-tinged stool</strong>.<br><br>
-    CT abdomen reveals <strong>inflamed pouches in the sigmoid colon</strong>.<br><br>
-    <em>What is the diagnosis? What is the key concern you should watch for?</em>
+    <strong>Dorothy, 68F</strong>, presents to the ED with <strong>LLQ pain</strong> that began 2 days ago and has worsened. Temp <strong>38.8&deg;C</strong> (normal 36&ndash;37.5; low-grade fever), <strong>WBC 14,200</strong> (normal 4,500&ndash;11,000 &mdash; elevated), and <strong>blood-tinged stool</strong>. CT abdomen reveals <strong>inflamed pouches in the sigmoid colon</strong>.
   </div>
-  <button class="case-reveal-btn" onclick="revealCase(this)">Reveal Answer</button>
-  <div class="case-answer">
-    <strong>Diagnosis: Acute Diverticulitis.</strong><br><br>
-    Dorothy has classic signs: LLQ pain (sigmoid territory), low-grade fever, elevated WBC (infection), blood-tinged stool, and CT-confirmed inflamed sigmoid pouches.<br><br>
-    <strong>Key concern: Perforation.</strong> If those inflamed pouches rupture, intestinal contents spill into the peritoneal cavity &rarr; <span class="hl-red">peritonitis</span> (potentially fatal). Watch for: rigid abdomen, rebound tenderness, sudden fever spike, hemodynamic instability.<br><br>
-    <strong>Expected management:</strong> NPO, IV fluids, IV antibiotics, close monitoring.
+  <div class="question">What is the diagnosis, and what is the key concern to watch for?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Diverticulosis &mdash; monitor at home
+      <div class="explanation">Diverticulosis is the quiet, asymptomatic form. Fever + elevated WBC + inflamed pouches on CT = diverticulitis (inflamed).</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Acute diverticulitis &mdash; watch for perforation
+      <div class="explanation">Correct! Textbook diverticulitis: LLQ pain, low-grade fever, elevated WBC, blood-tinged stool, CT-confirmed inflamed sigmoid pouches. Perforation is the key concern &rarr; peritonitis (potentially fatal). Watch for rigid abdomen, rebound tenderness, sudden fever spike. Management: NPO, IV fluids, IV antibiotics.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Acute appendicitis &mdash; prep for surgery
+      <div class="explanation">Appendicitis is lower RIGHT quadrant (appendix is attached to the cecum on the right). Dorothy&rsquo;s pain is LLQ = sigmoid territory.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Colon cancer &mdash; schedule colonoscopy now
+      <div class="explanation">Colonoscopy during ACUTE diverticulitis risks perforation. The CT finding of inflamed pouches, plus fever + elevated WBC, make diverticulitis the diagnosis. Scope later, after the acute episode resolves.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 24 — ANCHOR: Final Summary                           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 24: ANCHOR — Summary ════════ -->
 <div class="slide anchor">
-  <h2 style="font-size: 2.2rem; background: linear-gradient(135deg, var(--blue), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Lower GI &mdash; The Big Picture</h2>
-  <div class="subline" style="max-width: 760px; text-align: left; margin-top: 20px; font-size: 1.05rem; line-height: 1.85;">
-    <span class="hl-blue">&bull;</span> Large intestine's job = <strong>absorb water</strong>. Transit time is everything.<br>
-    <span class="hl-yellow">&bull;</span> Too fast (<strong>diarrhea</strong>) = metabolic <strong>acidosis</strong> + <strong>low K+</strong><br>
-    <span class="hl-blue">&bull;</span> Too slow (<strong>constipation</strong>) = hard stool, straining, fissures, hemorrhoids<br>
-    <span class="hl-red">&bull;</span> Diverticulosis = quiet pouches. Diverticulitis = infected &rarr; <strong>perforation risk</strong><br>
-    <span class="hl-purple">&bull;</span> <strong>Vomiting = metabolic alkalosis.</strong> <strong>Diarrhea = metabolic acidosis.</strong> Know the difference.
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lower GI &mdash; The Big Picture</h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.05rem;line-height:1.85;">
+    <span class="hl-blue">&bull;</span> Large intestine&rsquo;s job = <strong>absorb water</strong>. Transit time is everything.<br>
+    <span class="hl-yellow">&bull;</span> Too fast (<strong>diarrhea</strong>) = metabolic <strong>acidosis</strong> + <strong>low K&#8314;</strong> (the exception).<br>
+    <span class="hl-blue">&bull;</span> Too slow (<strong>constipation</strong>) = hard stool, straining, fissures, hemorrhoids.<br>
+    <span class="hl-red">&bull;</span> Diverticulosis = quiet pouches. Diverticulitis = infected &rarr; <strong>perforation risk</strong>.<br>
+    <span class="hl-purple">&bull;</span> <strong>Vomiting = metabolic alkalosis. Diarrhea = metabolic acidosis.</strong> Know the difference.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  JAVASCRIPT                                                  -->
-<!-- ============================================================ -->
+<!-- ════════ JAVASCRIPT ════════ -->
 <script>
-(function() {
-  const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let current = 0;
-
-  const progressBar = document.getElementById('progress-bar');
-  const counter = document.getElementById('slide-counter');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-
-  function updateUI() {
-    progressBar.style.width = ((current + 1) / total * 100) + '%';
-    counter.textContent = (current + 1) + ' / ' + total;
-    prevBtn.style.opacity = current === 0 ? '0.3' : '1';
-    prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
-    nextBtn.style.opacity = current === total - 1 ? '0.3' : '1';
-    nextBtn.style.pointerEvents = current === total - 1 ? 'none' : 'auto';
-  }
-
-  function goTo(index) {
-    if (index < 0 || index >= total || index === current) return;
-    slides[current].classList.remove('active');
-    slides[current].style.display = 'none';
-    current = index;
-    slides[current].classList.add('active');
-    slides[current].style.display = 'flex';
-    slides[current].scrollTop = 0; // scroll new slide to top
-    // Re-trigger animation
-    slides[current].style.animation = 'none';
-    slides[current].offsetHeight; // reflow
-    slides[current].style.animation = '';
-    updateUI();
-  }
-
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  // Keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-      e.preventDefault(); next();
-    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-      e.preventDefault(); prev();
-    } else if (e.key === 'Home') {
-      e.preventDefault(); goTo(0);
-    } else if (e.key === 'End') {
-      e.preventDefault(); goTo(total - 1);
-    }
-  });
-
-  // Button navigation
-  prevBtn.addEventListener('click', prev);
-  nextBtn.addEventListener('click', next);
-
-  // Touch/swipe navigation
-  let touchStartX = 0;
-  let touchStartY = 0;
-  document.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }, { passive: true });
-  document.addEventListener('touchend', function(e) {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    const dy = e.changedTouches[0].screenY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-      if (dx < 0) next(); else prev();
-    }
-  }, { passive: true });
-
-  updateUI();
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
 })();
-
-// Quiz handler
-function handleCheck(el) {
-  const parent = el.closest('.slide');
-  const options = parent.querySelectorAll('.check-option');
-  const explanation = parent.querySelector('.check-explanation');
-
-  // Prevent re-clicking
-  if (parent.dataset.answered) return;
-  parent.dataset.answered = 'true';
-
-  options.forEach(function(opt) {
-    opt.style.cursor = 'default';
-    if (opt.dataset.correct === 'true') {
-      opt.classList.add('correct');
-    } else if (opt === el && opt.dataset.correct === 'false') {
-      opt.classList.add('incorrect');
-    }
-  });
-  explanation.classList.add('visible');
-}
-
-// Case reveal handler
-function revealCase(btn) {
-  const answer = btn.nextElementSibling;
-  answer.classList.add('visible');
-  btn.style.display = 'none';
-}
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
 </script>
-n<!-- Student Tracking -->n<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">n<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">n<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>n<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>n<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />n<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>n</div></div>n<script>n(function(){nvar S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';nvar R=document.title;nvar n=localStorage.getItem('si_student_name');nif(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}nfunction doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}nfunction logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}n})();n</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
 </body>
 </html>

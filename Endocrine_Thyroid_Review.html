@@ -7,730 +7,669 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg-dark: #0f172a;
-  --bg-card: #1e293b;
-  --blue: #38bdf8;
-  --yellow: #f59e0b;
-  --red: #ef4444;
-  --purple: #a78bfa;
-  --teal: #22d3ee;
-  --green: #34d399;
-  --text: #f1f5f9;
-  --text-dim: #94a3b8;
-  --text-muted: #64748b;
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
 }
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
 
-html, body {
-  height: 100%;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg-dark);
-  color: var(--text);
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-}
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
 
-/* ── SCROLLBAR STYLING ── */
-.slide::-webkit-scrollbar { width: 6px; }
-.slide::-webkit-scrollbar-track { background: transparent; }
-.slide::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 3px; }
-.slide::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.5); }
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
 
-/* ── PROGRESS BAR ── */
-#progress-bar {
-  position: fixed; top: 0; left: 0; height: 4px;
-  background: linear-gradient(90deg, var(--blue), var(--purple));
-  transition: width 0.4s ease;
-  z-index: 1000;
-}
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── SLIDE COUNTER ── */
-#slide-counter {
-  position: fixed; bottom: 18px; right: 24px;
-  font-size: 0.85rem; color: var(--text-muted);
-  z-index: 1000; font-variant-numeric: tabular-nums;
-}
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
 
-/* ── NAV BUTTONS ── */
-.nav-btn {
-  position: fixed; top: 50%; transform: translateY(-50%);
-  background: rgba(30,41,59,0.85); border: 1px solid rgba(56,189,248,0.2);
-  color: var(--text-dim); width: 44px; height: 44px;
-  border-radius: 50%; font-size: 1.3rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; transition: all 0.2s;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}
-.nav-btn:hover { background: rgba(56,189,248,0.15); color: var(--blue); border-color: var(--blue); }
-#prev-btn { left: 16px; }
-#next-btn { right: 16px; }
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
 
-/* ── SLIDES ── */
-.slide {
-  display: none; flex-direction: column; justify-content: center; align-items: center;
-  position: absolute; inset: 0; overflow-y: auto;
-  padding: 48px 60px 80px 60px;
-  animation: fadeIn 0.35s ease;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148,163,184,0.3) transparent;
-}
-.slide.active { display: flex; }
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.2rem;color:var(--text-dim);max-width:700px;line-height:1.6}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:flex-start;max-width:960px;margin:0 auto}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:28px;width:100%}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.slide.narrative ul{list-style:none;width:100%}
+.slide.narrative ul li{padding:10px 0 10px 28px;position:relative;font-size:1.05rem;line-height:1.55}
+.slide.narrative ul li::before{content:'';position:absolute;left:0;top:18px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
 
-/* ── SLIDE TYPE: TITLE ── */
-.slide.title { text-align: center; }
-.slide.title h1 {
-  font-size: 3rem; font-weight: 900;
-  background: linear-gradient(135deg, var(--blue), var(--purple));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; line-height: 1.15; margin-bottom: 12px;
-}
-.slide.title .subtitle {
-  font-size: 1.15rem; color: var(--text-dim); margin-bottom: 28px; font-weight: 400;
-}
-.slide.title .meta {
-  font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;
-}
-
-/* ── SLIDE TYPE: ANCHOR ── */
-.slide.anchor { text-align: center; }
-.slide.anchor h2 {
-  font-size: 2.8rem; font-weight: 900; line-height: 1.15; margin-bottom: 18px;
-}
-.slide.anchor .subline {
-  font-size: 1.2rem; color: var(--text-dim); max-width: 700px; line-height: 1.6;
-}
-
-/* ── SLIDE TYPE: NARRATIVE ── */
-.slide.narrative { align-items: flex-start; max-width: 960px; margin: 0 auto; }
-.slide.narrative h3 {
-  font-size: 1.6rem; font-weight: 700; margin-bottom: 28px; width: 100%;
-}
-.slide.narrative ul { list-style: none; width: 100%; }
-.slide.narrative ul li {
-  padding: 10px 0 10px 28px; position: relative;
-  font-size: 1.05rem; line-height: 1.55; color: var(--text);
-}
-.slide.narrative ul li::before {
-  content: ''; position: absolute; left: 0; top: 18px;
-  width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
-}
-
-/* ── SLIDE TYPE: FLOW ── */
-.slide.flow { text-align: center; }
-.slide.flow h3 {
-  font-size: 1.5rem; font-weight: 700; margin-bottom: 36px;
-}
-.flow-chain {
-  display: flex; align-items: center; justify-content: center;
-  flex-wrap: nowrap; gap: 0; overflow-x: auto; max-width: 100%;
-  padding: 10px 0;
-}
-.flow-step {
-  background: var(--bg-card); border: 1px solid rgba(56,189,248,0.25);
-  border-radius: 12px; padding: 14px 20px;
-  font-size: 0.95rem; font-weight: 500; white-space: nowrap;
-  min-width: fit-content;
-}
-.flow-arrow {
-  font-size: 1.4rem; color: var(--blue); margin: 0 6px; flex-shrink: 0;
-}
-
-/* ── SLIDE TYPE: COMPARE ── */
-.slide.compare { text-align: center; }
-.slide.compare h3 {
-  font-size: 1.5rem; font-weight: 700; margin-bottom: 32px;
-}
-.compare-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
-  max-width: 880px; width: 100%;
-}
-.compare-col {
-  background: var(--bg-card); border-radius: 16px; padding: 28px;
-  text-align: left; border-top: 4px solid var(--blue);
-}
-.compare-col.col-danger { border-top-color: var(--red); }
-.compare-col h4 {
-  font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;
-}
-.compare-col ul { list-style: none; }
-.compare-col ul li {
-  padding: 6px 0 6px 20px; position: relative;
-  font-size: 0.95rem; line-height: 1.5; color: var(--text-dim);
-}
-.compare-col ul li::before {
-  content: ''; position: absolute; left: 0; top: 13px;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
-}
-.compare-col.col-danger ul li::before { background: var(--red); }
-
-/* ── SLIDE TYPE: CHECK ── */
-.slide.check { text-align: center; }
-.slide.check h3 {
-  font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;
-  color: var(--purple);
-}
-.slide.check .check-label {
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--purple); margin-bottom: 8px; font-weight: 600;
-}
-.check-question {
-  font-size: 1.15rem; color: var(--text); max-width: 720px;
-  line-height: 1.6; margin-bottom: 28px;
-}
-.check-options {
-  display: flex; flex-direction: column; gap: 12px;
-  max-width: 560px; width: 100%;
-}
-.check-option {
-  background: var(--bg-card); border: 1px solid rgba(167,139,250,0.25);
-  border-radius: 12px; padding: 14px 20px;
-  font-size: 1rem; cursor: pointer; transition: all 0.2s;
-  text-align: left; color: var(--text);
-}
-.check-option:hover { border-color: var(--purple); background: rgba(167,139,250,0.08); }
-.check-option.correct {
-  border-color: var(--green) !important; background: rgba(52,211,153,0.1) !important;
-}
-.check-option.incorrect {
-  border-color: var(--red) !important; background: rgba(239,68,68,0.08) !important;
-  opacity: 0.7;
-}
-.check-explanation {
-  display: none; margin-top: 22px; padding: 18px 24px;
-  background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);
-  border-radius: 12px; max-width: 620px;
-  font-size: 0.95rem; line-height: 1.6; color: var(--text-dim);
-  text-align: left;
-}
-.check-explanation.visible { display: block; }
-
-/* ── SLIDE TYPE: CASE ── */
-.slide.case { text-align: center; }
-.slide.case h3 {
-  font-size: 1.4rem; font-weight: 700; color: var(--teal); margin-bottom: 6px;
-}
-.slide.case .case-label {
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--teal); margin-bottom: 8px; font-weight: 600;
-}
-.case-scenario {
-  background: var(--bg-card); border: 1px solid rgba(34,211,238,0.2);
-  border-radius: 16px; padding: 24px 32px; max-width: 680px;
-  font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;
-  text-align: left; color: var(--text);
-}
-.case-scenario strong { color: var(--teal); }
-.case-reveal-btn {
-  background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.3);
-  color: var(--teal); padding: 12px 32px; border-radius: 10px;
-  font-size: 1rem; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; font-family: 'Inter', sans-serif;
-}
-.case-reveal-btn:hover { background: rgba(34,211,238,0.2); }
-.case-answer {
-  display: none; margin-top: 22px; padding: 20px 28px;
-  background: rgba(34,211,238,0.06); border: 1px solid rgba(34,211,238,0.15);
-  border-radius: 12px; max-width: 640px;
-  font-size: 0.95rem; line-height: 1.65; color: var(--text-dim);
-  text-align: left;
-}
-.case-answer.visible { display: block; }
-
-/* ── SLIDE TYPE: SECTION-DIVIDER ── */
-.slide.section-divider { text-align: center; }
-.slide.section-divider h2 {
-  font-size: 2.4rem; font-weight: 900;
-  background: linear-gradient(135deg, var(--yellow), var(--red));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; margin-bottom: 12px;
-}
-.slide.section-divider .divider-sub {
-  font-size: 1.1rem; color: var(--text-muted);
-}
-
-/* ── COLOR CARDS ── */
-.color-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  max-width: 820px; width: 100%;
-}
-.color-card {
-  display: flex; align-items: center; gap: 16px;
-  background: var(--bg-card); border-radius: 12px; padding: 14px 18px;
-  border-left: 5px solid;
-}
-.color-card .swatch {
-  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
-}
-.color-card .card-text {
-  font-size: 0.92rem; line-height: 1.45;
-}
-.color-card .card-text strong {
-  display: block; font-size: 0.95rem; margin-bottom: 2px;
-}
+/* ── COLUMNS LAYOUT ── */
+.content.cols{display:flex;gap:28px;width:100%}
+.content.cols .col{flex:1}
+.content.cols .col ul{list-style:none}
+.content.cols .col ul li{padding:8px 0 8px 20px;position:relative;font-size:0.98rem;line-height:1.5}
+.content.cols .col ul li::before{content:'';position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
 
 /* ── HIGHLIGHT HELPERS ── */
-.hl-blue { color: var(--blue); font-weight: 600; }
-.hl-yellow { color: var(--yellow); font-weight: 600; }
-.hl-red { color: var(--red); font-weight: 600; }
-.hl-green { color: var(--green); font-weight: 600; }
-.hl-purple { color: var(--purple); font-weight: 600; }
-.hl-teal { color: var(--teal); font-weight: 600; }
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)}
 
-.badge {
-  display: inline-block; padding: 3px 10px; border-radius: 6px;
-  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
-.badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
-.badge-blue { background: rgba(56,189,248,0.15); color: var(--blue); }
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:860px}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
 
-/* ── CALLOUT BOX ── */
-.callout {
-  margin-top: 18px; padding: 14px 20px; border-radius: 10px;
-  font-size: 0.95rem; line-height: 1.55; width: 100%;
-  max-width: 860px;
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:36px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:4px 0}
+
+/* ── AXIS WITH FEEDBACK LOOP (HPT, HPA, etc.) ── */
+.axis-wrap{position:relative;display:inline-flex;align-items:stretch;padding-left:120px;padding-right:120px}
+.axis-feedback{position:absolute;top:6px;right:6px;width:108px;height:calc(100% - 12px);pointer-events:none;overflow:visible}
+.axis-feedback-label{position:absolute;top:50%;right:-2px;transform:translateY(-50%) rotate(-90deg);transform-origin:center;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);font-weight:700;pointer-events:none;white-space:nowrap}
+@media(max-width:768px){
+  .axis-wrap{padding-left:0;padding-right:0;padding-bottom:0;flex-direction:column}
+  .axis-feedback{display:none}
+  .axis-feedback-label{display:none}
 }
-.callout-info {
-  background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2);
-  color: var(--text-dim);
-}
-.callout-warn {
-  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
-  color: var(--yellow);
-}
-.callout-danger {
-  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-  color: var(--red);
-}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:32px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:28px 24px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.15rem;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.compare-col ul li{font-size:0.95rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.5}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK (QUIZ) ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.1rem,2vw,1.5rem);font-weight:700;max-width:800px;line-height:1.4;margin-bottom:32px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:750px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:18px 20px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.05rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:24px 28px;max-width:750px;text-align:left;font-size:1.05rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:700;max-width:750px;line-height:1.4;margin-bottom:24px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CUSTOM: CELL CARDS (with optional bullet-list content) ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:740px;width:100%}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.cell-card .cell-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── CUSTOM: EMERGENCY CARDS ── */
+.emergency-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:800px;width:100%}
+.emergency-card{background:var(--bg-card);border-radius:14px;padding:24px;text-align:left;border-top:4px solid}
+.emergency-card h4{font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.emergency-card .em-subtitle{font-size:0.82rem;color:var(--text-muted);margin-bottom:14px}
+.emergency-card ul{list-style:none}
+.emergency-card ul li{font-size:0.92rem;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.4}
+.emergency-card ul li::before{content:'';position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%}
+.emergency-card .em-priority{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:0.9rem;font-weight:600;text-align:center}
 
 /* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .slide { padding: 56px 20px 80px 20px; padding-top: calc(env(safe-area-inset-top, 0px) + 56px); justify-content: flex-start; }
-
-  /* Typography */
-  .slide.title h1 { font-size: 1.8rem; }
-  .slide.anchor h2 { font-size: 1.6rem; }
-  .slide.section-divider h2 { font-size: 1.6rem; }
-  .slide.narrative h3,
-  .slide.flow h3,
-  .slide.compare h3,
-  .slide.check h3,
-  .slide.case h3 { font-size: 1.2rem; }
-  .slide.narrative ul li,
-  .slide p,
-  .check-question,
-  .check-option,
-  .case-scenario,
-  .case-answer,
-  .check-explanation,
-  .compare-col ul li,
-  .subline,
-  .divider-sub { font-size: 0.9rem; }
-
-  /* Grids: stack to single column */
-  .compare-grid { grid-template-columns: 1fr; gap: 16px; }
-  .color-cards { grid-template-columns: 1fr; }
-  .check-options { gap: 8px; }
-
-  /* Reduce card/box padding */
-  .compare-col { padding: 18px; }
-  .case-scenario { padding: 16px 20px; }
-  .check-explanation { padding: 14px 18px; }
-  .color-card { padding: 10px 14px; gap: 12px; }
-  .color-card .swatch { width: 28px; height: 28px; }
-  .callout { padding: 12px 16px; font-size: 0.85rem; }
-
-  /* Flow chains: stack vertical */
-  .flow-chain {
-    flex-direction: column; align-items: center;
-    overflow-x: visible; gap: 0; padding: 10px 0;
-  }
-  .flow-step {
-    padding: 10px 18px; font-size: 0.85rem;
-    white-space: normal; text-align: center; width: 80%;
-  }
-  .flow-arrow {
-    transform: rotate(90deg); margin: 4px 0;
-  }
-
-  /* Nav buttons: smaller, tighter to edges */
-  .nav-btn { width: 40px; height: 40px; font-size: 1.1rem; }
-  #prev-btn { left: 8px; }
-  #next-btn { right: 8px; }
-
-  /* Slide counter */
-  #slide-counter { bottom: 12px; right: 16px; font-size: 0.75rem; }
-}
-
-/* ── TOUCH HINT ── */
-.start-hint {
-  font-size: 0.8rem; color: var(--text-muted); margin-top: 28px;
-  opacity: 0.7;
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide.narrative ul li,.slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .content.cols{flex-direction:column;gap:20px}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.emergency-cards{grid-template-columns:1fr}
+  .flow-chain{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0} .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%} .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
 }
 </style>
 </head>
 <body>
 
-<!-- Progress Bar -->
-<div id="progress-bar" style="width: 0%;"></div>
-
-<!-- Slide Counter -->
+<div id="progress-bar" style="width:0%"></div>
 <div id="slide-counter">1 / 28</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
 
-<!-- Nav Buttons -->
-<button class="nav-btn" id="prev-btn" aria-label="Previous slide">&#8592;</button>
-<button class="nav-btn" id="next-btn" aria-label="Next slide">&#8594;</button>
-
-<!-- ============================================================ -->
-<!--  SLIDE 1 — TITLE                                            -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 1: TITLE ════════ -->
 <div class="slide title active">
-  <h1>Chapter 10: Endocrine &mdash; Thyroid Disorders</h1>
-  <div class="subtitle">Section 2 &mdash; The metabolic thermostat: T3, T4, feedback loops, and what happens when it breaks</div>
-  <div class="meta">
-    Lindsay Wilson &amp; Claude Code<br>
-    Supplemental Instructor Review
-  </div>
+  <h1>Endocrine &mdash; Thyroid Disorders</h1>
+  <div class="subtitle">Chapter 10 &middot; Section 2 &mdash; T3/T4, the thyroid axis, and the balance between hypothyroidism and hyperthyroidism</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
   <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 2 — SECTION DIVIDER: Thyroid Anatomy & Physiology    -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 2: SECTION — Thyroid Anatomy ════════ -->
 <div class="slide section-divider">
-  <h2>Thyroid Anatomy &amp; Physiology</h2>
-  <div class="divider-sub">The gland that sets your metabolic speed</div>
+  <div class="section-num">Section A</div>
+  <h2>Thyroid <em>Anatomy &amp; Physiology</em></h2>
+  <div class="divider-sub">The metabolic gas pedal of the body</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 3 — NARRATIVE: Thyroid Gland — Location & Structure  -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 3: Thyroid Gland — Location & Structure ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-blue">Thyroid Gland &mdash; Location &amp; Structure</span></h3>
+  <div class="section-label">Thyroid</div>
+  <h3>Location &amp; <em>Structure</em></h3>
   <ul>
-    <li>Located at base of neck, just below the <span class="hl-yellow">larynx</span></li>
-    <li><strong>Butterfly / H-shape</strong> &mdash; two lobes connected by a thin <span class="hl-blue">isthmus</span></li>
-    <li>Highly vascular &mdash; palpable on physical exam</li>
-    <li>Contains <span class="hl-yellow">follicles</span> that produce three key hormones</li>
-    <li>4 <span class="hl-teal">parathyroid glands</span> sit behind it (separate function &mdash; calcium regulation)</li>
+    <li>Butterfly-shaped gland in the <span class="hl-blue">anterior neck</span>, just below the larynx</li>
+    <li>Two lobes connected by a central <span class="hl-yellow">isthmus</span></li>
+    <li>Richly vascular &mdash; one of the most perfused organs in the body</li>
+    <li>Produces three hormones: <span class="hl-blue">T3</span>, <span class="hl-blue">T4</span>, and <span class="hl-teal">calcitonin</span></li>
+    <li><span class="hl-yellow">Iodine</span> is required to make T3 and T4</li>
   </ul>
-</div>
-
-<!-- ============================================================ -->
-<!--  SLIDE 4 — NARRATIVE: Three Thyroid Hormones                -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">Three Thyroid Hormones</span></h3>
-  <ul>
-    <li><span class="hl-yellow">T4 (thyroxine)</span> &mdash; regulates cellular metabolism &amp; growth/development</li>
-    <li><span class="hl-yellow">T3 (triiodothyronine)</span> &mdash; same function, but the <strong>more active form</strong></li>
-    <li>T3/T4 account for <span class="hl-blue">~95%</span> of all thyroid hormones</li>
-    <li><span class="hl-teal">Calcitonin</span> &mdash; <strong>LOWERS blood calcium</strong> by keeping Ca in bone (inhibits osteoclasts, stimulates osteoblasts). Think: calci-TONE-in <em>tones down</em> calcium. Does the <strong>opposite</strong> of PTH.</li>
-  </ul>
-  <div class="callout callout-info">
-    <strong>Key Point:</strong> Iodine is <strong>REQUIRED</strong> to synthesize T3 and T4. No iodine &rarr; hypothyroidism.
+  <div class="callout info">
+    <strong>Why iodine matters:</strong> no iodine, no T3/T4 &rarr; the gland enlarges (goiter) trying to compensate. US rarely sees this because of iodized salt.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 5 — FLOW: The Thyroid Axis (Negative Feedback)       -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 4: Three Thyroid Hormones ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Thyroid</div>
+  <h3 style="text-align:center;">The Three <em>Thyroid Hormones</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">T4</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Thyroxine (T4)</strong>
+        <ul>
+          <li>Regulates cellular metabolism</li>
+          <li>Supports growth &amp; development</li>
+          <li>Converted to active T3 in tissues</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">T3</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Triiodothyronine (T3)</strong>
+        <ul>
+          <li>The more active form</li>
+          <li>Same functions as T4</li>
+          <li>T3 + T4 = ~95% of thyroid output</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);" style="grid-column:span 2;">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">Ca</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Calcitonin</strong>
+        <ul>
+          <li>LOWERS blood calcium</li>
+          <li>Inhibits osteoclasts, stimulates osteoblasts &rarr; keeps Ca in bone</li>
+          <li>Opposite of PTH</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:700px;">
+    <strong>Calci-TONE-in tones down calcium.</strong> Calcitonin is a thyroid hormone, but it&rsquo;s a separate system from T3/T4 &mdash; different cells (parafollicular C-cells), different axis.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 5: FLOW — Thyroid Axis (vertical, anatomy-matched, with feedback loop) ════════ -->
 <div class="slide flow">
-  <h3><span class="hl-blue">The Thyroid Axis (Negative Feedback)</span></h3>
-  <div class="flow-chain">
-    <div class="flow-step">Hypothalamus<br>releases TRH</div>
-    <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step">Anterior Pituitary<br>releases TSH</div>
-    <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step">Thyroid Gland<br>produces T3/T4</div>
-    <span class="flow-arrow">&rarr;</span>
-    <div class="flow-step" style="border-color: rgba(52,211,153,0.4); color: var(--green);">T3/T4 feedback<br>inhibits hypothalamus</div>
+  <h3>The HPT <em class="blue">Axis</em></h3>
+  <div class="axis-wrap">
+    <div class="flow-chain vertical">
+      <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Hypothalamus<small>(brain) &mdash; <strong>senses T3/T4</strong>, releases TRH</small></div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step" style="border-color:rgba(56,189,248,0.4);color:var(--blue);">Anterior Pituitary<small>releases TSH</small></div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">Thyroid Gland<small>(neck) &mdash; releases &hellip;</small></div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step" style="border:2px solid rgba(245,158,11,0.7);background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(245,158,11,0.08));color:var(--yellow);font-weight:800;letter-spacing:1.5px;">T3 / T4<small style="letter-spacing:0;font-weight:500;">the hormones &mdash; circulate in blood, act on every tissue</small></div>
+    </div>
+    <svg class="axis-feedback" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <marker id="hpt-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L10,5 L0,10 z" fill="#34d399"/>
+        </marker>
+      </defs>
+      <path d="M0,94 C95,94 95,6 5,6" fill="none" stroke="#34d399" stroke-width="2.2" stroke-dasharray="5,4" stroke-linecap="round" marker-end="url(#hpt-arrow)"/>
+    </svg>
+    <div class="axis-feedback-label">&#8635; Negative Feedback (sensing)</div>
   </div>
-  <div class="callout callout-info" style="margin-top: 28px; max-width: 680px;">
-    When T3/T4 are sufficient, they signal back to <strong>STOP</strong> further TSH release. When they're low, TSH <strong>rises</strong> to stimulate more production.
+  <div class="callout info" style="margin-top:24px;max-width:700px;">
+    <strong>Reading the labs:</strong> TSH and T3/T4 move in <em>opposite</em> directions in primary thyroid disease. Low T3/T4 &rarr; hypothalamus ramps up TRH &rarr; TSH rises. High T3/T4 &rarr; hypothalamus quiets TRH &rarr; TSH drops.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 6 — QUICK CHECK: Thyroid Axis                        -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 6: CHECK — Thyroid Axis ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Thyroid Axis</h3>
-  <div class="check-question">
-    The hypothalamus senses low T3/T4 levels. What happens next?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Thyroid directly increases hormone production</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Anterior pituitary releases TSH, which stimulates the thyroid to produce more T3/T4</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Posterior pituitary releases ADH to compensate</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Calcitonin is released to raise metabolism</div>
-  </div>
-  <div class="check-explanation">
-    <strong>B. Anterior pituitary releases TSH.</strong> The thyroid doesn't act on its own &mdash; it needs TSH from the anterior pituitary (triggered by TRH from the hypothalamus). ADH regulates water balance, not thyroid function. Calcitonin regulates calcium, not metabolism.
+  <div class="question">A patient&rsquo;s labs show <strong>elevated TSH and low T4</strong>. How should you interpret this?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Primary hyperthyroidism &mdash; excess T3/T4 suppressing TSH
+      <div class="explanation">No &mdash; that&rsquo;s the opposite pattern (low TSH, high T3/T4).</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Primary hypothyroidism &mdash; thyroid underproducing, pituitary compensating
+      <div class="explanation">Correct! The thyroid is failing (low T4), so the pituitary ramps up TSH trying to stimulate it. Negative feedback in action.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Secondary hypothyroidism &mdash; pituitary failure
+      <div class="explanation">No. In secondary (pituitary) hypothyroidism, BOTH TSH and T4 would be low. Here TSH is high.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Normal thyroid function
+      <div class="explanation">No. Elevated TSH with low T4 is always pathologic &mdash; the body is trying to make more hormone and failing.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 7 — SECTION DIVIDER: Goiter                          -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 7: SECTION — Goiter ════════ -->
 <div class="slide section-divider">
-  <h2>Goiter</h2>
+  <div class="section-num">Section B</div>
+  <h2><em>Goiter</em></h2>
   <div class="divider-sub">The thyroid gets bigger &mdash; but why matters</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 8 — NARRATIVE: Goiter                                -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 8: Goiter ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-yellow">Goiter &mdash; Visible Thyroid Enlargement</span></h3>
+  <div class="section-label">Goiter</div>
+  <h3>Visible Thyroid <em>Enlargement</em></h3>
   <ul>
     <li>Can occur in <span class="hl-red">BOTH</span> hypo- and hyperthyroid states (and even normal function)</li>
     <li><span class="hl-yellow">Iodine deficiency</span> = #1 cause worldwide (rare in US due to iodized salt)</li>
-    <li>Autoimmune thyroid conditions are most common cause in the US</li>
+    <li>Autoimmune thyroid conditions are the most common cause in the US</li>
     <li>Usually painless but can compress <span class="hl-red">trachea/esophagus</span> &rarr; breathing &amp; swallowing difficulty</li>
     <li>Not necessarily malignant</li>
   </ul>
-  <div class="callout callout-warn">
-    <strong>Warning:</strong> Goiter does NOT tell you whether the thyroid is over- or underactive. You need <strong>lab values</strong> (TSH, T3/T4) to determine function.
+  <div class="callout warn">
+    <strong>Goiter does NOT tell you function.</strong> You need <strong>lab values</strong> (TSH, T3/T4) to determine whether the thyroid is over- or underactive.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 9 — SECTION DIVIDER: Hypothyroidism                  -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 9: SECTION — Hypothyroidism ════════ -->
 <div class="slide section-divider">
-  <h2>Hypothyroidism</h2>
+  <div class="section-num">Section C</div>
+  <h2><em>Hypothyroidism</em></h2>
   <div class="divider-sub">Everything slows down</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 10 — ANCHOR: Hypothyroidism                          -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 10: ANCHOR — Hypothyroidism ════════ -->
 <div class="slide anchor">
-  <h2 style="color: var(--blue);">Hypothyroidism = LOW Thyroid = The Body in Slow Motion</h2>
-  <div class="subline">Not enough T3/T4. Metabolism drops. Everything runs cold, slow, and sluggish.</div>
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Hypothyroidism = <em class="blue">Everything SLOW</em></h2>
+  <div class="subline">Not enough T3/T4. Metabolism drops. The body runs cold, sluggish, and slow in every system.</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 11 — NARRATIVE: Hypothyroidism Causes                -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">Hypothyroidism &mdash; Causes &amp; Risk Factors</span></h3>
-  <ul>
-    <li>Most common cause: <span class="hl-yellow">Hashimoto's thyroiditis</span> (autoimmune &mdash; body attacks thyroid tissue)</li>
-    <li>Also <span class="hl-red">iatrogenic</span>: thyroid removal, radiation therapy</li>
-    <li>Can be <strong>congenital</strong> &mdash; all US newborns are screened at birth</li>
-    <li>Risk increases with <span class="hl-blue">advancing age</span></li>
-    <li>More common in <span class="hl-purple">women</span> than men</li>
-    <li>Can result from hypothalamus or pituitary dysfunction (<span class="hl-teal">secondary hypothyroidism</span>)</li>
-  </ul>
-</div>
-
-<!-- ============================================================ -->
-<!--  SLIDE 12 — NARRATIVE: Hypothyroidism Manifestations        -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-blue">Hypothyroidism &mdash; Manifestations</span> <span class="badge badge-blue">Think: SLOW</span></h3>
-  <ul>
-    <li><span class="hl-yellow">Fatigue</span>, sluggishness, lethargy, depression</li>
-    <li><span class="hl-blue">Cold intolerance</span> &mdash; always cold</li>
-    <li><span class="hl-yellow">Weight gain</span> despite decreased appetite</li>
-    <li><span class="hl-red">Bradycardia</span>, hypotension</li>
-    <li><strong>Constipation</strong> (&darr; peristalsis)</li>
-    <li>Dry skin, brittle hair/nails, hair loss/thinning</li>
-    <li>Facial edema, hoarseness, large tongue</li>
-    <li>Hypercholesterolemia &bull; Heavier menstrual periods</li>
-  </ul>
-  <div class="callout callout-info">
-    <strong>In infants:</strong> failure to grow, impaired mental development. This is why <strong>ALL newborns</strong> are screened.
+<!-- ════════ SLIDE 11: Hypothyroidism Causes ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hypothyroidism</div>
+  <h3 style="text-align:center;">Where the <em>Deficiency</em> Comes From</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9888;</div>
+      <div class="cell-text"><strong style="color:var(--red);">#1: Hashimoto&rsquo;s</strong>Autoimmune destruction of thyroid tissue</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128136;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Iatrogenic</strong>Thyroid removal or radiation therapy</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128118;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Congenital</strong>All US newborns screened at birth</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Risk Factors</strong>
+        <ul>
+          <li>Women &gt; men</li>
+          <li>Advancing age</li>
+          <li>Secondary (pituitary/hypothal.)</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 13 — NARRATIVE: Myxedema                             -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-red">Myxedema &mdash; Severe Hypothyroidism</span> <span class="badge badge-red">Emergency</span></h3>
-  <ul>
-    <li>Rare, <span class="hl-red">life-threatening</span> advanced hypothyroidism</li>
-    <li>Marked <span class="hl-red">hypotension</span>, respiratory depression</li>
-    <li><span class="hl-blue">Hypothermia</span> &mdash; body can't generate heat</li>
-    <li>Lethargy &rarr; <span class="hl-red">coma</span></li>
-    <li><span class="hl-yellow">Cardiomegaly</span> (enlarged heart)</li>
-  </ul>
-  <div class="callout callout-danger">
-    <strong>Myxedema is a medical emergency.</strong> Vitals are LOW and SLOW across the board.
+<!-- ════════ SLIDE 12: Hypothyroidism Manifestations ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hypothyroidism</div>
+  <h3 style="text-align:center;">Manifestations <span class="badge badge-blue">Think: SLOW</span></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#10052;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Cold &amp; Slow</strong>
+        <ul>
+          <li>Cold intolerance</li>
+          <li>Fatigue, lethargy</li>
+          <li>Depression</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#9878;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Weight &amp; Metabolism</strong>
+        <ul>
+          <li>Weight gain despite &darr; appetite</li>
+          <li>Hypercholesterolemia</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9829;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Cardiac</strong>
+        <ul>
+          <li>Bradycardia</li>
+          <li>Hypotension</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#9776;</div>
+      <div class="cell-text"><strong style="color:var(--green);">GI &amp; Skin</strong>
+        <ul>
+          <li>Constipation</li>
+          <li>Dry skin</li>
+          <li>Brittle hair &amp; nails</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128100;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Appearance</strong>
+        <ul>
+          <li>Facial edema, hoarseness</li>
+          <li>Large tongue</li>
+          <li>Hair thinning</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Reproductive</strong>
+        <ul>
+          <li>Heavier menstrual periods</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:700px;">
+    <strong>In infants:</strong> failure to grow, impaired mental development. This is why <strong>ALL US newborns</strong> are screened.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 14 — NARRATIVE: Hypothyroidism Treatment             -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 13: Hypothyroidism Treatment ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-green">Hypothyroidism &mdash; Treatment</span></h3>
+  <div class="section-label">Hypothyroidism</div>
+  <h3>Treatment &mdash; <em class="green">Hormone Replacement</em></h3>
   <ul>
-    <li><span class="hl-green">Lifelong</span> thyroid hormone replacement therapy (<span class="hl-yellow">Synthroid / levothyroxine</span>)</li>
-    <li>Take on <span class="hl-red">EMPTY stomach</span>, 30 min before eating</li>
-    <li>Regular blood work to <span class="hl-blue">monitor and adjust</span> dosage</li>
-    <li>Manage: weight, constipation, body temperature (avoid cold)</li>
+    <li><span class="hl-green">Lifelong levothyroxine (Synthroid)</span> &mdash; synthetic T4</li>
+    <li><span class="hl-yellow">Take on EMPTY stomach</span>, 30 min before eating &mdash; food blocks absorption</li>
+    <li>Start low and titrate up based on TSH recheck (4&ndash;6 weeks)</li>
+    <li>Monitor for signs of over-replacement (palpitations, weight loss, insomnia)</li>
   </ul>
-  <div class="callout callout-info">
-    <strong>Key Concept:</strong> This is hormone <strong>REPLACEMENT</strong> &mdash; the thyroid isn't producing enough, so you supplement what's missing.
+  <div class="callout warn">
+    <strong>Patient teaching:</strong> never skip doses or stop abruptly &mdash; symptoms return gradually and myxedema risk rises.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 15 — QUICK CHECK: Hypothyroidism                     -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 14: ANCHOR — Myxedema ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-emergency">Emergency</div>
+  <h2>Myxedema = <em class="red">Severe Hypothyroidism</em></h2>
+  <div class="subline">Vitals low and slow across the board: marked hypotension, respiratory depression, hypothermia (can&rsquo;t generate heat), lethargy &rarr; coma, cardiomegaly.</div>
+</div>
+
+<!-- ════════ SLIDE 15: CHECK — Hypothyroidism Recognition ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Hypothyroidism Presentation</h3>
-  <div class="check-question">
-    A patient with hypothyroidism would most likely present with which set of findings?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Tachycardia, weight loss, heat intolerance</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Bradycardia, weight gain, cold intolerance, constipation</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Exophthalmos, tremor, anxiety</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Hypoglycemia, bronze skin, salt craving</div>
-  </div>
-  <div class="check-explanation">
-    <strong>B. Bradycardia, weight gain, cold intolerance, constipation.</strong> Everything is SLOW in hypothyroidism. Options A and C describe HYPERthyroid/Graves' signs. Option D describes Addison's disease (adrenal insufficiency).
+  <div class="question">A 58-year-old woman reports <strong>15-lb weight gain</strong>, fatigue, constipation, dry skin, and feeling cold all the time. Which lab pattern do you expect?</div>
+  <div class="choices">
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> TSH high, T4 low
+      <div class="explanation">Correct! Classic primary hypothyroidism. Thyroid is failing (low T4), pituitary compensates (high TSH).</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> TSH low, T4 high
+      <div class="explanation">No &mdash; that&rsquo;s the hyperthyroid pattern. Symptoms would be opposite (weight loss, heat intolerance, tachycardia).</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> TSH normal, T4 normal
+      <div class="explanation">No. A symptomatic patient with this constellation almost certainly has abnormal labs.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> TSH low, T4 low
+      <div class="explanation">That would suggest secondary (pituitary) hypothyroidism &mdash; less common than Hashimoto&rsquo;s.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 16 — SECTION DIVIDER: Hyperthyroidism                -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 16: SECTION — Hyperthyroidism ════════ -->
 <div class="slide section-divider">
-  <h2>Hyperthyroidism</h2>
+  <div class="section-num">Section D</div>
+  <h2><em>Hyperthyroidism</em></h2>
   <div class="divider-sub">Everything speeds up</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 17 — ANCHOR: Hyperthyroidism                         -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 17: ANCHOR — Hyperthyroidism ════════ -->
 <div class="slide anchor">
-  <h2 style="color: var(--red);">Hyperthyroidism = TOO MUCH Thyroid = The Body in Overdrive</h2>
-  <div class="subline">Excess T3/T4 creates a hypermetabolic state. Everything runs hot, fast, and wired.</div>
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Hyperthyroidism = <em class="red">Everything FAST</em></h2>
+  <div class="subline">Excess T3/T4 creates a hypermetabolic state. Every system runs hot, fast, and wired.</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 18 — NARRATIVE: Hyperthyroidism Causes               -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-red">Hyperthyroidism &mdash; Causes (Graves' Disease)</span></h3>
-  <ul>
-    <li>Most common cause: <span class="hl-yellow">Graves' disease</span> (autoimmune &mdash; antibodies overstimulate the thyroid)</li>
-    <li>Also: excessive iodine intake, thyroid tumors, thyroid inflammation</li>
-    <li>Excess thyroid hormone replacement (iatrogenic)</li>
-    <li>More common in <span class="hl-purple">women</span> than men</li>
-  </ul>
-  <div class="callout callout-warn">
-    <strong>Graves' = the thyroid is being told to GO GO GO</strong> by autoantibodies that mimic TSH.
+<!-- ════════ SLIDE 18: Hyperthyroidism Causes ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hyperthyroidism</div>
+  <h3 style="text-align:center;">Where the <em>Excess</em> Comes From</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9888;</div>
+      <div class="cell-text"><strong style="color:var(--red);">#1: Graves&rsquo; Disease</strong>Autoimmune antibodies mimic TSH &rarr; thyroid &ldquo;GO GO GO&rdquo;</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129658;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Excess Iodine or Tumors</strong>Iodine overload, thyroid tumors, thyroiditis</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Iatrogenic</strong>Excess thyroid hormone replacement</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Risk Factors</strong>
+        <ul>
+          <li>Women &gt; men</li>
+          <li>Family history</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 19 — NARRATIVE: Hyperthyroidism Manifestations       -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-red">Hyperthyroidism &mdash; Manifestations</span> <span class="badge badge-red">Think: FAST</span></h3>
-  <ul>
-    <li>Sudden <span class="hl-yellow">weight loss</span> despite increased appetite</li>
-    <li><span class="hl-red">Tachycardia</span>, hypertension, palpitations</li>
-    <li><span class="hl-red">Heat intolerance</span>, diaphoresis (sweating)</li>
-    <li>Nervousness, anxiety, irritability, <span class="hl-yellow">insomnia</span></li>
-    <li><span class="hl-blue">Fine hand tremors</span></li>
-    <li><strong>Diarrhea</strong> (&uarr; peristalsis)</li>
-    <li><span class="hl-teal">Exophthalmos</span> (bulging eyes) &mdash; hallmark of Graves'</li>
-    <li>Goiter &bull; Menstrual changes (lighter/absent periods)</li>
-  </ul>
+<!-- ════════ SLIDE 19: Hyperthyroidism Manifestations ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hyperthyroidism</div>
+  <h3 style="text-align:center;">Manifestations <span class="badge badge-red">Think: FAST</span></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9829;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Cardiac</strong>
+        <ul>
+          <li>Tachycardia</li>
+          <li>Hypertension</li>
+          <li>Palpitations</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128293;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Weight &amp; Metabolism</strong>
+        <ul>
+          <li>Weight loss despite &uarr; appetite</li>
+          <li>Heat intolerance</li>
+          <li>Diaphoresis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#9889;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Neuro &amp; Mood</strong>
+        <ul>
+          <li>Anxiety, irritability</li>
+          <li>Insomnia</li>
+          <li>Fine hand tremors</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#9776;</div>
+      <div class="cell-text"><strong style="color:var(--green);">GI</strong>
+        <ul>
+          <li>Diarrhea (&uarr; peristalsis)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#128065;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Eyes (Graves&rsquo; only)</strong>
+        <ul>
+          <li>Exophthalmos &mdash; hallmark</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Other</strong>
+        <ul>
+          <li>Goiter</li>
+          <li>Lighter/absent periods</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 20 — NARRATIVE: Exophthalmos                         -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 20: Exophthalmos ════════ -->
 <div class="slide narrative">
-  <h3><span class="hl-teal">Exophthalmos &mdash; The Graves' Hallmark</span></h3>
+  <div class="section-label">Hyperthyroidism</div>
+  <h3>Exophthalmos &mdash; <em class="teal">The Graves&rsquo; Hallmark</em></h3>
   <ul>
     <li><span class="hl-red">Bulging eyes</span> &mdash; sclera visible around the iris</li>
-    <li>Eyes may not fully close &rarr; cornea dries out &rarr; <span class="hl-red">scarring &rarr; vision loss</span></li>
+    <li>Eyes may not fully close &rarr; cornea dries &rarr; <span class="hl-red">scarring &rarr; vision loss</span></li>
     <li>Manage with: cool compresses, sunglasses, eye lubricants, elevate HOB</li>
   </ul>
-  <div class="callout callout-warn">
-    <strong>Warning:</strong> Exophthalmos may <strong>NOT resolve</strong> even after hyperthyroidism is treated. Protect the corneas.
+  <div class="callout warn">
+    <strong>Exophthalmos may NOT resolve</strong> even after hyperthyroidism is treated. Protect the corneas.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 21 — ANCHOR: Thyroid Storm                           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 21: Hyperthyroidism Treatment ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hyperthyroidism</div>
+  <h3 style="text-align:center;">Treatment &mdash; <em class="green">Suppress Production</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#9762;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Radioactive Iodine</strong>Destroys overactive thyroid tissue</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Antithyroid Agents</strong>Methimazole, PTU</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#9829;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Beta Blockers</strong>Control HR &amp; tremors (symptom management)</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128137;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Thyroidectomy</strong>Surgical removal &mdash; may need lifelong replacement</div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:700px;">
+    <strong>After radioactive iodine or surgery</strong>, patients often become HYPOthyroid and need levothyroxine. Also increase caloric &amp; calcium intake during hypermetabolic phase.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 22: ANCHOR — Thyroid Storm ════════ -->
 <div class="slide anchor">
-  <h2 style="color: var(--red);">Thyroid Storm (Thyrotoxicosis)</h2>
-  <div class="subline" style="max-width: 740px;">
-    <span class="badge badge-red" style="margin-bottom: 14px; display: inline-block;">Medical Emergency</span><br>
-    A sudden, life-threatening surge of T3/T4. Can be triggered by infection or stress.<br><br>
-    <span class="hl-red">Fever</span> &bull; Severely elevated BP &bull; <span class="hl-red">Tachycardia</span> &bull; Decreased mental alertness &bull; Abdominal pain
-  </div>
+  <div class="tag tag-emergency">Emergency</div>
+  <h2>Thyroid Storm = <em class="red">Thyrotoxicosis</em></h2>
+  <div class="subline">Sudden, life-threatening surge of T3/T4 &mdash; often triggered by infection or stress. Fever &middot; severely elevated BP &middot; tachycardia &middot; decreased mental alertness &middot; abdominal pain.</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 22 — NARRATIVE: Hyperthyroidism Treatment            -->
-<!-- ============================================================ -->
-<div class="slide narrative">
-  <h3><span class="hl-green">Hyperthyroidism &mdash; Treatment</span></h3>
-  <ul>
-    <li>Goal: <span class="hl-red">decrease</span> thyroid hormone production</li>
-    <li><span class="hl-yellow">Radioactive iodine</span> &mdash; destroys overactive thyroid tissue</li>
-    <li><span class="hl-blue">Antithyroid agents</span> (methimazole, PTU)</li>
-    <li><span class="hl-purple">Beta blockers</span> &mdash; control heart rate and tremors</li>
-    <li><span class="hl-red">Surgical removal</span> (thyroidectomy) &mdash; patient may then need lifelong replacement</li>
-    <li>Increase caloric and calcium intake (hypermetabolism depletes both)</li>
-  </ul>
-  <div class="callout callout-info">
-    <strong>Key Point:</strong> After radioactive iodine or surgery, the patient often becomes <strong>HYPOthyroid</strong> and needs replacement therapy.
-  </div>
-</div>
-
-<!-- ============================================================ -->
-<!--  SLIDE 23 — QUICK CHECK: Hyperthyroidism                    -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 23: CHECK — Hyperthyroidism Recognition ════════ -->
 <div class="slide check">
   <div class="check-label">Quick Check</div>
-  <h3>Hyperthyroidism Diagnosis</h3>
-  <div class="check-question">
-    A patient presents with weight loss, tachycardia, tremors, heat intolerance, and bulging eyes. What is the most likely diagnosis?
-  </div>
-  <div class="check-options">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Hypothyroidism / Hashimoto's</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">B. Cushing's disease</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">C. Hyperthyroidism / Graves' disease</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Addison's disease</div>
-  </div>
-  <div class="check-explanation">
-    <strong>C. Hyperthyroidism / Graves' disease.</strong> Exophthalmos (bulging eyes) + hypermetabolic symptoms (weight loss, tachycardia, tremors, heat intolerance) = classic Graves'. Hashimoto's causes the opposite symptoms. Cushing's causes weight gain, moon face, buffalo hump. Addison's causes hypotension, hyperpigmentation, fatigue.
+  <div class="question">A patient presents with weight loss, HR <strong>112</strong> (normal 60&ndash;100), tremors, heat intolerance, and bulging eyes. What is the most likely diagnosis?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Hypothyroidism / Hashimoto&rsquo;s
+      <div class="explanation">Opposite symptoms. Hypothyroid = weight gain, bradycardia, cold intolerance.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Cushing&rsquo;s syndrome
+      <div class="explanation">No. Cushing&rsquo;s causes weight GAIN, moon face, buffalo hump &mdash; and no exophthalmos.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Hyperthyroidism / Graves&rsquo; disease
+      <div class="explanation">Correct! Exophthalmos + hypermetabolic symptoms (weight loss, tachycardia, tremors, heat intolerance) = classic Graves&rsquo;.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Addison&rsquo;s disease
+      <div class="explanation">No. Addison&rsquo;s causes hypotension, hyperpigmentation, fatigue &mdash; not tachycardia or exophthalmos.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 24 — COMPARE: Hypothyroidism vs Hyperthyroidism      -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 24: COMPARE — Hypo vs Hyper ════════ -->
 <div class="slide compare">
-  <h3>Hypothyroidism <span class="hl-yellow">vs.</span> Hyperthyroidism</h3>
+  <h3>Hypothyroidism <em class="yellow">vs.</em> Hyperthyroidism</h3>
   <div class="compare-grid">
-    <div class="compare-col">
-      <h4 style="color: var(--blue);">Hypothyroidism (SLOW)</h4>
+    <div class="compare-col col-blue">
+      <h4>Hypothyroidism (SLOW)</h4>
       <ul>
         <li><strong>Metabolism:</strong> Slow</li>
         <li><strong>Weight:</strong> Gain</li>
@@ -739,12 +678,13 @@ html, body {
         <li><strong>GI:</strong> Constipation</li>
         <li><strong>Skin/Hair:</strong> Dry, brittle, coarse</li>
         <li><strong>Mood:</strong> Depressed, sluggish</li>
-        <li><strong>Cause:</strong> Hashimoto's (autoimmune destroy)</li>
-        <li><strong>Treatment:</strong> Hormone REPLACEMENT</li>
+        <li><strong>Cause:</strong> Hashimoto&rsquo;s (autoimmune destroy)</li>
+        <li><strong>Labs:</strong> &uarr; TSH, &darr; T4</li>
+        <li><strong>Tx:</strong> REPLACE &mdash; levothyroxine</li>
       </ul>
     </div>
-    <div class="compare-col col-danger">
-      <h4 style="color: var(--red);">Hyperthyroidism (FAST)</h4>
+    <div class="compare-col col-red">
+      <h4>Hyperthyroidism (FAST)</h4>
       <ul>
         <li><strong>Metabolism:</strong> Fast</li>
         <li><strong>Weight:</strong> Loss</li>
@@ -753,182 +693,114 @@ html, body {
         <li><strong>GI:</strong> Diarrhea</li>
         <li><strong>Skin/Hair:</strong> Fine, thin, diaphoresis</li>
         <li><strong>Mood:</strong> Anxious, irritable, insomnia</li>
-        <li><strong>Cause:</strong> Graves' (autoimmune overstimulate)</li>
-        <li><strong>Treatment:</strong> SUPPRESS production</li>
+        <li><strong>Cause:</strong> Graves&rsquo; (autoimmune overstimulate)</li>
+        <li><strong>Labs:</strong> &darr; TSH, &uarr; T3/T4</li>
+        <li><strong>Tx:</strong> SUPPRESS &mdash; methimazole, RAI, surgery</li>
       </ul>
     </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 25 — SECTION DIVIDER: Clinical Application           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 25: SECTION — Clinical Application ════════ -->
 <div class="slide section-divider">
-  <h2>Clinical Application</h2>
+  <div class="section-num">Section E</div>
+  <h2>Clinical <em>Application</em></h2>
   <div class="divider-sub">Put it all together</div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 26 — CASE: Margaret                                  -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 26: CASE — Margaret ════════ -->
 <div class="slide case">
-  <div class="case-label">Clinical Case 1</div>
-  <h3>Meet Margaret, 58 y/o Female</h3>
+  <div class="case-label">Clinical Scenario</div>
   <div class="case-scenario">
-    <strong>Margaret</strong> presents with <strong>fatigue</strong>, a <strong>15-lb weight gain</strong> over 6 months, reports being <strong>always cold</strong>, has <strong>constipation</strong>, <strong>dry skin</strong>, and <strong>thinning hair</strong>.<br><br>
-    Labs: <strong>TSH elevated</strong>, <strong>T4 low</strong>.<br><br>
-    <em>What is the diagnosis and expected treatment?</em>
+    <strong>Margaret, 58F</strong>, presents with <strong>fatigue, 15-lb weight gain</strong> over 6 months, reports being <strong>always cold</strong>, <strong>constipation, dry skin</strong>, and <strong>thinning hair</strong>. Labs: <strong>TSH elevated</strong> (normal 0.4&ndash;4.0), <strong>T4 low</strong> (normal 4.5&ndash;12.0).
   </div>
-  <div class="check-options" style="max-width: 560px;">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Graves' disease &mdash; start antithyroid medication</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">B. Hypothyroidism (Hashimoto's) &mdash; lifelong levothyroxine replacement</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">C. Cushing's syndrome &mdash; reduce cortisol</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Normal aging &mdash; no treatment needed</div>
-  </div>
-  <div class="check-explanation">
-    <strong>B. Hypothyroidism (Hashimoto's).</strong> Elevated TSH = pituitary is trying harder because T4 is low. All symptoms point to a slowed metabolism: weight gain, cold intolerance, constipation, dry skin, hair loss. Treatment: lifelong levothyroxine (Synthroid) replacement on an empty stomach. Graves' would show opposite symptoms. Cushing's causes a different pattern (moon face, buffalo hump). These findings together are pathologic, not normal aging.
+  <div class="question">What is the diagnosis and expected treatment?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Graves&rsquo; disease &mdash; start antithyroid medication
+      <div class="explanation">No. Graves&rsquo; causes opposite symptoms: weight loss, tachycardia, exophthalmos.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Hashimoto&rsquo;s hypothyroidism &mdash; lifelong levothyroxine
+      <div class="explanation">Correct! Elevated TSH + low T4 + slowed-metabolism symptoms = classic Hashimoto&rsquo;s. Treatment: lifelong levothyroxine on an empty stomach.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Cushing&rsquo;s syndrome &mdash; reduce cortisol
+      <div class="explanation">No. Cushing&rsquo;s has different pattern: moon face, buffalo hump, hyperglycemia, HTN.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Normal aging &mdash; no treatment needed
+      <div class="explanation">No. These findings together are pathologic. The TSH/T4 pattern alone confirms disease.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 27 — CASE: Devon                                     -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 27: CASE — Devon ════════ -->
 <div class="slide case">
-  <div class="case-label">Clinical Case 2</div>
-  <h3>Meet Devon, 32 y/o Female</h3>
+  <div class="case-label">Clinical Scenario</div>
   <div class="case-scenario">
-    <strong>Devon</strong> has lost <strong>20 lbs in 2 months</strong> despite eating constantly. Heart rate <strong>112</strong>, BP <strong>158/92</strong>, hands trembling. She reports feeling <strong>"wired and anxious all the time."</strong> Her eyes appear to be <strong>bulging</strong>.<br><br>
-    <em>What is the diagnosis? What is the most dangerous potential complication?</em>
+    <strong>Devon, 32F</strong>, has lost <strong>20 lbs in 2 months</strong> despite eating constantly. HR <strong>112</strong> (normal 60&ndash;100), BP <strong>158/92</strong> (HTN stage 2), hands trembling. She reports feeling <strong>&ldquo;wired and anxious all the time.&rdquo;</strong> Her eyes appear <strong>bulging</strong>.
   </div>
-  <div class="check-options" style="max-width: 560px;">
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">A. Panic disorder &mdash; prescribe anxiolytics</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">B. Hypothyroidism &mdash; start levothyroxine</div>
-    <div class="check-option" data-correct="true" onclick="handleCheck(this)">C. Graves' disease (hyperthyroidism) &mdash; most dangerous complication: thyroid storm</div>
-    <div class="check-option" data-correct="false" onclick="handleCheck(this)">D. Pheochromocytoma &mdash; surgical removal of adrenal tumor</div>
-  </div>
-  <div class="check-explanation">
-    <strong>C. Graves' disease (hyperthyroidism).</strong> Weight loss + tachycardia + tremors + anxiety + exophthalmos = classic Graves'. The most dangerous complication is <strong>thyroid storm</strong> (thyrotoxicosis) &mdash; a sudden surge of T3/T4 that can cause cardiovascular collapse and death. Panic disorder could mimic some symptoms, but doesn't explain weight loss + exophthalmos. Hypothyroidism is the opposite presentation. Pheochromocytoma has similar tachycardia/hypertension but no exophthalmos or weight loss pattern.
+  <div class="question">What is the diagnosis, and what is the most dangerous complication?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Panic disorder &mdash; prescribe anxiolytics
+      <div class="explanation">Anxiety could mimic some symptoms but doesn&rsquo;t explain weight loss + tachycardia + exophthalmos. Missing the diagnosis would miss thyroid storm risk.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Hypothyroidism &mdash; start levothyroxine
+      <div class="explanation">Wrong direction. Levothyroxine on a hyperthyroid patient could trigger thyroid storm.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Graves&rsquo; disease &mdash; thyroid storm is the deadliest complication
+      <div class="explanation">Correct! Weight loss + tachycardia + tremors + anxiety + exophthalmos = classic Graves&rsquo;. Thyroid storm (thyrotoxicosis) is a sudden T3/T4 surge that can cause cardiovascular collapse and death. Often triggered by infection or stress.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Pheochromocytoma &mdash; surgical removal of adrenal tumor
+      <div class="explanation">Pheo can mimic tachycardia/HTN but no exophthalmos or weight-loss pattern. Graves&rsquo; is far more common.</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  SLIDE 28 — ANCHOR: Final Summary                           -->
-<!-- ============================================================ -->
+<!-- ════════ SLIDE 28: ANCHOR — Summary ════════ -->
 <div class="slide anchor">
-  <h2 style="font-size: 2.2rem; background: linear-gradient(135deg, var(--blue), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Thyroid Disorders &mdash; The Big Picture</h2>
-  <div class="subline" style="max-width: 760px; text-align: left; margin-top: 20px; font-size: 1.05rem; line-height: 1.85;">
-    <span class="hl-blue">&bull;</span> Thyroid sets the metabolic speed: <strong>T3/T4</strong> via the hypothalamus-pituitary-thyroid axis.<br>
-    <span class="hl-blue">&bull;</span> <strong>Hypo = everything SLOW</strong> (cold, tired, constipated, weight gain). <strong>Hyper = everything FAST</strong> (hot, wired, diarrhea, weight loss).<br>
-    <span class="hl-yellow">&bull;</span> <strong>Hashimoto's</strong> = autoimmune destruction (hypo). <strong>Graves'</strong> = autoimmune overstimulation (hyper).<br>
-    <span class="hl-red">&bull;</span> Goiter can occur in <strong>BOTH</strong>. Exophthalmos is specific to <strong>Graves'</strong>.<br>
-    <span class="hl-purple">&bull;</span> <strong>Thyroid storm = medical emergency. Myxedema = medical emergency.</strong> Opposite ends, both deadly.
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Thyroid Disorders &mdash; The Big Picture</h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.05rem;line-height:1.85;">
+    <span class="hl-blue">&bull;</span> Thyroid sets the metabolic pace via <strong>T3/T4</strong> through the HPT axis.<br>
+    <span class="hl-blue">&bull;</span> <strong>Hypo = SLOW</strong> (cold, tired, constipated, weight gain). <strong>Hyper = FAST</strong> (hot, wired, diarrhea, weight loss).<br>
+    <span class="hl-yellow">&bull;</span> <strong>Hashimoto&rsquo;s</strong> = autoimmune destruction (hypo). <strong>Graves&rsquo;</strong> = autoimmune overstimulation (hyper).<br>
+    <span class="hl-red">&bull;</span> Labs move OPPOSITE in primary disease: &uarr; TSH + &darr; T4 = hypo; &darr; TSH + &uarr; T3/T4 = hyper.<br>
+    <span class="hl-red">&bull;</span> Goiter occurs in <strong>BOTH</strong>. Exophthalmos is specific to <strong>Graves&rsquo;</strong>.<br>
+    <span class="hl-purple">&bull;</span> <strong>Thyroid storm &amp; myxedema</strong> = medical emergencies. Opposite ends, both deadly.
   </div>
 </div>
 
-<!-- ============================================================ -->
-<!--  JAVASCRIPT                                                  -->
-<!-- ============================================================ -->
+<!-- ════════ JAVASCRIPT ════════ -->
 <script>
-(function() {
-  const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let current = 0;
-
-  const progressBar = document.getElementById('progress-bar');
-  const counter = document.getElementById('slide-counter');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-
-  function updateUI() {
-    progressBar.style.width = ((current + 1) / total * 100) + '%';
-    counter.textContent = (current + 1) + ' / ' + total;
-    prevBtn.style.opacity = current === 0 ? '0.3' : '1';
-    prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
-    nextBtn.style.opacity = current === total - 1 ? '0.3' : '1';
-    nextBtn.style.pointerEvents = current === total - 1 ? 'none' : 'auto';
-  }
-
-  function goTo(index) {
-    if (index < 0 || index >= total || index === current) return;
-    slides[current].classList.remove('active');
-    slides[current].style.display = 'none';
-    current = index;
-    slides[current].classList.add('active');
-    slides[current].style.display = 'flex';
-    slides[current].scrollTop = 0; // scroll new slide to top
-    // Re-trigger animation
-    slides[current].style.animation = 'none';
-    slides[current].offsetHeight; // reflow
-    slides[current].style.animation = '';
-    updateUI();
-  }
-
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  // Keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-      e.preventDefault(); next();
-    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-      e.preventDefault(); prev();
-    } else if (e.key === 'Home') {
-      e.preventDefault(); goTo(0);
-    } else if (e.key === 'End') {
-      e.preventDefault(); goTo(total - 1);
-    }
-  });
-
-  // Button navigation
-  prevBtn.addEventListener('click', prev);
-  nextBtn.addEventListener('click', next);
-
-  // Touch/swipe navigation
-  let touchStartX = 0;
-  let touchStartY = 0;
-  document.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }, { passive: true });
-  document.addEventListener('touchend', function(e) {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    const dy = e.changedTouches[0].screenY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-      if (dx < 0) next(); else prev();
-    }
-  }, { passive: true });
-
-  updateUI();
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
 })();
-
-// Quiz handler
-function handleCheck(el) {
-  const parent = el.closest('.slide');
-  const options = parent.querySelectorAll('.check-option');
-  const explanation = parent.querySelector('.check-explanation');
-
-  // Prevent re-clicking
-  if (parent.dataset.answered) return;
-  parent.dataset.answered = 'true';
-
-  options.forEach(function(opt) {
-    opt.style.cursor = 'default';
-    if (opt.dataset.correct === 'true') {
-      opt.classList.add('correct');
-    } else if (opt === el && opt.dataset.correct === 'false') {
-      opt.classList.add('incorrect');
-    }
-  });
-  explanation.classList.add('visible');
-}
-
-// Case reveal handler
-function revealCase(btn) {
-  const answer = btn.nextElementSibling;
-  answer.classList.add('visible');
-  btn.style.display = 'none';
-}
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
 </script>
-n<!-- Student Tracking -->n<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">n<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">n<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>n<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>n<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />n<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>n</div></div>n<script>n(function(){nvar S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';nvar R=document.title;nvar n=localStorage.getItem('si_student_name');nif(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}nfunction doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}nfunction logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}n})();n</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
 </body>
 </html>
