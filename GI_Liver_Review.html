@@ -1,679 +1,1073 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>GI Pathophysiology Review — Section 2: Hepatobiliary, Hepatitis, Cirrhosis</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 9: Liver — Hepatobiliary, Hepatitis, Cirrhosis Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ── RESET ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#0f172a;color:#e2e8f0}
-
-/* ── PALETTE ── */
-:root{
-  --bg-deep:#0f172a;--bg-card:#1e293b;--blue:#38bdf8;--yellow:#f59e0b;--red:#ef4444;
-  --purple:#a78bfa;--teal:#22d3ee;--green:#34d399;--text:#e2e8f0;--text-dim:#94a3b8;
-  --accent-glow:rgba(56,189,248,.12);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
 }
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
 
-/* ── PROGRESS BAR ── */
-#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .35s ease;z-index:100}
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
 
-/* ── SLIDE COUNTER ── */
-#slide-counter{position:fixed;bottom:18px;right:24px;font-size:.85rem;color:var(--text-dim);z-index:100;user-select:none}
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
 
-/* ── NAV BUTTONS ── */
-.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--text-dim);font-size:1.4rem;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:background .2s}
-.nav-btn:hover{background:rgba(255,255,255,.12);color:#fff}
-#prev-btn{left:16px}
-#next-btn{right:16px}
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── SLIDE WRAPPER ── */
-#deck{position:relative;width:100%;height:100%}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 6% 80px 6%;opacity:0;pointer-events:none;transition:opacity .4s ease,transform .4s ease;transform:translateX(40px)}
-.slide.active{opacity:1;pointer-events:auto;transform:translateX(0);overflow-y:auto;-webkit-overflow-scrolling:touch}
-
-/* ── SECTION LABEL ── */
-.section-label{font-size:.75rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px}
-.section-label.blue{color:var(--blue)}.section-label.yellow{color:var(--yellow)}.section-label.red{color:var(--red)}.section-label.teal{color:var(--teal)}.section-label.green{color:var(--green)}.section-label.purple{color:var(--purple)}
-
-/* ── TITLE SLIDE ── */
-.slide.title-slide .title-main{font-size:clamp(2rem,5vw,3.4rem);font-weight:900;line-height:1.15;text-align:center;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.slide.title-slide .title-sub{font-size:1.1rem;color:var(--text-dim);margin-top:14px;text-align:center}
-.slide.title-slide .title-meta{font-size:.82rem;color:var(--text-dim);margin-top:28px;text-align:center;opacity:.7}
-
-/* ── ANCHOR SLIDE ── */
-.slide.anchor-slide .anchor-text{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:800;text-align:center;line-height:1.3;max-width:860px}
-.slide.anchor-slide .anchor-sub{font-size:1.05rem;color:var(--text-dim);text-align:center;margin-top:16px;max-width:720px;line-height:1.6}
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
 
 /* ── SECTION DIVIDER ── */
-.slide.section-divider .divider-num{font-size:5rem;font-weight:900;opacity:.15;position:absolute;top:10%}
-.slide.section-divider .divider-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-align:center}
-.slide.section-divider .divider-sub{font-size:1rem;color:var(--text-dim);margin-top:12px;text-align:center}
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
 
-/* ── CONTENT CARD ── */
-.card{background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:36px 40px;max-width:920px;width:100%}
-.card h2{font-size:1.55rem;font-weight:800;margin-bottom:18px}
-.card ul{list-style:none;padding:0}
-.card ul li{position:relative;padding-left:22px;margin-bottom:11px;font-size:1rem;line-height:1.55;color:var(--text)}
-.card ul li::before{content:'';position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
-.card ul li.warn::before{background:var(--yellow)}
-.card ul li.danger::before{background:var(--red)}
-.card ul li.green::before{background:var(--green)}
-.card ul li.purple::before{background:var(--purple)}
-.card ul li.teal::before{background:var(--teal)}
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.15rem;color:var(--text-dim);max-width:720px;line-height:1.6}
 
-/* ── COLUMNS ── */
-.cols{display:flex;gap:28px;width:100%;max-width:920px}
-.cols .col{flex:1}
-.cols .col .card{max-width:none;height:100%}
-/* cols stacking handled in main mobile breakpoint */
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:center;max-width:960px;margin:0 auto;text-align:center}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:24px;text-align:center}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
 
-/* ── HIGHLIGHT BOX ── */
-.highlight-box{border-radius:10px;padding:14px 18px;margin-top:14px;font-size:.95rem;line-height:1.5}
-.highlight-box{background:rgba(56,189,248,.1);border-left:4px solid var(--blue);color:var(--blue)}
-.highlight-box.warn{background:rgba(245,158,11,.1);border-left-color:var(--yellow);color:var(--yellow)}
-.highlight-box.danger{background:rgba(239,68,68,.1);border-left-color:var(--red);color:var(--red)}
-.highlight-box.purple{background:rgba(167,139,250,.1);border-left-color:var(--purple);color:var(--purple)}
-.highlight-box.green{background:rgba(52,211,153,.1);border-left-color:var(--green);color:var(--green)}
-.highlight-box.teal{background:rgba(34,211,238,.1);border-left-color:var(--teal);color:var(--teal)}
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)} em.purple{font-style:normal;color:var(--purple)} em.teal{font-style:normal;color:var(--teal)}
 
-/* ── FLOW CHAIN ── */
-.flow-chain{display:flex;flex-wrap:nowrap;align-items:center;gap:0;max-width:960px;overflow-x:auto;padding:12px 0}
-.flow-step{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 18px;font-size:.92rem;font-weight:600;text-align:center;white-space:nowrap;min-width:100px}
-.flow-arrow{font-size:1.3rem;color:var(--blue);margin:0 6px;flex-shrink:0}
-.flow-step.danger{border-color:var(--red);color:var(--red)}
-.flow-step.warn{border-color:var(--yellow);color:var(--yellow)}
-.flow-step.blue{border-color:var(--blue);color:var(--blue)}
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:820px;text-align:left}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
 
-/* ── QUIZ ── */
-.quiz-wrap{max-width:720px;width:100%}
-.quiz-q{font-size:1.2rem;font-weight:700;margin-bottom:20px;color:var(--purple)}
-.quiz-choices{display:flex;flex-direction:column;gap:10px}
-.quiz-choice{background:var(--bg-card);border:2px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 20px;cursor:pointer;font-size:1rem;transition:border-color .2s,background .2s;user-select:none}
-.quiz-choice:hover:not(.chosen){border-color:var(--purple)}
-.quiz-choice.correct{border-color:var(--green);background:rgba(52,211,153,.12);color:var(--green)}
-.quiz-choice.wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
-.quiz-explanation{margin-top:16px;padding:14px 18px;border-radius:10px;background:rgba(167,139,250,.08);border-left:4px solid var(--purple);font-size:.95rem;line-height:1.55;color:var(--text-dim);display:none}
-.quiz-explanation.show{display:block}
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:8px;font-weight:600}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-chain.horizontal{flex-direction:row}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:4px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
 
-/* ── CASE SLIDE ── */
-.case-card{background:var(--bg-card);border:1px solid rgba(34,211,238,.25);border-radius:16px;padding:32px 36px;max-width:920px;width:100%}
-.case-card h2{color:var(--teal)}
-.case-card .case-prompt{font-size:1rem;line-height:1.6;margin-bottom:18px;color:var(--text)}
-.case-reveal-btn{background:rgba(34,211,238,.15);border:1px solid var(--teal);color:var(--teal);padding:10px 24px;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s}
-.case-reveal-btn:hover{background:rgba(34,211,238,.25)}
-.case-answer{margin-top:16px;display:none;font-size:.95rem;line-height:1.6;color:var(--text-dim)}
-.case-answer.show{display:block}
-.case-answer ul{list-style:none;padding:0}
-.case-answer ul li{padding-left:20px;position:relative;margin-bottom:8px}
-.case-answer ul li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--teal)}
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:26px 22px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.15rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.compare-col ul li{font-size:0.94rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
 
-/* ── COMPARE SLIDE ── */
-.compare-wrap{display:flex;gap:24px;max-width:940px;width:100%}
-.compare-col{flex:1;background:var(--bg-card);border-radius:16px;padding:28px 24px;border:1px solid rgba(255,255,255,.06)}
-.compare-col h3{font-size:1.15rem;font-weight:800;margin-bottom:14px}
-.compare-col ul{list-style:none;padding:0}
-.compare-col ul li{padding-left:18px;position:relative;margin-bottom:9px;font-size:.95rem;line-height:1.5}
-.compare-col ul li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%}
-.compare-col.left-col ul li::before{background:var(--blue)}
-.compare-col.right-col ul li::before{background:var(--yellow)}
-/* compare stacking handled in main mobile breakpoint */
+/* ── CHECK ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.05rem,2vw,1.4rem);font-weight:700;max-width:820px;line-height:1.4;margin-bottom:30px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:780px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:16px 18px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.02rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
 
-/* ── SCROLLBAR STYLING ── */
-.slide.active::-webkit-scrollbar{width:6px}
-.slide.active::-webkit-scrollbar-track{background:transparent}
-.slide.active::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
-.slide.active::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}
-.slide.active{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:22px 26px;max-width:780px;text-align:left;font-size:1.02rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:700;max-width:780px;line-height:1.4;margin-bottom:22px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
 
-/* ── MOBILE ── */
+/* ── CELL-CARDS ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;width:100%}
+.cell-cards.three-col{grid-template-columns:1fr 1fr 1fr;max-width:880px}
+.cell-cards .full-span{grid-column:1 / -1}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid;text-align:left}
+.cell-card .cell-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── RESPONSIVE ── */
 @media(max-width:768px){
-  .slide{padding:56px 20px 80px 20px;padding-top:calc(env(safe-area-inset-top, 0px) + 56px);justify-content:flex-start}
-
-  /* Anchor text (h1 equivalent) */
-  .slide.anchor-slide .anchor-text{font-size:1.5rem}
-  .slide.anchor-slide .anchor-sub{font-size:.9rem}
-
-  /* Section divider */
-  .slide.section-divider .divider-title{font-size:1.5rem}
-  .slide.section-divider .divider-num{font-size:3.5rem}
-
-  /* Title slide */
-  .slide.title-slide .title-main{font-size:1.6rem}
-  .slide.title-slide .title-sub{font-size:.92rem}
-
-  /* Card h2 */
-  .card h2{font-size:1.15rem}
-
-  /* Body text / list items */
-  .card ul li{font-size:.88rem}
-  .card{padding:20px}
-
-  /* Highlight boxes */
-  .highlight-box{padding:10px 14px;font-size:.85rem}
-
-  /* Columns — stack */
-  .cols{flex-direction:column}
-
-  /* Compare grids — stack */
-  .compare-wrap{flex-direction:column}
-  .compare-col{padding:20px 18px}
-  .compare-col ul li{font-size:.88rem}
-
-  /* Quiz */
-  .quiz-q{font-size:1.05rem}
-  .quiz-choice{padding:12px 16px;font-size:.9rem}
-  .quiz-explanation{font-size:.85rem;padding:10px 14px}
-  .quiz-wrap{max-width:100%}
-
-  /* Flow chains — stack vertical */
-  .flow-chain{flex-direction:column;align-items:stretch;gap:0;overflow-x:visible}
-  .flow-step{white-space:normal;min-width:unset;width:100%;font-size:.85rem;padding:10px 14px}
-  .flow-arrow{transform:rotate(90deg);margin:4px auto;font-size:1.1rem}
-
-  /* Case card */
-  .case-card{padding:20px 18px}
-  .case-card .case-prompt{font-size:.9rem}
-  .case-answer ul li{font-size:.88rem}
-
-  /* Nav buttons — smaller, closer to edges */
-  .nav-btn{width:36px;height:36px;font-size:1rem}
-  #prev-btn{left:8px}
-  #next-btn{right:8px}
-
-  /* Slide counter */
-  #slide-counter{font-size:.75rem;bottom:14px;right:14px}
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.cell-cards.three-col{grid-template-columns:1fr}
+  .flow-chain.horizontal{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0}
+  .flow-chain.horizontal .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%}
+  .flow-chain.horizontal .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
 }
 </style>
 </head>
 <body>
 
-<div id="progress-bar"></div>
-<div id="slide-counter"></div>
-<button class="nav-btn" id="prev-btn" aria-label="Previous">&#8592;</button>
-<button class="nav-btn" id="next-btn" aria-label="Next">&#8594;</button>
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter">1 / 30</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
 
-<div id="deck">
-
-<!-- ===================== SLIDE 1 — TITLE ===================== -->
-<div class="slide title-slide active">
-  <div class="title-main">GI Pathophysiology<br>Section 2</div>
-  <div class="title-sub">Hepatobiliary System &bull; Hepatitis &bull; Cirrhosis</div>
-  <div class="title-meta">Chapter 9 &mdash; Supplemental Instructor Review<br>Lindsay Wilson &amp; Claude Code</div>
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>GI &mdash; Liver, Hepatitis &amp; Cirrhosis</h1>
+  <div class="subtitle">Chapter 9 &middot; Section 2 &mdash; Hepatobiliary system, hepatitis, and cirrhosis</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
 </div>
 
-<!-- ===================== SLIDE 2 — SECTION DIVIDER: HEPATOBILIARY ===================== -->
+<!-- ════════ SLIDE 2: SECTION A — Hepatobiliary ════════ -->
 <div class="slide section-divider">
-  <div class="divider-num" style="color:var(--blue)">I</div>
-  <div class="divider-title" style="color:var(--blue)">Hepatobiliary System</div>
+  <div class="section-num">Section A</div>
+  <h2>Hepatobiliary <em>System</em></h2>
   <div class="divider-sub">The liver, bile, gallbladder &amp; pancreas</div>
 </div>
 
-<!-- ===================== SLIDE 3 — ANCHOR: THE LIVER ===================== -->
-<div class="slide anchor-slide">
-  <span class="section-label blue">Hepatobiliary System</span>
-  <div class="anchor-text" style="color:var(--blue)">The liver does <em>everything.</em></div>
-  <div class="anchor-sub">Largest internal organ. Highly vascular. CAN regenerate.<br>Unique dual blood supply: hepatic artery (O<sub>2</sub>) + portal vein (nutrients from GI).</div>
+<!-- ════════ SLIDE 3: ANCHOR — The Liver Does Everything ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>The Liver Does <em class="blue">Everything.</em></h2>
+  <div class="subline">Largest internal organ. Highly vascular. CAN regenerate. Dual blood supply: hepatic artery (O&#8322;) + portal vein (nutrients from GI).</div>
 </div>
 
-<!-- ===================== SLIDE 4 — LIVER FUNCTIONS A ===================== -->
-<div class="slide">
-  <span class="section-label blue">Liver Functions</span>
-  <div class="card">
-    <h2>What the Liver Does &mdash; Part 1</h2>
-    <ul>
-      <li><strong>Detoxifies:</strong> metabolizes drugs, toxins, alcohol</li>
-      <li><strong>Synthesizes:</strong> albumin, clotting factors, glucose, proteins, cholesterol</li>
-      <li><strong>Stores:</strong> glycogen, fats, nutrients &mdash; releases when needed</li>
-      <li><strong>Makes bile</strong> &rarr; emulsifies fat for absorption</li>
-    </ul>
-    <div class="highlight-box">Think of the liver as a factory, warehouse, and recycling center all in one.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 5 — LIVER FUNCTIONS B ===================== -->
-<div class="slide">
-  <span class="section-label blue">Liver Functions</span>
-  <div class="card">
-    <h2>What the Liver Does &mdash; Part 2</h2>
-    <ul>
-      <li><strong>Converts ammonia (NH<sub>3</sub>) &rarr; urea</strong> for kidney excretion</li>
-      <li><strong>Breaks down hormones</strong> (estrogen, testosterone)</li>
-      <li><strong>Removes old RBCs</strong> &mdash; recycles iron &amp; proteins</li>
-      <li><strong>Maintains blood volume</strong> via albumin (oncotic pressure holds fluid in vessels)</li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 6 — WHEN LIVER FAILS ===================== -->
-<div class="slide">
-  <span class="section-label red">When the Liver Fails</span>
-  <div class="card">
-    <h2>Map Each Failure to Its Symptom</h2>
-    <ul>
-      <li class="danger">Can't clear drugs &rarr; <strong>toxicity</strong></li>
-      <li class="danger">Can't make albumin &rarr; <strong>edema, ascites</strong></li>
-      <li class="danger">Can't make clotting factors &rarr; <strong>bleeding, bruising</strong></li>
-      <li class="danger">Can't clear bilirubin &rarr; <strong>jaundice, pruritus</strong></li>
-      <li class="danger">Can't convert ammonia &rarr; <strong>hepatic encephalopathy</strong></li>
-      <li class="danger">Can't break down estrogen &rarr; males: <strong>gynecomastia, hair loss</strong></li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 7 — QUICK CHECK: LIVER FUNCTIONS ===================== -->
-<div class="slide">
-  <span class="section-label purple">Quick Check</span>
-  <div class="quiz-wrap">
-    <div class="quiz-q">A patient has low albumin levels. What symptom would you expect?</div>
-    <div class="quiz-choices">
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Jaundice</div>
-      <div class="quiz-choice" data-correct="true" onclick="quizPick(this)">Edema / ascites</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Hepatic encephalopathy</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Gynecomastia</div>
+<!-- ════════ SLIDE 4: Liver Functions Part 1 (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Liver Functions</div>
+  <h3>What the Liver <em>Does</em> &mdash; Part 1</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9762;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Detoxifies</strong>
+        <ul>
+          <li>Metabolizes drugs, toxins</li>
+          <li>Processes alcohol</li>
+        </ul>
+      </div>
     </div>
-    <div class="quiz-explanation">Albumin maintains oncotic pressure &mdash; it holds fluid inside blood vessels. Low albumin = fluid leaks out = edema &amp; ascites.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 8 — BILE & GALLBLADDER ===================== -->
-<div class="slide">
-  <span class="section-label blue">Bile &amp; Gallbladder</span>
-  <div class="card">
-    <h2>Bile: Made by Liver, Stored in Gallbladder</h2>
-    <ul>
-      <li>Bile released into <strong>duodenum</strong> when fat is present</li>
-      <li>Emulsifies fat &rarr; allows absorption of fat + <strong>fat-soluble vitamins A, D, E, K</strong></li>
-      <li class="warn">No bile = <strong>steatorrhea</strong> (floating, greasy, foul stool) + ADEK deficiency</li>
-      <li class="danger"><strong>Vitamin K deficiency = no clotting</strong> (most dangerous)</li>
-    </ul>
-    <div class="highlight-box warn">No gallbladder? Bile still flows continuously &mdash; but patient can't handle large fatty meals.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 9 — GALLBLADDER PEARLS ===================== -->
-<div class="slide">
-  <span class="section-label blue">Bile &amp; Gallbladder</span>
-  <div class="card">
-    <h2>Gallbladder Clinical Pearls</h2>
-    <ul>
-      <li>Gallbladder sits <strong>under the liver</strong> &mdash; NOT normally palpable</li>
-      <li class="warn">Gallbladder pain is <strong>referred pain between the shoulders</strong></li>
-      <li>Ducts from gallbladder + pancreas enter duodenum <strong>side by side</strong></li>
-    </ul>
-    <div class="highlight-box danger">Gallstones &rarr; block bile duct &rarr; inflame pancreatic duct &rarr; enzymes auto-digest pancreas &rarr; <strong>pancreatitis</strong></div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 10 — PANCREAS ===================== -->
-<div class="slide">
-  <span class="section-label blue">Pancreas</span>
-  <div class="card">
-    <h2>Exocrine Pancreas</h2>
-    <ul>
-      <li><strong>Digestive enzymes</strong> &mdash; break down carbs, proteins, fats</li>
-      <li><strong>Bicarbonate (HCO<sub>3</sub><sup>&minus;</sup>)</strong> &mdash; neutralizes acidic chyme from stomach</li>
-      <li class="danger">Gallstones can block the shared duct &rarr; pancreatic enzymes activate inside the pancreas &rarr; <strong>auto-digestion = pancreatitis</strong></li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 11 — BABIES & VIT K ===================== -->
-<div class="slide">
-  <span class="section-label green">Nursing Pearl</span>
-  <div class="card">
-    <h2>Newborns &amp; Vitamin K</h2>
-    <ul>
-      <li>Newborn gut is <strong>sterile</strong> &mdash; no bacteria to make Vitamin K</li>
-      <li class="danger">Without Vit K, minor injury = <strong>major bleed</strong></li>
-      <li class="green"><strong>Vit K injection at birth</strong> &mdash; standard of care</li>
-      <li>Takes ~3 months for gut bacteria to colonize and produce Vit K</li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 12 — QUICK CHECK: BILIARY OBSTRUCTION ===================== -->
-<div class="slide">
-  <span class="section-label purple">Quick Check</span>
-  <div class="quiz-wrap">
-    <div class="quiz-q">A gallstone blocks the bile duct. Which vitamin deficiency is the MOST dangerous?</div>
-    <div class="quiz-choices">
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Vitamin A &mdash; vision problems</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Vitamin D &mdash; bone weakness</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Vitamin E &mdash; nerve damage</div>
-      <div class="quiz-choice" data-correct="true" onclick="quizPick(this)">Vitamin K &mdash; bleeding/no clotting</div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128736;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Synthesizes</strong>
+        <ul>
+          <li>Albumin, clotting factors</li>
+          <li>Glucose, proteins, cholesterol</li>
+        </ul>
+      </div>
     </div>
-    <div class="quiz-explanation">No bile = no fat absorption = no ADEK. Vitamin K is the most immediately dangerous because it's needed for clotting factors. Without it, the patient can bleed out.</div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128230;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Stores</strong>
+        <ul>
+          <li>Glycogen, fats, nutrients</li>
+          <li>Releases when needed</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#128167;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Makes Bile</strong>
+        <ul>
+          <li>Emulsifies fat for absorption</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    Think of the liver as a <strong>factory, warehouse, and recycling center</strong> all in one.
   </div>
 </div>
 
-<!-- ===================== SLIDE 13 — SECTION DIVIDER: HEPATITIS ===================== -->
+<!-- ════════ SLIDE 5: Liver Functions Part 2 (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Liver Functions</div>
+  <h3>What the Liver <em>Does</em> &mdash; Part 2</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">NH&#8323;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Converts Ammonia &rarr; Urea</strong>
+        <ul>
+          <li>NH&#8323; (toxic byproduct of protein metabolism) &rarr; urea</li>
+          <li>Urea excreted by kidneys</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Breaks Down Hormones</strong>
+        <ul>
+          <li>Estrogen, testosterone</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9851;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Removes Old RBCs</strong>
+        <ul>
+          <li>Recycles iron &amp; proteins</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128165;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Maintains Blood Volume</strong>
+        <ul>
+          <li>Albumin &rarr; oncotic pressure</li>
+          <li>Holds fluid inside vessels</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 6: When the Liver Fails (cell-cards mapping) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">When Liver Fails</div>
+  <h3>Map Each <em class="red">Failure</em> to Its Symptom</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9762;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Can&rsquo;t Clear Drugs</strong>
+        <ul>
+          <li>&rarr; Toxicity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&darr;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Can&rsquo;t Make Albumin</strong>
+        <ul>
+          <li>&rarr; Edema, ascites</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">!</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Can&rsquo;t Make Clotting Factors</strong>
+        <ul>
+          <li>&rarr; Bleeding, bruising</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&uarr;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Can&rsquo;t Clear Bilirubin</strong>
+        <ul>
+          <li>&rarr; Jaundice, pruritus</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">NH&#8323;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Can&rsquo;t Convert Ammonia</strong>
+        <ul>
+          <li>&rarr; Hepatic encephalopathy</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#9794;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Can&rsquo;t Break Down Estrogen</strong>
+        <ul>
+          <li>Males: gynecomastia, hair loss</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 7: CHECK — Low Albumin ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient has low albumin levels. What symptom would you expect?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Jaundice
+      <div class="explanation">Jaundice is from high bilirubin, not low albumin. Different liver function.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Edema / ascites
+      <div class="explanation">Correct. Albumin maintains oncotic pressure &mdash; it holds fluid inside blood vessels. Low albumin = fluid leaks out = edema and ascites.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Hepatic encephalopathy
+      <div class="explanation">That&rsquo;s from ammonia buildup (the liver can&rsquo;t convert NH&#8323; to urea), not albumin.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Gynecomastia
+      <div class="explanation">That&rsquo;s from failure to break down estrogen, not from low albumin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 8: Bile & Gallbladder (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Bile &amp; Gallbladder</div>
+  <h3>Bile: Made by <em class="yellow">Liver,</em> Stored in <em class="blue">Gallbladder</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128167;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Where Bile Goes</strong>
+        <ul>
+          <li>Released into duodenum when fat is present</li>
+          <li>Emulsifies fat &rarr; absorption</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">ADEK</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Fat-Soluble Vitamins</strong>
+        <ul>
+          <li>A, D, E, K absorbed with fat</li>
+          <li>No bile &rarr; no ADEK</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128169;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">No Bile</strong>
+        <ul>
+          <li>Steatorrhea (floating, greasy, foul stool)</li>
+          <li>ADEK deficiency</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">K</div>
+      <div class="cell-text"><strong style="color:var(--red);">Vitamin K = Most Dangerous</strong>
+        <ul>
+          <li>Needed for clotting factors</li>
+          <li>Deficiency &rarr; bleeding risk</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>No gallbladder?</strong> Bile still flows continuously &mdash; but patient can&rsquo;t handle large fatty meals.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 9: Gallbladder Clinical Pearls ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Bile &amp; Gallbladder</div>
+  <h3>Gallbladder <em class="teal">Clinical Pearls</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128205;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Location</strong>
+        <ul>
+          <li>Sits under the liver</li>
+          <li>NOT normally palpable</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129508;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Referred Pain</strong>
+        <ul>
+          <li>Gallbladder pain radiates between the shoulders</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128295;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Shared Duct Anatomy</strong>
+        <ul>
+          <li>Gallbladder and pancreas ducts enter duodenum side by side</li>
+          <li>A gallstone can block BOTH</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger">
+    <strong>Gallstones &rarr; block bile duct &rarr; inflame pancreatic duct &rarr; enzymes auto-digest pancreas &rarr; pancreatitis.</strong>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 10: Exocrine Pancreas ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Pancreas</div>
+  <h3>Exocrine <em>Pancreas</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">Enz</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Digestive Enzymes</strong>
+        <ul>
+          <li>Break down carbs, proteins, fats</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">HCO&#8323;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Bicarbonate</strong>
+        <ul>
+          <li>Neutralizes acidic chyme from stomach</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger">
+    <strong>Pancreatitis mechanism:</strong> Gallstones block the shared duct &rarr; pancreatic enzymes activate INSIDE the pancreas &rarr; auto-digestion &rarr; pancreatitis.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 11: Newborns & Vitamin K ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Nursing Pearl</div>
+  <h3>Newborns &amp; <em class="green">Vitamin K</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128118;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Sterile Gut at Birth</strong>
+        <ul>
+          <li>No bacteria to make Vit K yet</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9888;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Bleeding Risk</strong>
+        <ul>
+          <li>Without Vit K, minor injury = major bleed</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#128137;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Vit K Injection</strong>
+        <ul>
+          <li>Given at birth &mdash; standard of care</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128197;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Timeline</strong>
+        <ul>
+          <li>~3 months for gut bacteria to colonize</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 12: CHECK — Biliary Obstruction ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A gallstone blocks the bile duct. Which vitamin deficiency is the MOST dangerous?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Vitamin A &mdash; vision problems
+      <div class="explanation">Vit A deficiency is real here (no fat absorption = no ADEK) but not the most immediately dangerous.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Vitamin D &mdash; bone weakness
+      <div class="explanation">Important, but develops slowly. Not the acute threat.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Vitamin E &mdash; nerve damage
+      <div class="explanation">Also slow to develop. Not the most urgent.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Vitamin K &mdash; bleeding / no clotting
+      <div class="explanation">Correct. No bile = no fat absorption = no ADEK. Vit K is needed for clotting factors. Without it, the patient can bleed out &mdash; most immediate danger.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 13: SECTION B — Hepatitis ════════ -->
 <div class="slide section-divider">
-  <div class="divider-num" style="color:var(--yellow)">II</div>
-  <div class="divider-title" style="color:var(--yellow)">Hepatitis</div>
-  <div class="divider-sub">Inflammation of the liver &mdash; viral &amp; non-viral causes</div>
+  <div class="section-num">Section B</div>
+  <h2><em>Hepatitis</em></h2>
+  <div class="divider-sub">Inflammation of the liver &mdash; viral and non-viral causes</div>
 </div>
 
-<!-- ===================== SLIDE 14 — ANCHOR: HEPATITIS PATH ===================== -->
-<div class="slide anchor-slide">
-  <span class="section-label yellow">Hepatitis</span>
-  <div class="anchor-text" style="color:var(--yellow)">Hepatitis destroys liver cells.</div>
-  <div class="anchor-sub">Necrosis &rarr; scarring &rarr; cirrhosis &rarr; cancer.<br>The endpoint is always the same. The cause determines the timeline.</div>
+<!-- ════════ SLIDE 14: ANCHOR — Hepatitis Destroys Liver Cells ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-warn">Core Concept</div>
+  <h2>Hepatitis <em class="yellow">Destroys Liver Cells.</em></h2>
+  <div class="subline">Necrosis &rarr; scarring &rarr; cirrhosis &rarr; cancer. The endpoint is always the same. The cause determines the timeline.</div>
 </div>
 
-<!-- ===================== SLIDE 15 — VOWELS vs CONSONANTS ===================== -->
-<div class="slide">
-  <span class="section-label yellow">Hepatitis Types</span>
-  <div class="compare-wrap">
-    <div class="compare-col left-col">
-      <h3 style="color:var(--blue)">Vowels: A &amp; E</h3>
+<!-- ════════ SLIDE 15: COMPARE — Vowels vs Consonants ════════ -->
+<div class="slide compare">
+  <h3>Hepatitis <em class="yellow">Types</em></h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Vowels: A &amp; E</h4>
       <ul>
         <li><strong>Oral-fecal route</strong> (contaminated food/water)</li>
         <li><strong>Self-limiting</strong> &mdash; no chronic form</li>
-        <li>Hep A: <strong>vaccine (2-dose)</strong></li>
+        <li>Hep A: 2-dose vaccine available</li>
         <li>Hep E: no vaccine, rare in US</li>
       </ul>
     </div>
-    <div class="compare-col right-col">
-      <h3 style="color:var(--yellow)">Consonants: B, C, D</h3>
+    <div class="compare-col col-red">
+      <h4>Consonants: B, C, D</h4>
       <ul>
         <li><strong>Blood &amp; body fluids</strong> (HCW at greater risk)</li>
-        <li>Hep B: <strong>vaccine (3-dose)</strong>, CAN become chronic</li>
-        <li>Hep C: <strong>NO vaccine</strong>, most likely &rarr; chronic &rarr; cirrhosis</li>
-        <li>Hep D: only co-infects <strong>with B</strong></li>
+        <li>Hep B: 3-dose vaccine; CAN become chronic</li>
+        <li>Hep C: NO vaccine; most likely to become chronic &rarr; cirrhosis</li>
+        <li>Hep D: only co-infects with B</li>
       </ul>
     </div>
   </div>
-  <div class="highlight-box warn" style="max-width:920px;margin-top:16px"><strong>Memory trick:</strong> The <em>vowel</em> is in the <em>bowel</em> &mdash; A and E travel through the bowel (oral-fecal). Consonants = <em>blood</em> and body fluids.</div>
-</div>
-
-<!-- ===================== SLIDE 16 — CLINICAL COURSE ===================== -->
-<div class="slide">
-  <span class="section-label yellow">Hepatitis</span>
-  <div class="card">
-    <h2>Clinical Course</h2>
-    <ul>
-      <li><strong>Prodromal:</strong> fatigue, anorexia, nausea, RUQ discomfort (may be asymptomatic)</li>
-      <li class="warn"><strong>Icteric:</strong> jaundice, dark urine, clay-colored stools, pruritus, elevated AST/ALT</li>
-      <li class="green"><strong>Recovery:</strong> weeks to months. A &amp; E resolve. B &amp; C may become chronic.</li>
-    </ul>
-    <div class="highlight-box">Elevated <strong>AST/ALT</strong> = liver cell damage. Elevated <strong>bilirubin</strong> = liver can't do its job.</div>
+  <div class="callout warn">
+    <strong>Memory trick:</strong> The <em>vowel</em> is in the <em>bowel</em> &mdash; A and E travel through the bowel (oral-fecal). Consonants = <em>blood</em> and body fluids.
   </div>
 </div>
 
-<!-- ===================== SLIDE 17 — NON-VIRAL CAUSES ===================== -->
-<div class="slide">
-  <span class="section-label yellow">Hepatitis</span>
-  <div class="card">
-    <h2>Non-Viral Hepatitis</h2>
-    <ul>
-      <li class="danger"><strong>Alcohol</strong> &mdash; most common non-viral cause</li>
-      <li class="danger"><strong>Tylenol (acetaminophen)</strong> &mdash; toxic to liver in high doses</li>
-      <li>Seizure meds, antibiotics &mdash; drug-induced</li>
-      <li>Autoimmune hepatitis</li>
-    </ul>
-    <div class="highlight-box danger">Non-viral hepatitis is <strong>NOT contagious</strong> &mdash; but the liver damage is the same.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 18 — HEPATITIS TREATMENT ===================== -->
-<div class="slide">
-  <span class="section-label green">Hepatitis Treatment &amp; Prevention</span>
-  <div class="card">
-    <h2>Keep It Simple</h2>
-    <ul>
-      <li class="green"><strong>Vaccines:</strong> Hep A (2-dose) and Hep B (3-dose)</li>
-      <li class="green"><strong>Hygiene/sanitation</strong> for A &amp; E</li>
-      <li class="green"><strong>Universal precautions, safe sex, sterile needles</strong> for B, C, D</li>
-      <li><strong>Supportive care</strong> &mdash; rest, hydration, nutrition</li>
-      <li class="danger"><strong>No Tylenol. No alcohol.</strong></li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 19 — QUICK CHECK: HEPATITIS ===================== -->
-<div class="slide">
-  <span class="section-label purple">Quick Check</span>
-  <div class="quiz-wrap">
-    <div class="quiz-q">A traveler returns from Central America with jaundice, fatigue, and dark urine. No IV drug history. Most likely?</div>
-    <div class="quiz-choices">
-      <div class="quiz-choice" data-correct="true" onclick="quizPick(this)">Hepatitis A &mdash; oral-fecal, travel exposure</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Hepatitis B &mdash; blood/body fluid transmission</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Hepatitis C &mdash; blood transmission, no vaccine</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">Hepatitis D &mdash; co-infection with B</div>
+<!-- ════════ SLIDE 16: Clinical Course ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Hepatitis</div>
+  <h3>Clinical <em>Course</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">1</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Prodromal Phase</strong>
+        <ul>
+          <li>Fatigue, anorexia, nausea</li>
+          <li>RUQ discomfort</li>
+          <li>May be asymptomatic</li>
+        </ul>
+      </div>
     </div>
-    <div class="quiz-explanation">Travel + contaminated food/water + no IV drug history = oral-fecal route = <strong>Hep A</strong> (vowel!). Self-limiting, vaccine-preventable.</div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">2</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Icteric Phase</strong>
+        <ul>
+          <li>Jaundice, dark urine</li>
+          <li>Clay-colored stools, pruritus</li>
+          <li>Elevated AST/ALT</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">3</div>
+      <div class="cell-text"><strong style="color:var(--green);">Recovery</strong>
+        <ul>
+          <li>Weeks to months</li>
+          <li>A &amp; E resolve fully</li>
+          <li>B &amp; C may become chronic</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Elevated AST/ALT</strong> = liver cell damage. <strong>Elevated bilirubin</strong> = liver can&rsquo;t do its job.
   </div>
 </div>
 
-<!-- ===================== SLIDE 20 — SECTION DIVIDER: CIRRHOSIS ===================== -->
+<!-- ════════ SLIDE 17: Non-Viral Hepatitis ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Hepatitis</div>
+  <h3>Non-Viral <em class="red">Hepatitis</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#127866;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Alcohol (#1)</strong>
+        <ul>
+          <li>Most common non-viral cause</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Tylenol (Acetaminophen)</strong>
+        <ul>
+          <li>Toxic to liver in high doses</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Drug-Induced</strong>
+        <ul>
+          <li>Seizure meds</li>
+          <li>Some antibiotics</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129440;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Autoimmune</strong>
+        <ul>
+          <li>Body attacks liver tissue</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger">
+    Non-viral hepatitis is <strong>NOT contagious</strong> &mdash; but the liver damage is the same.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 18: Hepatitis Treatment ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Hepatitis</div>
+  <h3>Treatment &amp; <em class="green">Prevention</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#128137;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Vaccines</strong>
+        <ul>
+          <li>Hep A &mdash; 2-dose series</li>
+          <li>Hep B &mdash; 3-dose series</li>
+          <li>No vaccine for C, D, E</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#129529;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Prevention &mdash; A/E</strong>
+        <ul>
+          <li>Hygiene &amp; sanitation</li>
+          <li>Clean food/water</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128682;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Prevention &mdash; B/C/D</strong>
+        <ul>
+          <li>Universal precautions</li>
+          <li>Safe sex, sterile needles</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#10060;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Absolute No&rsquo;s</strong>
+        <ul>
+          <li>No Tylenol</li>
+          <li>No alcohol</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Supportive care</strong> &mdash; rest, hydration, nutrition. For chronic B/C, antivirals can suppress viral load.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 19: CHECK — Hepatitis ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A traveler returns from Central America with jaundice, fatigue, and dark urine. No IV drug history. Most likely?</div>
+  <div class="choices">
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Hepatitis A
+      <div class="explanation">Correct! Travel + contaminated food/water + no IV drug history = oral-fecal route = Hep A (the vowel!). Self-limiting, vaccine-preventable.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Hepatitis B
+      <div class="explanation">Hep B is blood/body fluid transmission. The travel + no IV drugs history makes this less likely.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Hepatitis C
+      <div class="explanation">Hep C is blood transmission &mdash; no vaccine. Not consistent with the travel-exposure pattern.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Hepatitis D
+      <div class="explanation">Hep D only co-infects with B. Less likely from travel exposure alone.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 20: SECTION C — Cirrhosis ════════ -->
 <div class="slide section-divider">
-  <div class="divider-num" style="color:var(--red)">III</div>
-  <div class="divider-title" style="color:var(--red)">Cirrhosis</div>
-  <div class="divider-sub">When the liver can't recover &mdash; irreversible failure</div>
+  <div class="section-num">Section C</div>
+  <h2><em>Cirrhosis</em></h2>
+  <div class="divider-sub">When the liver can&rsquo;t recover &mdash; irreversible failure</div>
 </div>
 
-<!-- ===================== SLIDE 21 — CIRRHOSIS FLOW ===================== -->
-<div class="slide">
-  <span class="section-label red">Cirrhosis Pathophysiology</span>
-  <div class="flow-chain">
-    <div class="flow-step">Chronic hepatitis<br>or alcohol</div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step warn">Repeated<br>inflammation</div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step warn">Irreversible<br>fibrosis + scarring</div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step danger">Liver shrinks<br>&amp; hardens</div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-step danger">ALL functions<br>fail</div>
+<!-- ════════ SLIDE 21: FLOW — Cirrhosis Pathway (true cascade) ════════ -->
+<div class="slide flow">
+  <div class="section-label">Cirrhosis Pathophysiology</div>
+  <h3>How Cirrhosis <em class="red">Develops</em></h3>
+  <div class="flow-chain horizontal">
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Chronic hepatitis<small>or alcohol</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Repeated<small>inflammation</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Irreversible<small>fibrosis &amp; scarring</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">Liver shrinks<small>&amp; hardens</small></div>
+    <span class="flow-arrow" style="color:var(--red);">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.5);color:var(--red);background:rgba(239,68,68,0.06);">ALL functions<small>fail</small></div>
   </div>
-  <div class="highlight-box danger" style="max-width:920px;margin-top:20px">Cirrhosis is <strong>irreversible</strong>. The only cure is liver transplant.</div>
-</div>
-
-<!-- ===================== SLIDE 22 — ANCHOR: THREE COLLAPSES ===================== -->
-<div class="slide anchor-slide">
-  <span class="section-label red">Cirrhosis</span>
-  <div class="anchor-text" style="color:var(--red)">Cirrhosis = three simultaneous failures</div>
-  <div class="anchor-sub">Bilirubin rises. Albumin drops. Ammonia accumulates.<br>Learn these three and you can explain every cirrhosis symptom.</div>
-</div>
-
-<!-- ===================== SLIDE 23 — COLLAPSE 1: BILIRUBIN ===================== -->
-<div class="slide">
-  <span class="section-label yellow">Collapse 1</span>
-  <div class="card">
-    <h2 style="color:var(--yellow)">&uarr; Bilirubin: Can't Conjugate or Excrete</h2>
-    <ul>
-      <li class="warn"><strong>Jaundice</strong> &mdash; yellow skin and sclera</li>
-      <li class="warn"><strong>Pruritus</strong> &mdash; bile salts deposit in skin (intense itching)</li>
-      <li class="warn"><strong>Dark urine</strong> &mdash; excess bilirubin excreted by kidneys</li>
-      <li class="warn"><strong>Clay-colored stools</strong> &mdash; no bilirubin reaches the gut</li>
-    </ul>
+  <div class="callout danger">
+    <strong>Cirrhosis is irreversible.</strong> The only cure is liver transplant.
   </div>
 </div>
 
-<!-- ===================== SLIDE 24 — COLLAPSE 2: ASCITES + 3RD SPACING ===================== -->
-<div class="slide">
-  <span class="section-label blue">Collapse 2</span>
-  <div class="card">
-    <h2 style="color:var(--blue)">&darr; Albumin + Portal HTN &rarr; <span style="color:var(--red)">Ascites &amp; 3rd Spacing</span></h2>
-    <ul>
-      <li><strong>Two forces drive fluid OUT of the vessels:</strong></li>
-      <li>&darr; albumin &rarr; &darr; oncotic pressure (can&rsquo;t hold fluid in)</li>
-      <li>&uarr; portal pressure &rarr; hydrostatic pressure pushes fluid out</li>
-      <li class="danger"><strong>Ascites</strong> &mdash; fluid pooling in the peritoneal cavity. Distended abdomen, can push the diaphragm up &rarr; shallow breathing, dyspnea.</li>
-      <li class="danger"><strong>Peripheral edema</strong> &mdash; fluid in interstitial tissue</li>
-      <li class="danger"><strong>3rd spacing</strong> &mdash; fluid is trapped in peritoneum + tissues, NOT in circulation. Patient looks wet but is intravascularly <em>dry</em>.</li>
-      <li style="opacity:0.85"><em>Also:</em> varices (esophageal, hemorrhoids) &mdash; blood reroutes around the blocked liver</li>
-    </ul>
-    <div class="highlight-box danger"><strong>The paradox:</strong> patient is fluid-overloaded peripherally but hypovolemic centrally. BP can be low even with massive ascites. Monitor volume status by BP, HR, urine output &mdash; not by how wet the patient looks.</div>
-  </div>
+<!-- ════════ SLIDE 22: ANCHOR — Three Collapses ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-red">Framework</div>
+  <h2>Cirrhosis = <em class="red">Three Simultaneous Failures</em></h2>
+  <div class="subline">Bilirubin rises. Albumin drops. Ammonia accumulates. Learn these three and you can explain every cirrhosis symptom.</div>
 </div>
 
-<!-- ===================== SLIDE 25 — COLLAPSE 3: AMMONIA ===================== -->
-<div class="slide">
-  <span class="section-label red">Collapse 3</span>
-  <div class="card">
-    <h2 style="color:var(--red)">&uarr; Ammonia: Can't Convert NH<sub>3</sub> &rarr; Urea</h2>
-    <ul>
-      <li>Ammonia accumulates in blood &rarr; <strong>crosses blood-brain barrier</strong></li>
-      <li class="danger"><strong>Hepatic encephalopathy:</strong> confusion &rarr; lethargy &rarr; unresponsive</li>
-      <li class="danger"><strong>Asterixis</strong> &mdash; "flapping tremor" of the hands (classic sign)</li>
-    </ul>
-    <div class="highlight-box purple">Test for asterixis: ask patient to extend arms &amp; dorsiflex wrists. Watch for involuntary flapping.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 26 — OTHER FAILURES ===================== -->
-<div class="slide">
-  <span class="section-label red">Cirrhosis</span>
-  <div class="card">
-    <h2>Other Cirrhosis Failures</h2>
-    <ul>
-      <li><strong>Hormone breakdown fails</strong> &rarr; males: gynecomastia, hair loss; females: masculine features</li>
-      <li class="danger"><strong>Clotting fails</strong> &rarr; bruising, bleeding, elevated INR</li>
-      <li><strong>Dilated abdominal veins</strong> (caput medusae)</li>
-      <li><strong>Low blood sugar</strong> &mdash; liver can't release stored glucose</li>
-      <li class="warn"><strong>Delayed drug clearance</strong> &mdash; medications build up</li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 27 — CIRRHOSIS TREATMENT ===================== -->
-<div class="slide">
-  <span class="section-label green">Cirrhosis Treatment</span>
-  <div class="card">
-    <h2>Nursing Priorities</h2>
-    <ul>
-      <li class="green"><strong>Encephalopathy:</strong> lactulose (traps NH<sub>3</sub> in gut), limit protein</li>
-      <li class="green"><strong>Ascites:</strong> diuretics, sodium restriction, paracentesis (drain fluid)</li>
-      <li class="green"><strong>Varices:</strong> monitor for bleeding (can be fatal)</li>
-      <li class="danger"><strong>No Tylenol. No alcohol. Ever.</strong></li>
-      <li class="green"><strong>Liver transplant</strong> is the only cure (liver CAN regenerate &mdash; living donor possible)</li>
-    </ul>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 28 — QUICK CHECK: CIRRHOSIS MAPPING ===================== -->
-<div class="slide">
-  <span class="section-label purple">Quick Check</span>
-  <div class="quiz-wrap">
-    <div class="quiz-q">A cirrhosis patient has confusion and asterixis. Which liver failure is responsible?</div>
-    <div class="quiz-choices">
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">&uarr; Bilirubin &mdash; can't conjugate/excrete</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">&darr; Albumin &mdash; low oncotic pressure</div>
-      <div class="quiz-choice" data-correct="true" onclick="quizPick(this)">&uarr; Ammonia &mdash; can't convert NH&#8323; to urea</div>
-      <div class="quiz-choice" data-correct="false" onclick="quizPick(this)">&darr; Clotting factors &mdash; bleeding risk</div>
+<!-- ════════ SLIDE 23: Collapse 1 — Bilirubin ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Collapse 1</div>
+  <h3>&uarr; <em class="yellow">Bilirubin</em> &mdash; Can&rsquo;t Conjugate or Excrete</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128012;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Jaundice</strong>
+        <ul>
+          <li>Yellow skin and sclera</li>
+        </ul>
+      </div>
     </div>
-    <div class="quiz-explanation">Confusion + asterixis (flapping tremor) = <strong>hepatic encephalopathy</strong>. Ammonia crosses the blood-brain barrier when the liver can't convert it to urea. Treat with lactulose.</div>
-  </div>
-</div>
-
-<!-- ===================== SLIDE 29 — CLINICAL CASE: ROBERT ===================== -->
-<div class="slide">
-  <span class="section-label teal">Clinical Case</span>
-  <div class="case-card">
-    <h2>Robert, 58 y/o Male</h2>
-    <div class="case-prompt">
-      History of chronic Hep C. Presents with <strong>distended abdomen</strong>, <strong>yellow sclera</strong>, <strong>confusion</strong>, and <strong>easy bruising</strong>.<br><br>
-      Labs: <strong>low albumin</strong>, <strong>high bilirubin</strong>, <strong>high ammonia</strong>, <strong>elevated INR</strong>.<br><br>
-      <em>Map each finding to the failed liver job.</em>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129336;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Pruritus</strong>
+        <ul>
+          <li>Bile salts deposit in skin</li>
+          <li>Intense itching</li>
+        </ul>
+      </div>
     </div>
-    <button class="case-reveal-btn" onclick="revealCase(this)">Reveal Mapping</button>
-    <div class="case-answer">
-      <ul>
-        <li><strong>Distended abdomen (ascites)</strong> &rarr; low albumin + portal HTN (fluid leaks out)</li>
-        <li><strong>Yellow sclera (jaundice)</strong> &rarr; high bilirubin (can't conjugate/excrete)</li>
-        <li><strong>Confusion</strong> &rarr; high ammonia (crosses BBB &rarr; encephalopathy)</li>
-        <li><strong>Easy bruising + elevated INR</strong> &rarr; can't make clotting factors</li>
-        <li><strong>Low albumin</strong> &rarr; liver can't synthesize proteins</li>
-      </ul>
-      <div class="highlight-box teal" style="margin-top:14px"><strong>Every symptom maps to a specific liver job that failed.</strong> This is the framework &mdash; learn the jobs, and you can explain any cirrhosis presentation.</div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128167;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Dark Urine</strong>
+        <ul>
+          <li>Excess bilirubin excreted by kidneys</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#129621;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Clay-Colored Stools</strong>
+        <ul>
+          <li>No bilirubin reaching the gut</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ===================== SLIDE 30 — FINAL SUMMARY ===================== -->
-<div class="slide anchor-slide">
-  <span class="section-label blue">Summary</span>
-  <div class="anchor-text" style="background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:clamp(1.4rem,3.2vw,2.2rem)">Three Big Takeaways</div>
-  <div style="max-width:720px;margin-top:24px;text-align:left">
-    <div class="highlight-box" style="margin-bottom:12px"><strong>1. The liver does everything.</strong> When it fails, map each symptom to the specific job.</div>
-    <div class="highlight-box warn" style="margin-bottom:12px"><strong>2. Hepatitis:</strong> vowels (A, E) = oral-fecal. Consonants (B, C, D) = blood &amp; body fluids.</div>
-    <div class="highlight-box danger"><strong>3. Cirrhosis = three collapses:</strong> &uarr; bilirubin, &darr; albumin/portal HTN, &uarr; ammonia.</div>
+<!-- ════════ SLIDE 24: Collapse 2 — Ascites & 3rd Spacing ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Collapse 2</div>
+  <h3>&darr; <em class="blue">Albumin</em> + <em class="red">Portal HTN</em> &rarr; Ascites &amp; 3rd Spacing</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&darr;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Low Albumin (Oncotic)</strong>
+        <ul>
+          <li>Can&rsquo;t hold fluid IN vessels</li>
+          <li>Fluid leaks out into tissues</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&uarr;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Portal HTN (Hydrostatic)</strong>
+        <ul>
+          <li>Fibrosis blocks portal vein</li>
+          <li>Pressure pushes fluid out</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129665;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Ascites</strong>
+        <ul>
+          <li>Fluid pools in peritoneum</li>
+          <li>Pushes diaphragm up &rarr; dyspnea</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129705;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">3rd Spacing</strong>
+        <ul>
+          <li>Fluid trapped in tissues, NOT circulation</li>
+          <li>Looks wet, intravascularly DRY</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--teal);opacity:0.9;">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&hellip;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Also: Varices</strong>
+        <ul>
+          <li>Blood reroutes around the blocked liver &rarr; esophageal varices, hemorrhoids</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger">
+    <strong>The paradox:</strong> patient is fluid-overloaded peripherally but hypovolemic centrally. BP can be low even with massive ascites. Monitor volume status by BP, HR, urine output &mdash; not by how wet the patient looks.
   </div>
 </div>
 
-</div><!-- end #deck -->
+<!-- ════════ SLIDE 25: Collapse 3 — Ammonia ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Collapse 3</div>
+  <h3>&uarr; <em class="red">Ammonia</em> &mdash; Can&rsquo;t Convert NH<sub>3</sub> &rarr; Urea</h3>
+  <div class="cell-cards">
+    <div class="cell-card full-span" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129504;</div>
+      <div class="cell-text"><strong style="color:var(--red);">NH&#8323; Crosses Blood-Brain Barrier</strong>
+        <ul>
+          <li>Ammonia accumulates in blood &rarr; crosses BBB</li>
+          <li>Neurotoxic</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128166;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Hepatic Encephalopathy</strong>
+        <ul>
+          <li>Confusion &rarr; lethargy &rarr; unresponsive</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129306;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Asterixis</strong>
+        <ul>
+          <li>&ldquo;Flapping tremor&rdquo; of the hands</li>
+          <li>Classic sign of encephalopathy</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Test for asterixis:</strong> ask patient to extend arms &amp; dorsiflex wrists. Watch for involuntary flapping.
+  </div>
+</div>
 
+<!-- ════════ SLIDE 26: Other Cirrhosis Failures ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Cirrhosis</div>
+  <h3>Other <em>Cirrhosis Failures</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#9794;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Hormone Breakdown Fails</strong>
+        <ul>
+          <li>Males: gynecomastia, hair loss</li>
+          <li>Females: masculine features</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128165;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Clotting Fails</strong>
+        <ul>
+          <li>Bruising, bleeding</li>
+          <li>Elevated INR</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129488;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Caput Medusae</strong>
+        <ul>
+          <li>Dilated abdominal veins from portal HTN backup</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&darr;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Low Blood Sugar</strong>
+        <ul>
+          <li>Liver can&rsquo;t release stored glucose</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Delayed Drug Clearance</strong>
+        <ul>
+          <li>Medications build up in the body</li>
+          <li>Increased risk of toxicity</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 27: Cirrhosis Treatment ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Cirrhosis Treatment</div>
+  <h3>Nursing <em class="green">Priorities</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128166;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Encephalopathy</strong>
+        <ul>
+          <li>Lactulose &mdash; traps NH&#8323; in gut</li>
+          <li>Limit dietary protein</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129665;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Ascites</strong>
+        <ul>
+          <li>Diuretics, sodium restriction</li>
+          <li>Paracentesis to drain fluid</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#10060;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Absolute No&rsquo;s</strong>
+        <ul>
+          <li>No Tylenol. Ever.</li>
+          <li>No alcohol. Ever.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#128295;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Liver Transplant</strong>
+        <ul>
+          <li>Only cure</li>
+          <li>Liver CAN regenerate &mdash; living donor possible</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Monitor for variceal bleeding</strong> &mdash; can be fatal. Be ready with banding, sclerotherapy, or balloon tamponade.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 28: CHECK — Cirrhosis Mapping ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A cirrhosis patient has <strong>confusion and asterixis</strong>. Which liver failure is responsible?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> &uarr; Bilirubin &mdash; can&rsquo;t conjugate/excrete
+      <div class="explanation">Bilirubin causes jaundice, pruritus, dark urine, clay stools &mdash; not the flapping tremor or confusion.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> &darr; Albumin &mdash; low oncotic pressure
+      <div class="explanation">Low albumin causes edema and ascites, not neurological symptoms.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> &uarr; Ammonia &mdash; can&rsquo;t convert NH&#8323; to urea
+      <div class="explanation">Correct. Confusion + asterixis (flapping tremor) = hepatic encephalopathy. Ammonia crosses the blood-brain barrier when the liver can&rsquo;t convert it to urea. Treat with lactulose.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> &darr; Clotting factors &mdash; bleeding risk
+      <div class="explanation">That causes bruising/bleeding, not confusion or asterixis.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 29: CASE — Robert ════════ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <div class="case-scenario">
+    <strong>Robert, 58M</strong>, history of chronic Hep C. Presents with <strong>distended abdomen, yellow sclera, confusion, and easy bruising.</strong> Labs: <strong>low albumin, high bilirubin, high ammonia, elevated INR.</strong>
+  </div>
+  <div class="question">Which of his findings maps to the ammonia failure specifically?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Distended abdomen
+      <div class="explanation">That&rsquo;s ascites &mdash; from low albumin (oncotic) + portal HTN (hydrostatic). Not ammonia.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Yellow sclera
+      <div class="explanation">That&rsquo;s jaundice &mdash; from high bilirubin (can&rsquo;t conjugate/excrete). Not ammonia.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Confusion
+      <div class="explanation">Correct! Confusion (and asterixis if present) = hepatic encephalopathy from ammonia crossing the BBB. Treatment: lactulose traps NH&#8323; in the gut.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Easy bruising + elevated INR
+      <div class="explanation">That&rsquo;s the clotting factor failure &mdash; liver can&rsquo;t synthesize them. Not ammonia.</div>
+    </div>
+  </div>
+  <div class="callout info" style="margin-top:14px;">
+    <strong>Every symptom maps to a specific liver job that failed.</strong> Distended abdomen &rarr; albumin + portal HTN. Yellow sclera &rarr; bilirubin. Confusion &rarr; ammonia. Bruising + INR &rarr; clotting factors.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 30: ANCHOR — Summary ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Liver &mdash; The <em>Big Picture</em></h2>
+  <div class="subline" style="max-width:780px;text-align:left;font-size:1.02rem;line-height:1.8;">
+    <span class="hl-blue">&bull;</span> <strong>The liver does everything.</strong> When it fails, map each symptom to the specific job that failed.<br>
+    <span class="hl-yellow">&bull;</span> <strong>Hepatitis:</strong> vowel is in the bowel &mdash; A and E are oral-fecal. Consonants (B, C, D) = blood &amp; body fluids.<br>
+    <span class="hl-red">&bull;</span> <strong>Cirrhosis = three collapses:</strong> &uarr; bilirubin, &darr; albumin + portal HTN (ascites/3rd spacing), &uarr; ammonia (encephalopathy).<br>
+    <span class="hl-purple">&bull;</span> <strong>Ascites paradox:</strong> patient looks wet but is intravascularly dry. Monitor volume by BP, HR, urine output.<br>
+    <span class="hl-green">&bull;</span> <strong>Cirrhosis is irreversible.</strong> Transplant is the only cure. No Tylenol, no alcohol &mdash; ever.
+  </div>
+</div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
 <script>
-/* ── ENGINE ── */
-const slides = document.querySelectorAll('.slide');
-let cur = 0;
-const total = slides.length;
-
-function go(n) {
-  if (n < 0 || n >= total) return;
-  slides[cur].classList.remove('active');
-  slides[cur].style.transform = n > cur ? 'translateX(-40px)' : 'translateX(40px)';
-  cur = n;
-  slides[cur].style.transform = 'translateX(0)';
-  slides[cur].classList.add('active');
-  slides[cur].scrollTop = 0;
-  updateUI();
-}
-
-function updateUI() {
-  document.getElementById('progress-bar').style.width = ((cur + 1) / total * 100) + '%';
-  document.getElementById('slide-counter').textContent = (cur + 1) + ' / ' + total;
-  document.getElementById('prev-btn').style.opacity = cur === 0 ? '.25' : '1';
-  document.getElementById('next-btn').style.opacity = cur === total - 1 ? '.25' : '1';
-}
-
-/* keyboard */
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
-  if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
-});
-
-/* buttons */
-document.getElementById('next-btn').addEventListener('click', () => go(cur + 1));
-document.getElementById('prev-btn').addEventListener('click', () => go(cur - 1));
-
-/* swipe */
-let sx = 0;
-document.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - sx;
-  if (Math.abs(dx) > 50) dx < 0 ? go(cur + 1) : go(cur - 1);
-}, { passive: true });
-
-/* quiz */
-function quizPick(el) {
-  const wrap = el.closest('.quiz-wrap') || el.closest('.slide');
-  if (wrap.querySelector('.chosen')) return;
-  el.classList.add('chosen');
-  const correct = el.getAttribute('data-correct') === 'true';
-  el.classList.add(correct ? 'correct' : 'wrong');
-  if (!correct) {
-    wrap.querySelectorAll('.quiz-choice').forEach(c => {
-      if (c.getAttribute('data-correct') === 'true') c.classList.add('correct');
-    });
-  }
-  const exp = wrap.querySelector('.quiz-explanation');
-  if (exp) exp.classList.add('show');
-}
-
-/* case reveal */
-function revealCase(btn) {
-  const ans = btn.nextElementSibling;
-  ans.classList.toggle('show');
-  btn.textContent = ans.classList.contains('show') ? 'Hide Mapping' : 'Reveal Mapping';
-}
-
-updateUI();
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
 </script>
+
 <!-- Student Tracking -->
 <div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
 <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
