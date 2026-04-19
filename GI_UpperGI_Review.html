@@ -227,7 +227,14 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-items: center; /* center children horizontally on the slide */
     gap: 16px;
+  }
+  .slide.narrative .content > ul,
+  .slide.narrative .content > p,
+  .slide.narrative .content > .callout {
+    /* full-width items still span — only fixed-width children (tables/grids) get centered */
+    align-self: stretch;
   }
   .slide.narrative .content.cols {
     flex-direction: row;
