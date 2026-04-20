@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 11: Neural — Stroke / CVA Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+}
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
+
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
+
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
+
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
+
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.2rem;color:var(--text-dim);max-width:700px;line-height:1.6}
+
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:flex-start;max-width:960px;margin:0 auto}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:28px;width:100%}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.slide.narrative ul{list-style:none;width:100%}
+.slide.narrative ul li{padding:10px 0 10px 28px;position:relative;font-size:1.05rem;line-height:1.55}
+.slide.narrative ul li::before{content:'';position:absolute;left:0;top:18px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
+
+/* ── COLUMNS LAYOUT ── */
+.content.cols{display:flex;gap:28px;width:100%}
+.content.cols .col{flex:1}
+.content.cols .col ul{list-style:none}
+.content.cols .col ul li{padding:8px 0 8px 20px;position:relative;font-size:0.98rem;line-height:1.5}
+.content.cols .col ul li::before{content:'';position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:860px}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:36px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:32px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-grid.three{grid-template-columns:1fr 1fr 1fr;max-width:1000px}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:24px 20px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.1rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)} .compare-col.col-teal h4{color:var(--teal);border-color:var(--teal)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.compare-col ul li{font-size:0.9rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)} .compare-col.col-teal ul li::before{background:var(--teal)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK (QUIZ) ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.1rem,2vw,1.5rem);font-weight:700;max-width:800px;line-height:1.4;margin-bottom:32px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:750px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:18px 20px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.05rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:24px 28px;max-width:750px;text-align:left;font-size:1.05rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:700;max-width:750px;line-height:1.4;margin-bottom:24px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CUSTOM: CELL CARDS (with optional bullet-list content) ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:740px;width:100%}
+.cell-cards.four-col{grid-template-columns:1fr 1fr 1fr 1fr;max-width:820px}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.cell-card .cell-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── CUSTOM: BRAIN ART CONTAINER ── */
+.brain-art{width:100%;max-width:780px;margin:4px auto 0}
+.brain-art svg{width:100%;height:auto;display:block}
+
+/* ── CUSTOM: RULE + DECISION TREE (Monroe-Kellie pattern) ── */
+.rule-tree{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;max-width:920px;width:100%;align-items:stretch}
+.rule-card{background:var(--bg-card);border:2px solid var(--yellow);border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.rule-card .rule-label{font-size:11px;letter-spacing:2.5px;color:var(--yellow);font-weight:800;margin-bottom:10px}
+.rule-card .rule-headline{font-size:1.05rem;font-weight:800;margin-bottom:10px;color:var(--text)}
+.rule-card .rule-body{font-size:0.92rem;color:var(--text-dim);line-height:1.55}
+.rule-card .rule-body strong.accent{color:var(--yellow)}
+.rule-card .rule-body strong.warn{color:var(--red)}
+.rule-card ul{list-style:none;margin:8px 0}
+.rule-card ul li{padding:3px 0 3px 16px;position:relative;font-size:0.93rem;color:var(--text)}
+.rule-card ul li::before{content:'•';position:absolute;left:0;color:var(--yellow);font-weight:700}
+.decision-tree{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.decision-tree .dec-label{font-size:11px;letter-spacing:2.5px;color:var(--blue);font-weight:800;margin-bottom:4px}
+.dec-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;background:var(--bg-card);border-radius:10px;padding:12px 14px;border-left:4px solid}
+.dec-row .d-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.dec-row .d-if{line-height:1.3}
+.dec-row .d-if .label{font-weight:700;font-size:0.94rem;display:block}
+.dec-row .d-if .examples{font-size:0.8rem;color:var(--text-dim);display:block;margin-top:2px}
+.dec-row .d-arrow{font-size:1.3rem;font-weight:800}
+.dec-row .d-action{font-weight:800;color:var(--green);font-size:0.95rem;letter-spacing:1px;white-space:nowrap}
+@media(max-width:768px){
+  .rule-tree{grid-template-columns:1fr;gap:14px}
+  .dec-row{grid-template-columns:auto 1fr;row-gap:8px}
+  .dec-row .d-arrow{display:none}
+  .dec-row .d-action{grid-column:2}
+}
+
+/* ── KNOWN GAP FLAG ── */
+.gap-flag{background:rgba(245,158,11,0.1);border:1.5px dashed rgba(245,158,11,0.5);border-radius:10px;padding:14px 20px;font-size:0.92rem;line-height:1.5;max-width:820px;margin-top:14px;color:var(--yellow)}
+.gap-flag strong{display:block;font-size:0.85rem;letter-spacing:1.5px;color:var(--yellow);margin-bottom:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide.narrative ul li,.slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .content.cols{flex-direction:column;gap:20px}
+  .choices{grid-template-columns:1fr} .compare-grid,.compare-grid.three{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.cell-cards.four-col{grid-template-columns:1fr}
+  .flow-chain{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0} .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%} .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter">1 / 24</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
+
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>Neural &mdash; Stroke / CVA</h1>
+  <div class="subtitle">Chapter 11 &middot; Ischemic vs hemorrhagic stroke, FAST, treatment window, and prevention</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ════════ SLIDE 2: FOUNDATIONS RECAP ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Before You Start</div>
+  <h3>If You Haven&rsquo;t Yet &mdash; <em>Skim the Foundations Deck</em></h3>
+  <div style="background:rgba(56,189,248,0.06);border:1.5px dashed rgba(56,189,248,0.35);border-radius:14px;padding:24px;max-width:720px;width:100%;text-align:left;">
+    <h4 style="font-size:0.9rem;letter-spacing:2px;color:var(--blue);font-weight:800;margin-bottom:10px;text-transform:uppercase;">Quick Anchor</h4>
+    <p style="font-size:0.95rem;color:var(--text-dim);line-height:1.55;">This deck builds on the <strong style="color:var(--text);">Foundations deck</strong> &mdash; meninges, brain regions, neurons &amp; their fuel, &uarr;ICP, Cushing&rsquo;s triad, hematoma types, Circle of Willis. If you need a refresh on any of that, skim Foundations first. Otherwise, let&rsquo;s go.</p>
+  </div>
+</div>
+<!-- ════════ SLIDE 13: SECTION — Stroke / CVA ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section A</div>
+  <h2>Stroke / <em>CVA</em></h2>
+  <div class="divider-sub">When brain perfusion fails &mdash; symptoms depend on WHERE + HOW BAD</div>
+</div>
+
+<!-- ════════ SLIDE 14: ANCHOR — Stroke Framing ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Symptoms Depend on <em class="blue">WHERE</em> + <em class="red">HOW BAD</em></h2>
+  <div class="subline">A stroke in Broca&rsquo;s area &rarr; can&rsquo;t speak. A stroke in the occipital lobe &rarr; vision loss. Deficits map directly to the damaged region.</div>
+</div>
+
+<!-- ════════ SLIDE 15: ANCHOR — TIA ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-warn">Warning Sign</div>
+  <h2>TIA Is <em class="yellow">NOT</em> a Mini-Stroke</h2>
+  <div class="subline">Transient Ischemic Attack = same symptoms as stroke, but <strong>NO permanent damage</strong>. Why this matters: 50% will have a full stroke within 1 year if the cause isn&rsquo;t found and treated.</div>
+</div>
+
+<!-- ════════ SLIDE 16: COMPARE — Ischemic vs Hemorrhagic ════════ -->
+<div class="slide compare">
+  <h3>Ischemic <em class="yellow">vs.</em> Hemorrhagic</h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Ischemic (most common)</h4>
+      <ul>
+        <li><strong>Mechanism:</strong> artery BLOCKED</li>
+        <li>Atherosclerosis narrows artery, then embolus or thrombus blocks it</li>
+        <li><strong>Most common:</strong> embolus from <span class="hl-yellow">AFib</span> &rarr; LA &rarr; LV &rarr; aorta &rarr; carotid &rarr; brain</li>
+        <li>Must come from <strong>L heart</strong> &mdash; cannot originate in a vein</li>
+        <li><strong>CT:</strong> no blood visible</li>
+        <li><strong>Tx:</strong> fibrinolytics (within 3 hrs)</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>Hemorrhagic</h4>
+      <ul>
+        <li><strong>Mechanism:</strong> artery RUPTURED</li>
+        <li>Aneurysm (weak arterial wall) tends to rupture from &uarr;BP</li>
+        <li>Blood accumulates &rarr; shifts brain tissue from midline</li>
+        <li><strong>CT:</strong> blood visible</li>
+        <li><strong>NO fibrinolytics</strong> &mdash; would worsen bleeding</li>
+        <li><strong>Tx:</strong> maybe drain; rehab + lifestyle changes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 17: FLOW — Ischemic Patho (true cascade) ════════ -->
+<div class="slide flow">
+  <h3>Ischemic Stroke <em class="blue">Cascade</em></h3>
+  <div class="flow-chain">
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Atherosclerosis /<small>AFib</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Embolus / thrombus<small>in cerebral artery</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(56,189,248,0.4);color:var(--blue);">Blood flow<small>BLOCKED</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">No O&#8322;, no glucose<small>to brain region</small></div>
+    <span class="flow-arrow" style="color:var(--red);">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.5);color:var(--red);background:rgba(239,68,68,0.06);">Neuron death<small>(infarct)</small></div>
+  </div>
+  <div class="callout info" style="margin-top:24px;max-width:740px;">
+    <strong>Time = brain.</strong> Neurons begin dying within minutes. Treatment window is 3 hours from clot formation.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 18: FLOW — Hemorrhagic Patho (true cascade) ════════ -->
+<div class="slide flow">
+  <h3>Hemorrhagic Stroke <em class="red">Cascade</em></h3>
+  <div class="flow-chain">
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Aneurysm +<small>&uarr; BP</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">Artery<small>RUPTURES</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Blood into<small>brain tissue</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.4);color:var(--red);">&uarr; ICP +<small>vasospasm</small></div>
+    <span class="flow-arrow" style="color:var(--red);">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.5);color:var(--red);background:rgba(239,68,68,0.06);">Midline shift,<small>neuron death</small></div>
+  </div>
+  <div class="callout danger" style="margin-top:24px;max-width:740px;">
+    <strong>NEVER give fibrinolytics for hemorrhagic stroke.</strong> Plasmin would dissolve clots trying to stop the bleed &rarr; catastrophic worsening.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 19: Stroke Risk Factors ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Stroke</div>
+  <h3 style="text-align:center;">Risk <em>Factors</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&uarr;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Hypertension</strong>Biggest single risk factor &mdash; ruptures aneurysms, accelerates atherosclerosis</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#127852;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Diabetes</strong>Accelerates vascular damage everywhere</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">LDL</div>
+      <div class="cell-text"><strong style="color:var(--blue);">&uarr; Cholesterol</strong>Feeds atherosclerosis</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Medications / Drugs</strong>Birth control, recreational drugs, others</div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:740px;">
+    <strong>Spiral connection:</strong> same modifiable risk factors drive CAD, PAD, and stroke &mdash; because they all share the same blood vessel disease.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 20: Stroke Deficits (WHERE → WHAT, colors match the brain map) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Stroke</div>
+  <h3 style="text-align:center;">Location &rarr; <em class="yellow">Deficit</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">F</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Frontal &mdash; Broca&rsquo;s</strong>Can&rsquo;t produce speech (motor)</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&harr;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Motor cortex (frontal)</strong>Contralateral weakness (L brain &rarr; R body deficit)</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">T</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Temporal &mdash; Wernicke&rsquo;s</strong>Can&rsquo;t understand speech (sensory)</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128065;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Occipital</strong>Vision loss or cuts</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#129485;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Cerebellum</strong>Ataxia &mdash; abnormal gait, balance loss</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--text-dim);">
+      <div class="cell-icon" style="background:rgba(148,163,184,0.15);color:var(--text-dim);">&#127860;</div>
+      <div class="cell-text"><strong style="color:var(--text-dim);">Brainstem &mdash; Swallowing</strong>Can&rsquo;t talk &rarr; can&rsquo;t swallow &rarr; can&rsquo;t eat safely (aspiration risk)</div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:740px;">
+    Card colors match the brain-map colors on the previous slide. Frontal + motor cortex both purple because motor cortex lives in the frontal lobe.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 21: SECTION — Assessment & Treatment ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section B</div>
+  <h2>Assessment &amp; <em>Treatment</em></h2>
+  <div class="divider-sub">Recognize fast. Treat faster. Time = Brain.</div>
+</div>
+
+<!-- ════════ SLIDE 22: FAST Assessment ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Assessment</div>
+  <h3 style="text-align:center;">FAST &mdash; <em class="teal">Recognize a Stroke</em></h3>
+  <div class="cell-cards four-col">
+    <div class="cell-card" style="border-left-color:var(--blue);flex-direction:column;align-items:center;text-align:center;">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);font-size:1.6rem;">F</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Face</strong>Uneven / drooping on one side</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);flex-direction:column;align-items:center;text-align:center;">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);font-size:1.6rem;">A</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Arm</strong>Can&rsquo;t raise / arm drifts down</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);flex-direction:column;align-items:center;text-align:center;">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);font-size:1.6rem;">S</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Speech</strong>Slurred, can&rsquo;t understand or form words</div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);flex-direction:column;align-items:center;text-align:center;">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);font-size:1.6rem;">T</div>
+      <div class="cell-text"><strong style="color:var(--red);">Time</strong>CRITICAL &mdash; when did symptoms start?</div>
+    </div>
+  </div>
+  <div class="callout danger" style="max-width:740px;">
+    <strong>Immediate workup: CT scan</strong> to rule out bleeding. CT clear + confirmed clot + within window &rarr; fibrinolytic candidate.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 23: ANCHOR — Treatment Window ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-emergency">Emergency</div>
+  <h2>3 Hours to <em class="red">Save Brain Tissue</em></h2>
+  <div class="subline">From when the clot forms. CT clear + confirmed ischemic &rarr; <span class="hl-green">fibrinolytic therapy</span> (plasmin breaks the clot). 4 hrs: might work. 8 hrs: will not work.</div>
+</div>
+
+<!-- ════════ SLIDE 24: Treatment by Type ════════ -->
+<div class="slide compare">
+  <h3>Treatment by <em class="yellow">Stroke Type</em></h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Ischemic &mdash; Open the Artery</h4>
+      <ul>
+        <li><strong>Fibrinolytics</strong> (plasmin) &mdash; within 3 hrs</li>
+        <li>Mechanical thrombectomy in select centers</li>
+        <li>Treat underlying: AFib &rarr; anticoagulate; atherosclerosis &rarr; statins, BP control</li>
+        <li>Rehab for deficits</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>Hemorrhagic &mdash; Stop the Bleed</h4>
+      <ul>
+        <li><strong>NEVER fibrinolytics</strong></li>
+        <li>Maybe <strong>drain</strong> the hematoma</li>
+        <li>Control BP aggressively</li>
+        <li>Rehab + lifestyle changes post-event</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ CHECK — Stroke Type Recognition ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient arrives at ED with sudden facial drooping, inability to raise the left arm, and slurred speech. CT shows <strong>NO bleeding</strong>. Symptoms started 2 hours ago. Priority intervention?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Antihypertensives to reduce BP immediately
+      <div class="explanation">BP management matters but isn&rsquo;t the priority here. Reperfusion is.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Fibrinolytic therapy &mdash; ischemic within 3-hr window
+      <div class="explanation">Correct! FAST confirmed stroke, CT clear = ischemic. Within 3 hrs = fibrinolytic candidate. Plasmin breaks the clot. Time = Brain.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Prepare for surgical drainage
+      <div class="explanation">No &mdash; surgical drainage is for hemorrhagic strokes. CT showed NO bleeding here.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Anticoagulants + follow-up MRI in 48 hrs
+      <div class="explanation">48 hrs is far too late. The 3-hour window is closing. Anticoagulation is for prevention, not acute reperfusion.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 27: SECTION — Prevention ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section C</div>
+  <h2><em>Prevention</em> &mdash; Primary, Secondary, Tertiary</h2>
+  <div class="divider-sub">Three levels. Same framework works for every disease. Stroke is today&rsquo;s example.</div>
+</div>
+
+<!-- ════════ SLIDE 28: ANCHOR — Prevention Mnemonic ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2><em class="blue">Primary</em> Prevents. <em class="yellow">Secondary</em> Screens. <em class="red">Tertiary</em> Rehabs.</h2>
+  <div class="subline">Three levels are about <em style="color:var(--text);font-style:normal;">when</em> you intervene, not <em style="color:var(--text);font-style:normal;">what</em> you do. Primary = before anything bad happens. Secondary = after a warning event. Tertiary = after established damage.</div>
+</div>
+
+<!-- ════════ SLIDE 29: PRIMARY — Prevent the First Stroke ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Primary Prevention</div>
+  <h3 style="text-align:center;"><em class="blue">Primary</em> &mdash; Prevent the First Stroke</h3>
+  <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:16px;max-width:720px;text-align:center;">
+    <strong style="color:var(--blue);">Who:</strong> general population or at-risk, <em>no stroke or TIA yet.</em> &nbsp;
+    <strong style="color:var(--blue);">Goal:</strong> reduce modifiable risk factors.
+  </div>
+  <div class="cell-cards" style="max-width:820px;">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">BP</div>
+      <div class="cell-text"><strong style="color:var(--blue);">BP control</strong>
+        <ul><li>HTN is the <strong>#1</strong> modifiable stroke risk</li><li>Home BP monitoring, meds, DASH diet</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#129656;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Cholesterol &amp; diabetes</strong>
+        <ul><li>Statins, diet, exercise</li><li>A1C &lt; 7% for diabetics</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128684;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Smoking cessation</strong>
+        <ul><li><strong>Doubles</strong> stroke risk</li><li>Counsel, refer, support</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#9829;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">AFib screening</strong>
+        <ul><li>Irregular pulse &rarr; EKG</li><li>Anticoag if AFib confirmed (LA embolus)</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    Primary prevention is the cheapest, most effective intervention &mdash; and the hardest to get patients to commit to because they feel fine.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 30: SECONDARY — After TIA / First Stroke ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Secondary Prevention</div>
+  <h3 style="text-align:center;"><em class="yellow">Secondary</em> &mdash; Catch It Early, Stop It From Getting Worse</h3>
+  <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:16px;max-width:720px;text-align:center;">
+    <strong style="color:var(--yellow);">Who:</strong> patients who&rsquo;ve had a <em>TIA or first stroke.</em> &nbsp;
+    <strong style="color:var(--yellow);">Goal:</strong> prevent progression and recurrence.
+  </div>
+  <div class="cell-cards" style="max-width:820px;">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128269;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">TIA workup = alarm bell</strong>
+        <ul><li><strong>50%</strong> of untreated TIAs &rarr; full stroke within 1 yr</li><li>CT, carotid US, echo, EKG, labs</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Antiplatelet / anticoagulant</strong>
+        <ul><li>Aspirin, clopidogrel after ischemic</li><li>Warfarin/DOACs if AFib/cardioembolic</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#9889;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Aggressive risk-factor control</strong>
+        <ul><li>Tighter BP targets than primary</li><li>Aggressive LDL lowering (statin)</li><li>Carotid endarterectomy if stenosis</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128106;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">F.A.S.T. education + adherence</strong>
+        <ul><li>Teach patient AND family</li><li>Patients stop meds when they &ldquo;feel fine&rdquo;</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>TIA is not nothing.</strong> Every unexplained neuro symptom gets investigated &mdash; the &ldquo;weird spell&rdquo; the patient dismissed is what you&rsquo;re looking for.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 31: TERTIARY — Post-Stroke Rehab & Recurrence Prevention ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Tertiary Prevention</div>
+  <h3 style="text-align:center;"><em class="red">Tertiary</em> &mdash; Minimize Damage, Prevent the Next One</h3>
+  <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:16px;max-width:720px;text-align:center;">
+    <strong style="color:var(--red);">Who:</strong> post-stroke <em>with established damage</em> (deficits, disability). &nbsp;
+    <strong style="color:var(--red);">Goal:</strong> maximize function, prevent complications.
+  </div>
+  <div class="cell-cards" style="max-width:820px;">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#127947;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Rehab</strong>
+        <ul><li>PT (gait, mobility), OT (ADLs)</li><li>Speech therapy (aphasia, dysphagia)</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128566;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Swallow &amp; fall prevention</strong>
+        <ul><li>NPO until swallow eval cleared</li><li>Hemiparesis/ataxia/visual cuts &rarr; falls</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129657;</div>
+      <div class="cell-text"><strong style="color:var(--red);">DVT &amp; skin</strong>
+        <ul><li>SCDs, early mobilization</li><li>Prophylactic anticoag &middot; pressure injury prevention</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128106;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Med recon &amp; caregiver teaching</strong>
+        <ul><li>Patients leave on 5&ndash;8 new meds</li><li>Family is now part of the care team</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Primary risk factor control never stops.</strong> BP, cholesterol, diabetes, AFib management continue for life &mdash; because the next stroke is what we&rsquo;re most worried about.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 32: CHECK — NCLEX Secondary Prevention ════════ -->
+<div class="slide check">
+  <div class="check-label">NCLEX Check</div>
+  <div class="question">A 58-year-old patient had a <strong>TIA 3 days ago</strong> and is now in the clinic for follow-up. Which nursing intervention represents <strong>secondary</strong> prevention?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Teaching the DASH diet because she has no history of CVD
+      <div class="explanation">This is <strong>primary</strong> prevention &mdash; acting before any event.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Initiating clopidogrel and scheduling a carotid ultrasound
+      <div class="explanation">Correct. Secondary = after a warning event (TIA), before full damage. Antiplatelet + workup targets preventing progression to full stroke.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Arranging physical therapy for residual left-arm weakness
+      <div class="explanation">This is <strong>tertiary</strong> &mdash; damage has already occurred; the goal is maximizing function.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Educating the family on seizure precautions
+      <div class="explanation">Unrelated to stroke prevention framework.</div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>TIA is the body&rsquo;s warning shot &mdash; treat it like an emergency.</strong>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 33: SECTION — Clinical Application ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section D</div>
+  <h2>Clinical <em>Application</em></h2>
+  <div class="divider-sub">Put it all together</div>
+</div>
+
+<!-- ════════ SLIDE 28: CASE — Mr. Washington ════════ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <div class="case-scenario">
+    <strong>Mr. Washington, 72M</strong>, history of <strong>AFib</strong> (stopped warfarin on his own &mdash; &ldquo;didn&rsquo;t like side effects&rdquo;), <strong>HTN</strong>, &uarr; cholesterol. Wife called 911: found him unable to speak clearly, right arm limp, face drooping on the right. Onset <strong>90 minutes ago</strong>. Vitals: <strong>BP 178/96</strong> (stage 2 HTN), <strong>HR 88 irregular</strong>, RR 18, <strong>SpO&#8322; 96%</strong>. CT scan: <strong>no blood visible</strong>. Neuro: alert but confused, right-sided weakness (face + arm + leg), dysarthria.
+  </div>
+  <div class="question">What is happening, and what is the priority intervention?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Hemorrhagic stroke &mdash; prepare for surgical drainage
+      <div class="explanation">No. CT shows NO blood = not hemorrhagic. The AFib + no anticoagulation history strongly points to embolic ischemic stroke.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Ischemic stroke from AFib embolus &mdash; fibrinolytic candidate (within 3-hr window)
+      <div class="explanation">Correct! AFib + off anticoagulation = clot forms in LA &rarr; travels LA &rarr; LV &rarr; aorta &rarr; carotid &rarr; lodges in cranium. CT clear + 90 min onset = within window. Right-sided deficits = LEFT hemisphere affected (contralateral). Priority: fibrinolytic therapy.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> TIA &mdash; reassure and discharge after observation
+      <div class="explanation">No. Persistent deficits (not transient) + CT findings and acute presentation mean this is a stroke, not TIA. TIA = symptoms resolve without damage.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Cushing&rsquo;s triad from &uarr; ICP &mdash; manage pressure
+      <div class="explanation">No. Cushing&rsquo;s triad = &uarr; BP + &darr; HR + Cheyne-Stokes. His HR is 88 (not bradycardic) and no Cheyne-Stokes pattern. This is a focal stroke presentation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 29: ANCHOR — Summary ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Stroke &mdash; The Big Picture</h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.05rem;line-height:1.85;">
+    <span class="hl-blue">&bull;</span> <strong>Symptoms depend on WHERE + HOW BAD.</strong> Deficits map to the damaged region.<br>
+    <span class="hl-blue">&bull;</span> <strong>Ischemic</strong> (common) = artery blocked. <strong>Hemorrhagic</strong> = artery ruptured. CT tells you which.<br>
+    <span class="hl-yellow">&bull;</span> Most common ischemic source = <strong>AFib &rarr; embolus from LA</strong>. Must come from L heart.<br>
+    <span class="hl-red">&bull;</span> <strong>NEVER fibrinolytics</strong> for hemorrhagic &mdash; would worsen the bleed.<br>
+    <span class="hl-red">&bull;</span> <strong>3-hour window</strong> for ischemic fibrinolytic therapy. Time = Brain.<br>
+    <span class="hl-purple">&bull;</span> <strong>TIA is not a mini-stroke</strong> &mdash; it&rsquo;s a warning. 50% have full stroke within a year if cause isn&rsquo;t found.<br>
+    <span class="hl-green">&bull;</span> <strong>FAST</strong>: Face, Arm, Speech, Time.
+  </div>
+</div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
+<script>
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

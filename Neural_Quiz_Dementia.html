@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chapter 11 Neural &mdash; Dementia Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --text-dim: #94a3b8; --accent: #38bdf8;
+    --accent-glow: rgba(56,189,248,0.15); --correct: #4ade80;
+    --correct-bg: rgba(74,222,128,0.12); --incorrect: #f87171;
+    --incorrect-bg: rgba(248,113,113,0.12); --warning: #fbbf24;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .container { max-width:820px; margin:0 auto; padding:20px 16px 60px; }
+  .quiz-header { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--surface2); }
+  .quiz-header h1 { font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .quiz-header .subtitle { font-size:0.85rem; color:var(--text-dim); }
+  .quiz-header .authors { font-size:0.78rem; color:var(--text-dim); margin-top:2px; font-style:italic; }
+  .progress-wrap { background:var(--surface); border-radius:20px; height:10px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:20px; transition:width 0.4s ease; width:0%; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--text-dim); margin-bottom:24px; }
+  .score-display { font-weight:600; color:var(--accent); }
+  .question-card { background:var(--surface); border-radius:var(--radius); padding:28px 24px; border:1px solid var(--surface2); animation:fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .question-number { font-size:0.82rem; font-weight:600; color:var(--accent); }
+  .question-type { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:20px; background:var(--accent-glow); color:var(--accent); }
+  .section-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:10px; background:var(--surface2); }
+  .question-stem { font-size:1.05rem; font-weight:500; line-height:1.65; margin-bottom:22px; color:#f1f5f9; }
+  .question-stem strong { color:var(--warning); }
+  .choices { display:flex; flex-direction:column; gap:10px; }
+  .choice-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:2px solid var(--surface2); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s ease; background:transparent; user-select:none; -webkit-user-select:none; }
+  .choice-card:hover:not(.disabled) { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.selected { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.disabled { cursor:default; pointer-events:none; }
+  .choice-card.correct-answer { border-color:var(--correct)!important; background:var(--correct-bg)!important; }
+  .choice-card.incorrect-answer { border-color:var(--incorrect)!important; background:var(--incorrect-bg)!important; }
+  .choice-card.missed-correct { border-color:var(--correct)!important; background:var(--correct-bg)!important; opacity:0.7; }
+  .choice-indicator { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; font-size:0.7rem; font-weight:700; }
+  .choice-card.selected .choice-indicator { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+  .checkbox-indicator { border-radius:4px!important; }
+  .choice-card.correct-answer .choice-indicator { border-color:var(--correct); background:var(--correct); color:var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color:var(--incorrect); background:var(--incorrect); color:var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color:var(--correct); background:transparent; color:var(--correct); }
+  .choice-text { font-size:0.95rem; line-height:1.5; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:12px 28px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s ease; gap:8px; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#818cf8); color:var(--bg); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text); }
+  .btn-secondary:hover { background:var(--border); }
+  .button-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .explanation { margin-top:20px; padding:20px; border-radius:var(--radius-sm); border-left:4px solid var(--correct); background:rgba(74,222,128,0.06); animation:fadeIn 0.35s ease; }
+  .explanation.wrong { border-left-color:var(--incorrect); background:rgba(248,113,113,0.06); }
+  .explanation-title { font-weight:700; font-size:0.9rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .explanation-title.right { color:var(--correct); }
+  .explanation-title.wrong { color:var(--incorrect); }
+  .explanation-body { font-size:0.9rem; color:var(--text-dim); line-height:1.7; }
+  .explanation-body strong { color:var(--text); }
+  .results-screen { animation:fadeIn 0.4s ease; }
+  .results-header { text-align:center; margin-bottom:32px; }
+  .results-score { font-size:3.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .results-percent { font-size:1.2rem; color:var(--text-dim); margin-top:4px; }
+  .results-message { font-size:1rem; margin-top:12px; color:var(--text); font-weight:500; }
+  .missed-list { margin-top:24px; }
+  .missed-list h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--incorrect); }
+  .missed-item { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin-bottom:14px; border:1px solid var(--surface2); border-left:4px solid var(--incorrect); }
+  .missed-item-q { font-weight:600; font-size:0.92rem; margin-bottom:8px; color:#f1f5f9; }
+  .missed-item-detail { font-size:0.85rem; color:var(--text-dim); line-height:1.6; }
+  .missed-item-detail strong { color:var(--text); }
+  .start-screen { text-align:center; padding:40px 20px; }
+  .start-screen h2 { font-size:1.6rem; font-weight:800; margin-bottom:12px; color:#f1f5f9; }
+  .start-screen p { color:var(--text-dim); margin-bottom:8px; font-size:0.95rem; }
+  .start-details { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin:24px 0; border:1px solid var(--surface2); text-align:left; }
+  .start-details li { margin-bottom:6px; color:var(--text-dim); font-size:0.9rem; list-style:none; padding-left:20px; position:relative; }
+  .start-details li::before { content:"\2022"; position:absolute; left:4px; color:var(--accent); font-weight:bold; }
+  .hidden { display:none!important; }
+  @media(max-width:600px) {
+    .container{padding:14px 10px 40px} .quiz-header h1{font-size:1.2rem} .question-card{padding:20px 16px}
+    .question-stem{font-size:0.98rem} .choice-card{padding:12px 14px} .choice-text{font-size:0.9rem}
+    .btn{padding:12px 20px;font-size:0.9rem;width:100%} .button-row{flex-direction:column} .results-score{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Chapter 11 Neural &mdash; Dementia Quiz</h1>
+    <div class="subtitle">Scenario-based &bull; Alzheimer&rsquo;s, Lewy body, progression, safety &amp; family teaching &bull; 10 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 10</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    id:1, section:"Pathology", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A son asks the nurse, \u201cWhy does mom\u2019s CT scan show <strong>enlarged ventricles</strong> on top of the brain atrophy?\u201d Best response?",
+    choices:["\u201cThe ventricles produce extra CSF as the disease progresses.\u201d","\u201cAs brain tissue is lost, the CSF-filled ventricles expand to fill the empty space.\u201d","\u201cThe ventricles are being compressed by amyloid plaques.\u201d","\u201cIt\u2019s a side effect of the medications.\u201d"],
+    correct:[1],
+    explanation:"<strong>Tissue loss \u2192 ventricles expand to fill the space.</strong> Alzheimer\u2019s destroys neurons through \u03b2-amyloid plaques, neurofibrillary tangles, and loss of synaptic connections. As cortical tissue is lost (atrophy), the CSF-filled ventricles appear larger on CT \u2014 not because they\u2019re making more CSF, but because there\u2019s less brain tissue around them. This is the classic radiographic picture of advanced Alzheimer\u2019s."
+  },
+  {
+    id:2, section:"Lewy Body vs Alzheimer's", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 78-year-old man\u2019s wife reports: \u201cSome days he\u2019s completely himself, other days he doesn\u2019t know me. He\u2019s been seeing small animals in the corner of the room. He\u2019s also getting stiff and shuffling when he walks.\u201d Which diagnosis is MOST consistent?",
+    choices:["Early Alzheimer\u2019s disease","Lewy body dementia","Vascular dementia","Normal aging"],
+    correct:[1],
+    explanation:"<strong>Lewy body dementia.</strong> The triad of <strong>fluctuating cognition + hallucinations + motor/gait changes</strong> is classic Lewy body. In Alzheimer\u2019s, hallucinations appear LATE \u2014 here they\u2019re prominent and early. Steady progression (not day-to-day fluctuation) points to Alzheimer\u2019s; stepwise decline with stroke-like events points to vascular dementia."
+  },
+  {
+    id:3, section:"Brain Region \u2194 Symptom", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 70-year-old woman with mid-stage Alzheimer\u2019s has started yelling profanities at her grandchildren and grabbing at staff \u2014 behavior the family says is \u201ccompletely out of character.\u201d Which brain region is most likely now involved?",
+    choices:["Occipital lobe","Prefrontal cortex","Cerebellum","Brainstem"],
+    correct:[1],
+    explanation:"<strong>Prefrontal cortex.</strong> The prefrontal lobe governs personality, judgment, and impulse control. When dementia progresses into the prefrontal region, disinhibition and personality changes emerge. This isn\u2019t intentional behavior \u2014 it\u2019s disease progression. Teaching point: behavior/personality changes = prefrontal involvement (spiral to Foundations lobe map)."
+  },
+  {
+    id:4, section:"Distinguishing Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A daughter says, \u201cI forget where I put my keys all the time too \u2014 how is what\u2019s happening to mom any different from normal aging?\u201d Best nurse response?",
+    choices:["\u201cDementia is just normal aging happening faster.\u201d","\u201cDementia is a progressive decline in cortical function \u2014 cognition AND motor function, eventually behavior and personality. It\u2019s not just occasional forgetfulness.\u201d","\u201cIt\u2019s only different because of her age.\u201d","\u201cDementia only affects short-term memory; everything else stays intact.\u201d"],
+    correct:[1],
+    explanation:"<strong>Dementia = progressive \u2193 cortical function affecting cognition + motor + eventually behavior.</strong> Losing keys occasionally is not the same as losing the ability to follow a conversation, navigate familiar places, or recognize family. Dementia is cortical, progressive, and touches multiple domains. If behavior/personality changes appear, the prefrontal lobe is involved."
+  },
+  {
+    id:5, section:"Immobility Complications", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient with late-stage Alzheimer\u2019s is now bedridden. Which CLUSTER of complications is the nurse\u2019s PRIORITY to prevent?",
+    choices:["Hyperthyroidism, osteoporosis, and glaucoma","Infections, falls, malnutrition/anorexia, and dehydration","Seizures, stroke, and migraines","Diarrhea, GERD, and PUD"],
+    correct:[1],
+    explanation:"<strong>Infections, falls, malnutrition/anorexia, and dehydration.</strong> Per Lindsay\u2019s notes, these are the four complications of prolonged immobility in advanced dementia. Even bedridden patients are fall risks (during transfers). Skin integrity and aspiration pneumonia join this list as the disease progresses."
+  },
+  {
+    id:6, section:"Meaningful Activities", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A nurse is planning cognitive stimulation for a 72-year-old woman with early Alzheimer\u2019s who was a <strong>lifelong pianist and music teacher</strong>. Which activity BEST follows the \u201cwhat is meaningful to them?\u201d principle?",
+    choices:["A generic crossword puzzle from the day room","Listening to favorite piano recordings and, if able, playing simple familiar pieces","Watching a documentary about bird migration","Sitting quietly to \u201crest her brain\u201d"],
+    correct:[1],
+    explanation:"<strong>Music \u2014 what\u2019s meaningful to HER.</strong> Cognitive stimulation works best when it\u2019s personal. Familiar music taps preserved long-term memory circuits and maintains identity. Generic activities are fine as options, but the anchor question is always \u201c<em>what is meaningful to them?</em>\u201d \u2014 crosswords, match games, puzzles, crafts, photos of loved ones, and the specific things they loved before the disease."
+  },
+  {
+    id:7, section:"Progression Timeline", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A family member asks, \u201cHow fast will this progress? Is it like a stroke, where it happens all at once?\u201d Best response regarding Alzheimer\u2019s?",
+    choices:["\u201cAlzheimer\u2019s happens suddenly, usually within days.\u201d","\u201cAlzheimer\u2019s has an insidious onset, typically progressing over 10 to 20 years.\u201d","\u201cAlzheimer\u2019s is a rapid decline measured in weeks.\u201d","\u201cThe timeline depends entirely on medication.\u201d"],
+    correct:[1],
+    explanation:"<strong>Insidious onset, 10 to 20 years.</strong> Alzheimer\u2019s is slow and gradual \u2014 the opposite of stroke. Early on the exam may look normal; patients forget recent events. Over many years, the progression advances through memory \u2192 conversations \u2192 orientation \u2192 judgment \u2192 continence \u2192 personality \u2192 aggression \u2192 hallucinations. Stroke-like stepwise decline suggests vascular dementia instead."
+  },
+  {
+    id:8, section:"Vascular Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 72-year-old woman with <strong>long-standing HTN, LDL 180, and type 2 diabetes</strong> presents with progressive cognitive decline. Which type of dementia is MOST likely, and why?",
+    choices:["Alzheimer\u2019s \u2014 it\u2019s the most common, so it\u2019s probably this","Lewy body \u2014 because of her age","Vascular dementia \u2014 her risk factor profile matches CVD, and atherosclerosis reduces cerebral blood flow","Frontotemporal \u2014 from personality changes"],
+    correct:[2],
+    explanation:"<strong>Vascular dementia.</strong> HTN, high cholesterol, and diabetes are the same modifiable risk factors that drive CVD (spiral to Ch. 4). Atherosclerosis doesn\u2019t stop at the heart \u2014 it narrows cerebral arteries too, reducing brain perfusion and producing vascular dementia. This is why cardiovascular risk management is also brain-health management."
+  },
+  {
+    id:9, section:"Family Teaching", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The husband of a patient with mid-stage dementia tells the nurse, \u201cShe started hitting me when I try to help her bathe. She\u2019s never been violent. How do I handle this?\u201d Best nurse response?",
+    choices:["\u201cShe\u2019s acting out on purpose \u2014 you need to set firm limits.\u201d","\u201cThis is part of disease progression, not intentional. Stay calm, redirect with something meaningful, and adjust the environment \u2014 avoid arguing.\u201d","\u201cRestrain her hands during care to keep both of you safe.\u201d","\u201cShe needs a higher dose of her medication right away.\u201d"],
+    correct:[1],
+    explanation:"<strong>This is disease progression \u2014 redirect, stay calm, adjust the environment.</strong> Aggression in dementia is a sign of prefrontal involvement; it is NOT purposeful behavior. Arguing or setting firm limits escalates agitation. Restraint is inappropriate and dangerous. Redirection and environmental changes (quiet setting, familiar objects, calm tone, breaking care into smaller steps) are the core interventions. Caregivers need support and respite too."
+  },
+  {
+    id:10, section:"Environmental Safety", type:"mc", typeLabel:"Multiple Choice",
+    stem:"An early-stage Alzheimer\u2019s patient\u2019s family asks, \u201cCan we just hide the car keys?\u201d Best teaching?",
+    choices:["\u201cYes \u2014 hiding keys is enough.\u201d","\u201cKeys can be found. <strong>Disconnect the car battery</strong> \u2014 that removes the option entirely.\u201d","\u201cLet her drive only during daylight on familiar streets.\u201d","\u201cNothing to worry about until she gets lost.\u201d"],
+    correct:[1],
+    explanation:"<strong>Disconnect the car battery.</strong> Hiding keys relies on the person not remembering where they are \u2014 but dementia patients can surprise you. Disconnecting the battery makes the car inoperable regardless. This joins the core dementia environmental-safety teachings: remove throw rugs (falls), turn off the gas (fires), disconnect the car battery (wandering driving), and provide supervision. Driving risk grows before the family realizes it."
+  }
+];
+
+// ── QUIZ ENGINE ──
+let currentQ=0, score=0, answered=0, userAnswers=[], results=[];
+const main=document.getElementById('mainContent'), progressArea=document.getElementById('progressArea'),
+  progressBar=document.getElementById('progressBar'), progressText=document.getElementById('progressText'),
+  scoreDisplay=document.getElementById('scoreDisplay');
+
+function init(){userAnswers=questions.map(()=>[]);results=[];score=0;answered=0;currentQ=0;showStart()}
+function showStart(){
+  progressArea.classList.add('hidden');
+  main.innerHTML=`<div class="start-screen"><h2>Dementia Quiz</h2>
+    <p>10 scenario-based questions &mdash; harder than the warm-up</p>
+    <div class="start-details"><ul>
+      <li>Clinical scenarios &mdash; the kind you\u2019ll see on exams</li>
+      <li>Alzheimer\u2019s pathology, timeline, progression</li>
+      <li>Lewy body vs Alzheimer\u2019s vs vascular</li>
+      <li>Safety, meaningful activities, family teaching</li>
+    </ul></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Begin Quiz</button></div>`;
+}
+function startQuiz(){progressArea.classList.remove('hidden');showQuestion()}
+function showQuestion(){
+  const q=questions[currentQ], pct=(currentQ/questions.length)*100;
+  progressBar.style.width=pct+'%';
+  progressText.textContent=`Question ${currentQ+1} of ${questions.length}`;
+  scoreDisplay.textContent=answered>0?`Score: ${score}/${answered}`:'Score: 0/0';
+  const isCB=(q.type==='sata'), ic=isCB?'choice-indicator checkbox-indicator':'choice-indicator';
+  let ch=q.choices.map((c,i)=>{const l=String.fromCharCode(65+i);return`<div class="choice-card" data-index="${i}" onclick="toggleChoice(${i},${isCB})"><div class="${ic}">${l}</div><div class="choice-text">${c}</div></div>`}).join('');
+  main.innerHTML=`<div class="question-card"><div class="question-meta"><span class="question-number">Question ${q.id} of ${questions.length}</span><span class="question-type">${q.typeLabel}</span>${q.section?`<span class="section-label">${q.section}</span>`:''}</div><div class="question-stem">${q.stem}</div><div class="choices" id="choicesContainer">${ch}</div><div class="button-row" id="buttonRow"><button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button></div><div id="explanationArea"></div></div>`;
+}
+function toggleChoice(i,cb){
+  const cards=document.querySelectorAll('.choice-card');if(cards[0].classList.contains('disabled'))return;
+  if(cb){cards[i].classList.toggle('selected')}else{cards.forEach(c=>c.classList.remove('selected'));cards[i].classList.add('selected')}
+  document.getElementById('submitBtn').disabled=!document.querySelector('.choice-card.selected');
+}
+function submitAnswer(){
+  const q=questions[currentQ],cards=document.querySelectorAll('.choice-card'),sel=[];
+  cards.forEach((c,i)=>{if(c.classList.contains('selected'))sel.push(i)});
+  userAnswers[currentQ]=sel;
+  const cs=new Set(q.correct),ss=new Set(sel);
+  let ok=cs.size===ss.size&&[...cs].every(v=>ss.has(v));
+  results.push({qIndex:currentQ,correct:ok});answered++;if(ok)score++;
+  cards.forEach((c,i)=>{c.classList.add('disabled');const ws=ss.has(i),ir=cs.has(i);
+    if(ws&&ir){c.classList.remove('selected');c.classList.add('correct-answer');c.querySelector('.choice-indicator').innerHTML='&#10003;'}
+    else if(ws&&!ir){c.classList.remove('selected');c.classList.add('incorrect-answer');c.querySelector('.choice-indicator').innerHTML='&#10007;'}
+    else if(!ws&&ir){c.classList.add('missed-correct');c.querySelector('.choice-indicator').innerHTML='&#10003;'}});
+  document.getElementById('explanationArea').innerHTML=`<div class="explanation ${ok?'':'wrong'}"><div class="explanation-title ${ok?'right':'wrong'}">${ok?'&#10003; Correct!':'&#10007; Incorrect'}</div><div class="explanation-body">${q.explanation}</div></div>`;
+  scoreDisplay.textContent=`Score: ${score}/${answered}`;
+  const br=document.getElementById('buttonRow');
+  br.innerHTML=currentQ<questions.length-1?`<button class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>`:`<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+}
+function nextQuestion(){currentQ++;showQuestion();window.scrollTo({top:0,behavior:'smooth'})}
+function showResults(){
+  progressBar.style.width='100%';progressText.textContent='Quiz Complete';
+  scoreDisplay.textContent=`Final: ${score}/${questions.length}`;
+  const pct=Math.round((score/questions.length)*100);
+  let msg='';
+  if(pct>=90)msg='Excellent! You have strong dementia care reasoning.';
+  else if(pct>=80)msg='Great work! Review what you missed and you\u2019re solid on dementia.';
+  else if(pct>=70)msg='Good foundation. Revisit the Dementia review deck for weak spots.';
+  else if(pct>=60)msg='You\u2019re building toward mastery. Read the rationales carefully.';
+  else msg='Spend time with the Dementia review deck, then come back to this quiz.';
+  const missed=results.filter(r=>!r.correct);
+  let mh='';
+  if(missed.length>0){mh=`<div class="missed-list"><h3>Review Missed Questions (${missed.length})</h3>${missed.map(m=>{const q=questions[m.qIndex],cl=q.correct.map(c=>String.fromCharCode(65+c)).join(', '),ul=userAnswers[m.qIndex].map(c=>String.fromCharCode(65+c)).join(', ')||'None';return`<div class="missed-item"><div class="missed-item-q">Q${q.id} (${q.section}): ${q.stem.replace(/<[^>]*>/g,'')}</div><div class="missed-item-detail"><strong>Your answer:</strong> ${ul}<br><strong>Correct:</strong> ${cl}<br><br>${q.explanation}</div></div>`}).join('')}</div>`}
+  main.innerHTML=`<div class="results-screen"><div class="results-header"><div class="results-score">${score}/${questions.length}</div><div class="results-percent">${pct}%</div><div class="results-message">${msg}</div></div><div class="button-row" style="justify-content:center;margin-bottom:24px"><button class="btn btn-primary" onclick="init()">Retake Quiz</button>${missed.length>0?`<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>`:''}</div>${mh}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+init();
+</script>
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

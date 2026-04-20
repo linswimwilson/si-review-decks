@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 11: Neural — Seizures Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+}
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
+
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
+
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
+
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
+
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.15rem;color:var(--text-dim);max-width:720px;line-height:1.6}
+
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:center;max-width:960px;margin:0 auto;text-align:center}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:24px;text-align:center}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)} em.purple{font-style:normal;color:var(--purple)} em.teal{font-style:normal;color:var(--teal)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:820px;text-align:left}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:8px;font-weight:600}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-chain.horizontal{flex-direction:row}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:4px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:26px 22px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.15rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)} .compare-col.col-teal h4{color:var(--teal);border-color:var(--teal)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.compare-col ul li{font-size:0.94rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)} .compare-col.col-teal ul li::before{background:var(--teal)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.05rem,2vw,1.4rem);font-weight:700;max-width:820px;line-height:1.4;margin-bottom:30px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:780px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:16px 18px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.02rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:22px 26px;max-width:780px;text-align:left;font-size:1.02rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:700;max-width:780px;line-height:1.4;margin-bottom:22px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CELL-CARDS ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;width:100%}
+.cell-cards.three-col{grid-template-columns:1fr 1fr 1fr;max-width:880px}
+.cell-cards .full-span{grid-column:1 / -1}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid;text-align:left}
+.cell-card .cell-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── FOUNDATIONS RECAP ── */
+.recap-card{background:rgba(56,189,248,0.06);border:1.5px dashed rgba(56,189,248,0.35);border-radius:14px;padding:24px;max-width:720px;width:100%;text-align:left}
+.recap-card h4{font-size:0.9rem;letter-spacing:2px;color:var(--blue);font-weight:800;margin-bottom:10px;text-transform:uppercase}
+.recap-card p{font-size:0.95rem;color:var(--text-dim);line-height:1.55}
+.recap-card strong{color:var(--text)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.cell-cards.three-col{grid-template-columns:1fr}
+  .flow-chain.horizontal{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0}
+  .flow-chain.horizontal .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%}
+  .flow-chain.horizontal .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter">1 / 22</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
+
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>Neural &mdash; Seizures</h1>
+  <div class="subtitle">Chapter 11 &middot; Electrical disruption, classification, phases, and nursing safety</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ════════ SLIDE 2: FOUNDATIONS RECAP ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Before You Start</div>
+  <h3>If You Haven&rsquo;t Yet &mdash; <em>Skim the Foundations Deck</em></h3>
+  <div class="recap-card">
+    <h4>Quick Anchor</h4>
+    <p>Seizures happen when the brain&rsquo;s normal electrical rhythm is disrupted. If you need a refresh on how neurons fire (Na&#8314; influx &rarr; depolarization &rarr; wave travels &rarr; K&#8314; efflux &rarr; repolarization), skim the <strong>Foundations deck</strong> first. This deck builds on that base. Otherwise, let&rsquo;s go.</p>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 3: SECTION A — What's a Seizure? ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section A</div>
+  <h2>What&rsquo;s a <em>Seizure</em>?</h2>
+  <div class="divider-sub">Normal electrical rhythm disrupted &mdash; and what disrupts it</div>
+</div>
+
+<!-- ════════ SLIDE 4: ANCHOR — Seizures = Electrical Disruption ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Seizure = <em class="blue">Abnormal Electrical Activity</em></h2>
+  <div class="subline">Originates in the motor cortex. Measured with EEG (20 channels). Epilepsy = pattern of abnormal neurons &mdash; often no known cause and no cure.</div>
+</div>
+
+<!-- ════════ SLIDE 5: Seizure Causes (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Seizures</div>
+  <h3>What <em class="red">Disrupts</em> the Rhythm</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129665;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Trauma</strong>
+        <ul>
+          <li>Direct brain injury</li>
+          <li>Post-TBI seizures</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128165;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Ischemia / Hypoxia</strong>
+        <ul>
+          <li>Neurons need constant O&#8322;</li>
+          <li>Stroke, hypoxia &rarr; disrupted firing</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#127852;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Glucose Extremes</strong>
+        <ul>
+          <li>Hypoglycemia &mdash; brain starves</li>
+          <li>Hyperglycemia &mdash; also disrupts firing</li>
+          <li>Spiral to Ch.10 Diabetes</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">Na&#8314;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Electrolyte Imbalance</strong>
+        <ul>
+          <li>Especially Na&#8314; (hyponatremia)</li>
+          <li>Na&#8314; shifts &rarr; brain cell swelling &rarr; seizure</li>
+          <li>Spiral to Ch.6 Sodium</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Common thread:</strong> anything that messes with the Na&#8314;/K&#8314; balance or the brain&rsquo;s fuel supply can trigger abnormal firing. Find and fix the underlying cause.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 6: CHECK — Seizure Causes ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient with chronic SIADH has serum Na&#8314; of <strong>118 mEq/L</strong> (normal 135&ndash;145) and develops a seizure. What is the mechanism?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Low Na&#8314; directly damages motor cortex cells
+      <div class="explanation">Not direct damage. Na&#8314; affects water movement across the blood-brain barrier.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Hyponatremia pulls water into brain cells &rarr; cellular swelling &rarr; abnormal firing
+      <div class="explanation">Correct. Low serum Na&#8314; makes blood hypotonic relative to cells. Water shifts INTO brain cells &rarr; cerebral edema &rarr; disrupts normal electrical rhythm &rarr; seizure. Spiral to Ch.6 sodium balance.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Low Na&#8314; prevents insulin release &rarr; hyperglycemic seizure
+      <div class="explanation">No. SIADH isn&rsquo;t a diabetes mechanism.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Hyponatremia causes hypoxia &rarr; seizure
+      <div class="explanation">No. Hyponatremia doesn&rsquo;t cause hypoxia. The mechanism is cellular swelling.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 7: SECTION B — Classification ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section B</div>
+  <h2><em>Classification</em></h2>
+  <div class="divider-sub">Focal vs generalized &mdash; how much of the brain is firing</div>
+</div>
+
+<!-- ════════ SLIDE 8: ANCHOR — Focal vs Generalized ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Focal = <em class="blue">One Part.</em> Generalized = <em class="red">Whole Brain.</em></h2>
+  <div class="subline">Focal seizures start in 1 part of the brain and often produce symptoms in 1 part of the body. Generalized seizures involve both hemispheres and cause loss of consciousness.</div>
+</div>
+
+<!-- ════════ SLIDE 9: Focal Seizure Types (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Focal Types</div>
+  <h3>Focal <em class="blue">Seizures</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">P</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Partial / Focal Aware</strong>
+        <ul>
+          <li>1 part of body, 1 part of brain</li>
+          <li>Patient AWARE &mdash; stays conscious</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">CF</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Complex Focal</strong>
+        <ul>
+          <li>Change in consciousness</li>
+          <li>Repetitive behaviors</li>
+          <li>Often has an aura before</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128564;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Absence</strong>
+        <ul>
+          <li>Staring into space &mdash; can look like ADHD</li>
+          <li>Brief loss of awareness</li>
+          <li>May have subtle jerking/twitching or none</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 10: Generalized Seizure Types (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Generalized Types</div>
+  <h3>Generalized <em class="red">Seizures</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">T</div>
+      <div class="cell-text"><strong style="color:var(--red);">Tonic</strong>
+        <ul>
+          <li>Stiffening (muscles contract)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">C</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Clonic</strong>
+        <ul>
+          <li>Repeated jerking</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">A</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Atonic</strong>
+        <ul>
+          <li>Loss of muscle tone</li>
+          <li>&ldquo;Drop attacks&rdquo; &mdash; fall risk</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">TC</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Tonic-Clonic</strong>
+        <ul>
+          <li>Stiffening + jerking combined</li>
+          <li>Trembling, shaking</li>
+          <li>Can cause brain damage</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 11: COMPARE — Focal vs Generalized ════════ -->
+<div class="slide compare">
+  <h3>Focal <em class="yellow">vs.</em> Generalized</h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Focal (Partial)</h4>
+      <ul>
+        <li><strong>Brain:</strong> 1 part</li>
+        <li><strong>Body:</strong> often 1 part</li>
+        <li><strong>Awareness:</strong> usually preserved (partial aware); lost in complex focal</li>
+        <li><strong>Examples:</strong> partial aware, complex focal, absence</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>Generalized</h4>
+      <ul>
+        <li><strong>Brain:</strong> both hemispheres</li>
+        <li><strong>Body:</strong> whole-body motion</li>
+        <li><strong>Awareness:</strong> LOST</li>
+        <li><strong>Examples:</strong> tonic, clonic, atonic, tonic-clonic</li>
+        <li>Can cause brain damage with prolonged episodes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 12: CHECK — Classification ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A teacher notices a 9-year-old student frequently stares blankly for 5&ndash;10 seconds, then resumes activity as if nothing happened. Which seizure type?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Tonic-clonic
+      <div class="explanation">No. Tonic-clonic involves stiffening + jerking with loss of consciousness &mdash; visually obvious.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Absence seizure
+      <div class="explanation">Correct. Classic absence seizure: brief staring spell, can look like ADHD or daydreaming. Often missed. Common in kids.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Atonic
+      <div class="explanation">No. Atonic seizures cause sudden loss of muscle tone (drop attacks), not quiet staring.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Partial aware
+      <div class="explanation">Not quite. Partial aware usually has specific motor or sensory symptoms in 1 body part. Pure staring = absence.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 13: SECTION C — Phases ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section C</div>
+  <h2>Seizure <em>Phases</em></h2>
+  <div class="divider-sub">Aura &rarr; Ictal &rarr; Postictal</div>
+</div>
+
+<!-- ════════ SLIDE 14: FLOW — Seizure Phases (true cascade) ════════ -->
+<div class="slide flow">
+  <div class="section-label">Phases</div>
+  <h3>The Three <em class="blue">Phases</em></h3>
+  <div class="flow-chain horizontal">
+    <div class="flow-step" style="border-color:rgba(34,211,238,0.4);color:var(--teal);">Aura<small>premonition &mdash; warning</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(239,68,68,0.5);color:var(--red);background:rgba(239,68,68,0.06);">Ictal<small>active seizure</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Postictal<small>confused, tired, exhausted</small></div>
+  </div>
+  <div class="cell-cards" style="margin-top:30px;">
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#128270;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Aura &mdash; Warning</strong>
+        <ul>
+          <li>A &ldquo;premonition&rdquo; something is coming</li>
+          <li>May be a smell, sound, feeling, or d&eacute;j&agrave;-vu</li>
+          <li>Seizure-alert dogs can detect</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#9889;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Ictal &mdash; Active Seizure</strong>
+        <ul>
+          <li>The active seizure activity itself</li>
+          <li>Stiffening, jerking, staring, or fall &mdash; depends on type</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128564;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Postictal &mdash; After</strong>
+        <ul>
+          <li>Confused, tired, exhausted</li>
+          <li>Let them rest until they wake up on their own</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 15: ANCHOR — Status Epilepticus ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-emergency">Emergency</div>
+  <h2>Status Epilepticus &rarr; <em class="red">Acidosis</em></h2>
+  <div class="subline">Seizure lasting longer than <strong>20 minutes</strong>. Uses tons of energy &rarr; metabolic acidosis &rarr; brain damage. This is a medical emergency &mdash; stop the seizure with IV meds.</div>
+</div>
+
+<!-- ════════ SLIDE 16: SECTION D — Nursing Safety ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section D</div>
+  <h2>Nursing <em>Safety</em></h2>
+  <div class="divider-sub">Their safety AND our safety</div>
+</div>
+
+<!-- ════════ SLIDE 17: COMPARE — DO / DO NOT ════════ -->
+<div class="slide compare">
+  <h3>Seizure Safety &mdash; <em class="green">DO</em> vs <em class="red">DO NOT</em></h3>
+  <div class="compare-grid">
+    <div class="compare-col col-green">
+      <h4>DO</h4>
+      <ul>
+        <li><strong>Side-lying (recovery position)</strong> &mdash; prevents aspiration</li>
+        <li><strong>Open airway</strong> with head tilt back AFTER seizure activity stops</li>
+        <li><strong>Remove hazards</strong> from the immediate area</li>
+        <li><strong>Let them rest</strong> in the postictal phase &mdash; wake up on their own</li>
+        <li><strong>Time the seizure</strong> &mdash; length matters (&gt;20 min = status epilepticus)</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>DO NOT</h4>
+      <ul>
+        <li><strong>NEVER put fingers or objects in the mouth</strong> &mdash; injury risk to YOU and the patient</li>
+        <li><strong>NEVER restrain</strong> &mdash; let the seizure run its course; restraint can cause injury</li>
+        <li>Do not move the patient unless they&rsquo;re in danger</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Risks during a seizure:</strong> fall (especially atonic); aspiration (if eating or lying flat).
+  </div>
+</div>
+
+<!-- ════════ SLIDE 18: Patient Teaching (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Patient Teaching</div>
+  <h3>Patient &amp; Family <em class="green">Teaching</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#10060;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Do NOT Restrain</strong>
+        <ul>
+          <li>Family should know: do not hold them down</li>
+          <li>Clear the area; let it run its course</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128278;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Medi-Alert Bracelet</strong>
+        <ul>
+          <li>Identifies the condition to first responders</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128269;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Find the Cause</strong>
+        <ul>
+          <li>Workup: CT, MRI, bloodwork</li>
+          <li>Rule out treatable triggers</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#128138;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Anti-Seizure Medication Adherence</strong>
+        <ul>
+          <li>Never skip doses</li>
+          <li>Sudden stop can trigger status epilepticus</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 19: CHECK — Safety ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient is having a generalized tonic-clonic seizure. Which nursing actions are appropriate? (Pick the best action below)</div>
+  <div class="choices">
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Position the patient on their side and remove hazards
+      <div class="explanation">Correct. Side-lying prevents aspiration. Removing hazards protects from injury. Open airway with head tilt AFTER seizure stops. Let them rest postictally. NEVER restrain or put objects in the mouth.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Insert a padded tongue blade between the teeth
+      <div class="explanation">NO. Never put anything in the mouth during a seizure. You can injure the patient&rsquo;s teeth/jaw or get bitten yourself.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Restrain the patient to prevent injury
+      <div class="explanation">NO. Restraining during a seizure can cause broken bones or muscle injury. Let the seizure run its course in a safe space.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Administer CPR immediately
+      <div class="explanation">No. The patient is seizing, not in cardiac arrest. CPR would be wrong. Focus on safety positioning until the seizure stops.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 20: SECTION E — Clinical Application ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section E</div>
+  <h2>Clinical <em>Application</em></h2>
+  <div class="divider-sub">Put it all together</div>
+</div>
+
+<!-- ════════ SLIDE 21: CASE — Tonic-Clonic ════════ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <div class="case-scenario">
+    You&rsquo;re at the nurses&rsquo; station when a family member shouts for help. You enter the room to find a <strong>44M patient on the floor next to the bed</strong>, rigid, then jerking rhythmically. His eyes are rolled back. The seizure started <strong>~30 seconds ago</strong>. You know he has a <strong>history of epilepsy</strong>.
+  </div>
+  <div class="question">Which is your FIRST action?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Insert a bite block to prevent tongue injury
+      <div class="explanation">NEVER. Bite blocks / anything in the mouth during a seizure &rarr; risk of broken teeth, aspiration, and injury to you. This is old teaching &mdash; do not do it.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Turn him to side-lying and clear hazards from the area
+      <div class="explanation">Correct. First action: protect the airway with side-lying (prevents aspiration) and remove hazards so he doesn&rsquo;t injure himself on furniture. Time the seizure. Don&rsquo;t restrain. Open airway with head tilt AFTER it ends.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Hold his arms and legs still to prevent injury
+      <div class="explanation">NEVER restrain. You can cause fractures or muscle injury. Let the seizure run its course in a safe space.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Begin chest compressions
+      <div class="explanation">He&rsquo;s seizing, not in cardiac arrest. CPR would be wrong. Focus on seizure safety.</div>
+    </div>
+  </div>
+  <div class="callout warn">
+    If this seizure lasts longer than <strong>20 minutes</strong>, it becomes <strong>status epilepticus</strong> &mdash; medical emergency, IV meds to stop it, watch for metabolic acidosis and brain damage.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 22: ANCHOR — Summary ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Seizures &mdash; The <em>Big Picture</em></h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.02rem;line-height:1.8;">
+    <span class="hl-blue">&bull;</span> <strong>Seizure = abnormal electrical activity</strong>, usually starting in motor cortex. EEG confirms.<br>
+    <span class="hl-red">&bull;</span> <strong>Causes:</strong> trauma, ischemia, hypoxia, glucose extremes, electrolyte imbalance (especially Na&#8314;).<br>
+    <span class="hl-yellow">&bull;</span> <strong>Focal = 1 part</strong> (partial aware, complex focal, absence). <strong>Generalized = whole brain</strong> (tonic, clonic, atonic, tonic-clonic).<br>
+    <span class="hl-teal">&bull;</span> <strong>Three phases:</strong> Aura &rarr; Ictal &rarr; Postictal. Let them rest until they wake up on their own.<br>
+    <span class="hl-red">&bull;</span> <strong>Status epilepticus</strong> (&gt; 20 min) = emergency &rarr; acidosis &rarr; brain damage.<br>
+    <span class="hl-green">&bull;</span> <strong>Safety:</strong> side-lying, clear hazards, time it, let it run. NEVER restrain. NEVER put anything in the mouth.<br>
+    <span class="hl-purple">&bull;</span> <strong>Their safety AND our safety.</strong>
+  </div>
+</div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
+<script>
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

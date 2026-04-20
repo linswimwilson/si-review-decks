@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chapter 11 Neural &mdash; Seizures Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --text-dim: #94a3b8; --accent: #38bdf8;
+    --accent-glow: rgba(56,189,248,0.15); --correct: #4ade80;
+    --correct-bg: rgba(74,222,128,0.12); --incorrect: #f87171;
+    --incorrect-bg: rgba(248,113,113,0.12); --warning: #fbbf24;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .container { max-width:820px; margin:0 auto; padding:20px 16px 60px; }
+  .quiz-header { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--surface2); }
+  .quiz-header h1 { font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .quiz-header .subtitle { font-size:0.85rem; color:var(--text-dim); }
+  .quiz-header .authors { font-size:0.78rem; color:var(--text-dim); margin-top:2px; font-style:italic; }
+  .progress-wrap { background:var(--surface); border-radius:20px; height:10px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:20px; transition:width 0.4s ease; width:0%; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--text-dim); margin-bottom:24px; }
+  .score-display { font-weight:600; color:var(--accent); }
+  .question-card { background:var(--surface); border-radius:var(--radius); padding:28px 24px; border:1px solid var(--surface2); animation:fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .question-number { font-size:0.82rem; font-weight:600; color:var(--accent); }
+  .question-type { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:20px; background:var(--accent-glow); color:var(--accent); }
+  .section-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:10px; background:var(--surface2); }
+  .question-stem { font-size:1.05rem; font-weight:500; line-height:1.65; margin-bottom:22px; color:#f1f5f9; }
+  .question-stem strong { color:var(--warning); }
+  .choices { display:flex; flex-direction:column; gap:10px; }
+  .choice-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:2px solid var(--surface2); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s ease; background:transparent; user-select:none; -webkit-user-select:none; }
+  .choice-card:hover:not(.disabled) { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.selected { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.disabled { cursor:default; pointer-events:none; }
+  .choice-card.correct-answer { border-color:var(--correct)!important; background:var(--correct-bg)!important; }
+  .choice-card.incorrect-answer { border-color:var(--incorrect)!important; background:var(--incorrect-bg)!important; }
+  .choice-card.missed-correct { border-color:var(--correct)!important; background:var(--correct-bg)!important; opacity:0.7; }
+  .choice-indicator { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; font-size:0.7rem; font-weight:700; }
+  .choice-card.selected .choice-indicator { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+  .checkbox-indicator { border-radius:4px!important; }
+  .choice-card.correct-answer .choice-indicator { border-color:var(--correct); background:var(--correct); color:var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color:var(--incorrect); background:var(--incorrect); color:var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color:var(--correct); background:transparent; color:var(--correct); }
+  .choice-text { font-size:0.95rem; line-height:1.5; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:12px 28px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s ease; gap:8px; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#818cf8); color:var(--bg); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text); }
+  .btn-secondary:hover { background:var(--border); }
+  .button-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .explanation { margin-top:20px; padding:20px; border-radius:var(--radius-sm); border-left:4px solid var(--correct); background:rgba(74,222,128,0.06); animation:fadeIn 0.35s ease; }
+  .explanation.wrong { border-left-color:var(--incorrect); background:rgba(248,113,113,0.06); }
+  .explanation-title { font-weight:700; font-size:0.9rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .explanation-title.right { color:var(--correct); }
+  .explanation-title.wrong { color:var(--incorrect); }
+  .explanation-body { font-size:0.9rem; color:var(--text-dim); line-height:1.7; }
+  .explanation-body strong { color:var(--text); }
+  .results-screen { animation:fadeIn 0.4s ease; }
+  .results-header { text-align:center; margin-bottom:32px; }
+  .results-score { font-size:3.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .results-percent { font-size:1.2rem; color:var(--text-dim); margin-top:4px; }
+  .results-message { font-size:1rem; margin-top:12px; color:var(--text); font-weight:500; }
+  .missed-list { margin-top:24px; }
+  .missed-list h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--incorrect); }
+  .missed-item { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin-bottom:14px; border:1px solid var(--surface2); border-left:4px solid var(--incorrect); }
+  .missed-item-q { font-weight:600; font-size:0.92rem; margin-bottom:8px; color:#f1f5f9; }
+  .missed-item-detail { font-size:0.85rem; color:var(--text-dim); line-height:1.6; }
+  .missed-item-detail strong { color:var(--text); }
+  .start-screen { text-align:center; padding:40px 20px; }
+  .start-screen h2 { font-size:1.6rem; font-weight:800; margin-bottom:12px; color:#f1f5f9; }
+  .start-screen p { color:var(--text-dim); margin-bottom:8px; font-size:0.95rem; }
+  .start-details { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin:24px 0; border:1px solid var(--surface2); text-align:left; }
+  .start-details li { margin-bottom:6px; color:var(--text-dim); font-size:0.9rem; list-style:none; padding-left:20px; position:relative; }
+  .start-details li::before { content:"\2022"; position:absolute; left:4px; color:var(--accent); font-weight:bold; }
+  .hidden { display:none!important; }
+  @media(max-width:600px) {
+    .container{padding:14px 10px 40px} .quiz-header h1{font-size:1.2rem} .question-card{padding:20px 16px}
+    .question-stem{font-size:0.98rem} .choice-card{padding:12px 14px} .choice-text{font-size:0.9rem}
+    .btn{padding:12px 20px;font-size:0.9rem;width:100%} .button-row{flex-direction:column} .results-score{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Chapter 11 Neural &mdash; Seizures Quiz</h1>
+    <div class="subtitle">Scenario-based &bull; Classification, phases, safety, causes &bull; 10 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 10</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    id:1, section:"Active Seizure", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 44-year-old man has a witnessed generalized tonic-clonic seizure in his hospital bed. His whole body is stiffening and jerking. The nurse\u2019s <strong>FIRST</strong> action is:",
+    choices:["Insert a padded tongue depressor to prevent tongue biting","Roll him to his side, clear hazards from the area, and time the seizure","Hold his arms and legs down to stop the jerking","Run for the doctor before doing anything"],
+    correct:[1],
+    explanation:"<strong>Side-lying, clear hazards, time it.</strong> Safety is the first priority: side-lying protects the airway from aspirated saliva, clearing hazards prevents injury during the jerking, and timing matters (&gt;20 min = status epilepticus = emergency). <strong>Never put anything in the mouth.</strong> Never restrain. Running for help without protecting the airway wastes the critical first seconds."
+  },
+  {
+    id:2, section:"Postictal Care", type:"mc", typeLabel:"Multiple Choice",
+    stem:"After a 90-second generalized tonic-clonic seizure, a patient is sleepy, confused, and slurring words. The family is panicking, asking if you should \u201cwake him up.\u201d The nurse\u2019s BEST response is:",
+    choices:["\u201cYes \u2014 let\u2019s wake him with a cold cloth so he\u2019s alert.\u201d","\u201cHe\u2019s in the postictal phase. Let him rest in a side-lying position \u2014 he\u2019ll wake up on his own.\u201d","\u201cHe may be in a coma \u2014 call the rapid response team.\u201d","\u201cGive him water to drink to help him recover faster.\u201d"],
+    correct:[1],
+    explanation:"<strong>Let him rest \u2014 this is the postictal phase.</strong> Sleepiness, confusion, and slurred speech are normal as the brain recovers. Forcing him awake is unhelpful. Giving fluids is dangerous \u2014 aspiration risk from altered consciousness. Rapid response isn\u2019t indicated unless the seizure recurs or exceeds 20 min (status epilepticus). The three phases: <strong>Aura \u2192 Ictal \u2192 Postictal.</strong>"
+  },
+  {
+    id:3, section:"Causes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 17-year-old with <strong>type 1 diabetes</strong> was in the middle of soccer practice when she had a brief tonic-clonic seizure. Fingerstick at arrival: <strong>38 mg/dL</strong>. Which mechanism best explains her seizure?",
+    choices:["Hypoglycemia \u2014 neurons were starved of their glucose fuel, disrupting electrical firing","The physical exertion triggered a structural lesion","Dehydration caused cerebral edema","Post-exercise adrenaline spike"],
+    correct:[0],
+    explanation:"<strong>Hypoglycemia.</strong> Neurons need a constant supply of glucose (and O\u2082) \u2014 cut either one off and they can\u2019t maintain their Na\u207a/K\u207a electrical rhythm. At 38 mg/dL, the brain is fuel-starved. This is why <strong>glucose extremes</strong> (both hypoglycemia and severe hyperglycemia) are on the short list of seizure causes, along with trauma, ischemia/hypoxia, and electrolyte imbalance. Spiral: Ch. 10 Diabetes."
+  },
+  {
+    id:4, section:"Classification", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 7-year-old child\u2019s teacher reports that the child \u201cspaces out for 10 to 20 seconds at a time, staring at nothing, then snaps back like nothing happened.\u201d The teacher suspects ADHD. The pediatric provider should consider:",
+    choices:["Generalized tonic-clonic seizure","Complex focal seizure with aura","Absence seizure \u2014 brief loss of awareness that can mimic inattention","Simple inattention with no neurologic cause"],
+    correct:[2],
+    explanation:"<strong>Absence seizure.</strong> Classic presentation: staring into space for seconds at a time, brief loss of awareness, then back to normal with no postictal period. Can look identical to inattention/ADHD, which is why it\u2019s often missed. May have subtle jerking/twitching. Absence seizures are in the focal / non-motor family. Always consider seizure in a child who \u201czones out\u201d repeatedly."
+  },
+  {
+    id:5, section:"Status Epilepticus", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient in the ED has been seizing continuously for <strong>22 minutes</strong> despite a first dose of lorazepam. Which acid-base derangement should the nurse anticipate?",
+    choices:["Metabolic alkalosis","Metabolic acidosis","Respiratory alkalosis","No acid-base change at this duration"],
+    correct:[1],
+    explanation:"<strong>Metabolic acidosis.</strong> Status epilepticus (&gt; 20 minutes of continuous seizure activity) produces massive anaerobic muscle metabolism \u2192 lactic acid buildup \u2192 metabolic acidosis. Without intervention, the combination of hypoxia, acidosis, and hyperthermia causes brain damage and can be fatal. Requires IV antiseizure meds (benzos first, then second-line agents) plus airway/O\u2082/monitoring."
+  },
+  {
+    id:6, section:"Causes", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 60-year-old man is admitted with hyponatremia (serum Na\u207a <strong>115 mEq/L</strong>) from SIADH. He develops a new seizure in the ED. Which mechanism applies?",
+    choices:["Hyponatremia directly damages the motor cortex","Low serum Na\u207a creates hypotonic plasma \u2192 water shifts INTO brain cells \u2192 cerebral edema \u2192 abnormal electrical firing","Hyponatremia causes vasoconstriction of cerebral arteries","Low Na\u207a triggers a reflex seizure from the medulla"],
+    correct:[1],
+    explanation:"<strong>Water shifts INTO brain cells \u2192 cerebral edema \u2192 seizure.</strong> This is the hyponatremia seizure pathway: low plasma Na\u207a makes blood hypotonic relative to cells, water follows the osmotic gradient into neurons, cells swell, and the abnormal environment disrupts the Na\u207a/K\u207a electrical rhythm. <strong>Electrolyte imbalance</strong> is a key seizure cause \u2014 especially sodium. Spiral: Ch. 6 Sodium."
+  },
+  {
+    id:7, section:"Classification", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A 35-year-old woman reports: \u201cBefore it happens, I smell burnt rubber, even though there\u2019s nothing burning. Then I space out for about a minute, and my husband says I lick my lips and pick at my shirt. I don\u2019t remember that part.\u201d Which seizure type does this describe?",
+    choices:["Absence seizure","Simple focal (partial aware) seizure","Complex focal seizure with aura","Generalized tonic-clonic seizure"],
+    correct:[2],
+    explanation:"<strong>Complex focal seizure with aura.</strong> Key features: an aura (smell of burnt rubber = olfactory aura \u2014 hallmark), altered awareness (she doesn\u2019t remember), and repetitive automatisms (lip licking, picking at clothing). Simple focal = awareness preserved. Absence = no aura, no automatisms, briefer. Generalized tonic-clonic = whole body, full loss of consciousness."
+  },
+  {
+    id:8, section:"Safety", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which statement demonstrates CORRECT seizure-safety knowledge?",
+    choices:["\u201cIf I see someone seizing, I should restrain their arms so they don\u2019t hurt themselves.\u201d","\u201cPut a padded spoon in the mouth to prevent biting the tongue.\u201d","\u201cRoll them on their side, move furniture away, and time the seizure \u2014 don\u2019t put anything in the mouth, don\u2019t restrain.\u201d","\u201cHold the head still to keep the airway open.\u201d"],
+    correct:[2],
+    explanation:"<strong>Side-lying, clear hazards, time it, no mouth objects, no restraint.</strong> Everything else is a safety violation. Restraining muscles mid-contraction can break bones and damage joints. Objects in the mouth can break teeth, block the airway, or injure the caregiver. Holding the head still can injure the neck. The mantra: <em>\u201cTheir safety AND our safety.\u201d</em>"
+  },
+  {
+    id:9, section:"Post-Seizure Assessment", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient in the postictal phase is breathing regularly but drooling and slumped in bed. What is the nurse\u2019s BEST position and action?",
+    choices:["Supine and flat, head midline","Side-lying with head slightly lower, suction at bedside","Semi-Fowler\u2019s with head turned forward","Prone with arms at sides"],
+    correct:[1],
+    explanation:"<strong>Side-lying, head slightly lower, suction ready.</strong> Postictal patients are at high aspiration risk \u2014 saliva pools, gag reflex is blunted, airway tone is reduced. Side-lying lets gravity drain secretions away from the airway, and suction is there for what doesn\u2019t drain. Supine positioning maximizes aspiration risk. Prone is unsafe for airway monitoring."
+  },
+  {
+    id:10, section:"Epilepsy vs Acute Seizure", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient with no prior neuro history has a single generalized seizure after 36 hours without sleep, excessive caffeine, and skipping meals. Workup is normal. Which statement is MOST accurate?",
+    choices:["This patient now has epilepsy and needs lifelong antiseizure medication","A single provoked seizure doesn\u2019t equal epilepsy \u2014 treat the provoking factors (sleep, fuel, trigger avoidance) and monitor","Seizures from lifestyle causes don\u2019t require any follow-up","This is almost certainly a brain tumor until proven otherwise"],
+    correct:[1],
+    explanation:"<strong>A single provoked seizure doesn\u2019t equal epilepsy.</strong> Epilepsy = a <em>pattern</em> of abnormal firing \u2014 typically recurrent unprovoked seizures. Sleep deprivation, fasting hypoglycemia, and stimulants can lower the seizure threshold enough to provoke one seizure in an otherwise healthy person. Treat the provoking factors, educate on triggers, and follow up rather than immediately labeling as epilepsy or assuming tumor."
+  }
+];
+
+// ── QUIZ ENGINE ──
+let currentQ=0, score=0, answered=0, userAnswers=[], results=[];
+const main=document.getElementById('mainContent'), progressArea=document.getElementById('progressArea'),
+  progressBar=document.getElementById('progressBar'), progressText=document.getElementById('progressText'),
+  scoreDisplay=document.getElementById('scoreDisplay');
+
+function init(){userAnswers=questions.map(()=>[]);results=[];score=0;answered=0;currentQ=0;showStart()}
+function showStart(){
+  progressArea.classList.add('hidden');
+  main.innerHTML=`<div class="start-screen"><h2>Seizures Quiz</h2>
+    <p>10 scenario-based questions &mdash; harder than the warm-up</p>
+    <div class="start-details"><ul>
+      <li>Clinical scenarios &mdash; the kind you\u2019ll see on exams</li>
+      <li>Classification, phases, safety, status epilepticus</li>
+      <li>Seizure causes: glucose, sodium, structural, provoked vs epilepsy</li>
+      <li>Detailed rationales referencing Ch. 11 content</li>
+    </ul></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Begin Quiz</button></div>`;
+}
+function startQuiz(){progressArea.classList.remove('hidden');showQuestion()}
+function showQuestion(){
+  const q=questions[currentQ], pct=(currentQ/questions.length)*100;
+  progressBar.style.width=pct+'%';
+  progressText.textContent=`Question ${currentQ+1} of ${questions.length}`;
+  scoreDisplay.textContent=answered>0?`Score: ${score}/${answered}`:'Score: 0/0';
+  const isCB=(q.type==='sata'), ic=isCB?'choice-indicator checkbox-indicator':'choice-indicator';
+  let ch=q.choices.map((c,i)=>{const l=String.fromCharCode(65+i);return`<div class="choice-card" data-index="${i}" onclick="toggleChoice(${i},${isCB})"><div class="${ic}">${l}</div><div class="choice-text">${c}</div></div>`}).join('');
+  main.innerHTML=`<div class="question-card"><div class="question-meta"><span class="question-number">Question ${q.id} of ${questions.length}</span><span class="question-type">${q.typeLabel}</span>${q.section?`<span class="section-label">${q.section}</span>`:''}</div><div class="question-stem">${q.stem}</div><div class="choices" id="choicesContainer">${ch}</div><div class="button-row" id="buttonRow"><button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button></div><div id="explanationArea"></div></div>`;
+}
+function toggleChoice(i,cb){
+  const cards=document.querySelectorAll('.choice-card');if(cards[0].classList.contains('disabled'))return;
+  if(cb){cards[i].classList.toggle('selected')}else{cards.forEach(c=>c.classList.remove('selected'));cards[i].classList.add('selected')}
+  document.getElementById('submitBtn').disabled=!document.querySelector('.choice-card.selected');
+}
+function submitAnswer(){
+  const q=questions[currentQ],cards=document.querySelectorAll('.choice-card'),sel=[];
+  cards.forEach((c,i)=>{if(c.classList.contains('selected'))sel.push(i)});
+  userAnswers[currentQ]=sel;
+  const cs=new Set(q.correct),ss=new Set(sel);
+  let ok=cs.size===ss.size&&[...cs].every(v=>ss.has(v));
+  results.push({qIndex:currentQ,correct:ok});answered++;if(ok)score++;
+  cards.forEach((c,i)=>{c.classList.add('disabled');const ws=ss.has(i),ir=cs.has(i);
+    if(ws&&ir){c.classList.remove('selected');c.classList.add('correct-answer');c.querySelector('.choice-indicator').innerHTML='&#10003;'}
+    else if(ws&&!ir){c.classList.remove('selected');c.classList.add('incorrect-answer');c.querySelector('.choice-indicator').innerHTML='&#10007;'}
+    else if(!ws&&ir){c.classList.add('missed-correct');c.querySelector('.choice-indicator').innerHTML='&#10003;'}});
+  document.getElementById('explanationArea').innerHTML=`<div class="explanation ${ok?'':'wrong'}"><div class="explanation-title ${ok?'right':'wrong'}">${ok?'&#10003; Correct!':'&#10007; Incorrect'}</div><div class="explanation-body">${q.explanation}</div></div>`;
+  scoreDisplay.textContent=`Score: ${score}/${answered}`;
+  const br=document.getElementById('buttonRow');
+  br.innerHTML=currentQ<questions.length-1?`<button class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>`:`<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+}
+function nextQuestion(){currentQ++;showQuestion();window.scrollTo({top:0,behavior:'smooth'})}
+function showResults(){
+  progressBar.style.width='100%';progressText.textContent='Quiz Complete';
+  scoreDisplay.textContent=`Final: ${score}/${questions.length}`;
+  const pct=Math.round((score/questions.length)*100);
+  let msg='';
+  if(pct>=90)msg='Excellent! You have strong seizure assessment and safety reasoning.';
+  else if(pct>=80)msg='Great work! Review what you missed and you\u2019re solid on seizures.';
+  else if(pct>=70)msg='Good foundation. Revisit the Seizures review deck for weak spots.';
+  else if(pct>=60)msg='You\u2019re building toward mastery. Read the rationales carefully.';
+  else msg='Spend time with the Seizures review deck, then come back to this quiz.';
+  const missed=results.filter(r=>!r.correct);
+  let mh='';
+  if(missed.length>0){mh=`<div class="missed-list"><h3>Review Missed Questions (${missed.length})</h3>${missed.map(m=>{const q=questions[m.qIndex],cl=q.correct.map(c=>String.fromCharCode(65+c)).join(', '),ul=userAnswers[m.qIndex].map(c=>String.fromCharCode(65+c)).join(', ')||'None';return`<div class="missed-item"><div class="missed-item-q">Q${q.id} (${q.section}): ${q.stem.replace(/<[^>]*>/g,'')}</div><div class="missed-item-detail"><strong>Your answer:</strong> ${ul}<br><strong>Correct:</strong> ${cl}<br><br>${q.explanation}</div></div>`}).join('')}</div>`}
+  main.innerHTML=`<div class="results-screen"><div class="results-header"><div class="results-score">${score}/${questions.length}</div><div class="results-percent">${pct}%</div><div class="results-message">${msg}</div></div><div class="button-row" style="justify-content:center;margin-bottom:24px"><button class="btn btn-primary" onclick="init()">Retake Quiz</button>${missed.length>0?`<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>`:''}</div>${mh}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+init();
+</script>
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

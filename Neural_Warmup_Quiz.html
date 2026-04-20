@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chapter 11 Neural Warm-Up Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155; --border: #475569;
+    --text: #e2e8f0; --text-dim: #94a3b8; --accent: #38bdf8;
+    --accent-glow: rgba(56,189,248,0.15); --correct: #4ade80;
+    --correct-bg: rgba(74,222,128,0.12); --incorrect: #f87171;
+    --incorrect-bg: rgba(248,113,113,0.12); --warning: #fbbf24;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .container { max-width:820px; margin:0 auto; padding:20px 16px 60px; }
+  .quiz-header { text-align:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--surface2); }
+  .quiz-header h1 { font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .quiz-header .subtitle { font-size:0.85rem; color:var(--text-dim); }
+  .quiz-header .authors { font-size:0.78rem; color:var(--text-dim); margin-top:2px; font-style:italic; }
+  .progress-wrap { background:var(--surface); border-radius:20px; height:10px; margin-bottom:10px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:20px; transition:width 0.4s ease; width:0%; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--text-dim); margin-bottom:24px; }
+  .score-display { font-weight:600; color:var(--accent); }
+  .question-card { background:var(--surface); border-radius:var(--radius); padding:28px 24px; border:1px solid var(--surface2); animation:fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+  .question-number { font-size:0.82rem; font-weight:600; color:var(--accent); }
+  .question-type { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:3px 10px; border-radius:20px; background:var(--accent-glow); color:var(--accent); }
+  .section-label { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:10px; background:var(--surface2); }
+  .question-stem { font-size:1.05rem; font-weight:500; line-height:1.65; margin-bottom:22px; color:#f1f5f9; }
+  .choices { display:flex; flex-direction:column; gap:10px; }
+  .choice-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border:2px solid var(--surface2); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s ease; background:transparent; user-select:none; -webkit-user-select:none; }
+  .choice-card:hover:not(.disabled) { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.selected { border-color:var(--accent); background:var(--accent-glow); }
+  .choice-card.disabled { cursor:default; pointer-events:none; }
+  .choice-card.correct-answer { border-color:var(--correct)!important; background:var(--correct-bg)!important; }
+  .choice-card.incorrect-answer { border-color:var(--incorrect)!important; background:var(--incorrect-bg)!important; }
+  .choice-card.missed-correct { border-color:var(--correct)!important; background:var(--correct-bg)!important; opacity:0.7; }
+  .choice-indicator { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; font-size:0.7rem; font-weight:700; }
+  .choice-card.selected .choice-indicator { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+  .checkbox-indicator { border-radius:4px!important; }
+  .choice-card.correct-answer .choice-indicator { border-color:var(--correct); background:var(--correct); color:var(--bg); }
+  .choice-card.incorrect-answer .choice-indicator { border-color:var(--incorrect); background:var(--incorrect); color:var(--bg); }
+  .choice-card.missed-correct .choice-indicator { border-color:var(--correct); background:transparent; color:var(--correct); }
+  .choice-text { font-size:0.95rem; line-height:1.5; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:12px 28px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s ease; gap:8px; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#818cf8); color:var(--bg); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(56,189,248,0.3); }
+  .btn-primary:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text); }
+  .btn-secondary:hover { background:var(--border); }
+  .button-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .explanation { margin-top:20px; padding:20px; border-radius:var(--radius-sm); border-left:4px solid var(--correct); background:rgba(74,222,128,0.06); animation:fadeIn 0.35s ease; }
+  .explanation.wrong { border-left-color:var(--incorrect); background:rgba(248,113,113,0.06); }
+  .explanation-title { font-weight:700; font-size:0.9rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .explanation-title.right { color:var(--correct); }
+  .explanation-title.wrong { color:var(--incorrect); }
+  .explanation-body { font-size:0.9rem; color:var(--text-dim); line-height:1.7; }
+  .explanation-body strong { color:var(--text); }
+  .results-screen { animation:fadeIn 0.4s ease; }
+  .results-header { text-align:center; margin-bottom:32px; }
+  .results-score { font-size:3.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .results-percent { font-size:1.2rem; color:var(--text-dim); margin-top:4px; }
+  .results-message { font-size:1rem; margin-top:12px; color:var(--text); font-weight:500; }
+  .missed-list { margin-top:24px; }
+  .missed-list h3 { font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--incorrect); }
+  .missed-item { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin-bottom:14px; border:1px solid var(--surface2); border-left:4px solid var(--incorrect); }
+  .missed-item-q { font-weight:600; font-size:0.92rem; margin-bottom:8px; color:#f1f5f9; }
+  .missed-item-detail { font-size:0.85rem; color:var(--text-dim); line-height:1.6; }
+  .missed-item-detail strong { color:var(--text); }
+  .start-screen { text-align:center; padding:40px 20px; }
+  .start-screen h2 { font-size:1.6rem; font-weight:800; margin-bottom:12px; color:#f1f5f9; }
+  .start-screen p { color:var(--text-dim); margin-bottom:8px; font-size:0.95rem; }
+  .start-details { background:var(--surface); border-radius:var(--radius-sm); padding:20px; margin:24px 0; border:1px solid var(--surface2); text-align:left; }
+  .start-details li { margin-bottom:6px; color:var(--text-dim); font-size:0.9rem; list-style:none; padding-left:20px; position:relative; }
+  .start-details li::before { content:"\2022"; position:absolute; left:4px; color:var(--accent); font-weight:bold; }
+  .hidden { display:none!important; }
+  @media(max-width:600px) {
+    .container{padding:14px 10px 40px} .quiz-header h1{font-size:1.2rem} .question-card{padding:20px 16px}
+    .question-stem{font-size:0.98rem} .choice-card{padding:12px 14px} .choice-text{font-size:0.9rem}
+    .btn{padding:12px 20px;font-size:0.9rem;width:100%} .button-row{flex-direction:column} .results-score{font-size:2.8rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="quiz-header">
+    <h1>Chapter 11 Neural &mdash; Warm-Up Quiz</h1>
+    <div class="subtitle">Rapid-fire fundamentals &bull; Foundations, Stroke, Seizures, Dementia &bull; 25 Questions</div>
+    <div class="authors">Lindsay Wilson &amp; Claude Code</div>
+  </div>
+  <div id="progressArea" class="hidden">
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Question 1 of 25</span>
+      <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+    </div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+const questions = [
+  // ── FOUNDATIONS (1-6) ──
+  {
+    id:1, section:"Foundations", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which is the correct order of the meninges from OUTSIDE to INSIDE?",
+    choices:["Pia \u2192 Arachnoid \u2192 Dura","Dura \u2192 Arachnoid \u2192 Pia","Arachnoid \u2192 Dura \u2192 Pia","Dura \u2192 Pia \u2192 Arachnoid"],
+    correct:[1],
+    explanation:"<strong>Dura \u2192 Arachnoid \u2192 Pia.</strong> Dura = outer tough layer against the skull. Arachnoid = middle, web-like, vascular. Pia = thin inner layer directly on the brain. The three hematoma names tell you exactly which layer they sit below: <strong>epi</strong>dural, <strong>sub</strong>dural, <strong>sub</strong>arachnoid."
+  },
+  {
+    id:2, section:"Foundations", type:"tf", typeLabel:"True / False",
+    stem:"Normal CSF contains no blood cells and yes sugar.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Normal CSF has no blood cells and does contain sugar. Blood cells or absent sugar on a lumbar puncture = something is wrong (bleeding, meningitis, etc.)."
+  },
+  {
+    id:3, section:"Foundations", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Neurons require a constant supply of which two substances or they die within minutes?",
+    choices:["Sodium and potassium","Oxygen and glucose","Calcium and magnesium","Insulin and cortisol"],
+    correct:[1],
+    explanation:"<strong>Oxygen and glucose.</strong> CNS neurons have no reserves \u2014 they need continuous O\u2082 and glucose. This is why the stroke treatment window is measured in hours, not days, and why CNS neurons CANNOT regenerate once they die."
+  },
+  {
+    id:4, section:"Foundations", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The Monroe-Kellie rule states that the skull is a closed box containing three things. What are they?",
+    choices:["Blood, brain tissue, CSF","Blood, CSF, meninges","Gray matter, white matter, CSF","Blood, brain tissue, lymph"],
+    correct:[0],
+    explanation:"<strong>Blood, brain tissue, and CSF.</strong> Total volume is fixed. If one grows (hemorrhage, tumor, hydrocephalus), another must shrink \u2014 or pressure rises. Treatment logic follows: excess blood \u2192 drain it. Excess tissue \u2192 remove it. Excess CSF \u2192 drain it."
+  },
+  {
+    id:5, section:"Foundations", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Cushing's triad (a sign of dangerously elevated ICP) consists of:",
+    choices:["\u2191 BP, \u2191 HR, tachypnea","\u2191 BP (widening pulse pressure), \u2193 HR, Cheyne-Stokes breathing","\u2193 BP, \u2191 HR, shallow breathing","\u2193 BP, \u2193 HR, fever"],
+    correct:[1],
+    explanation:"<strong>\u2191 BP with widening pulse pressure, \u2193 HR, and Cheyne-Stokes breathing.</strong> The brain forces systemic BP up to push blood past the rising ICP. Baroreceptors sense the high BP and slow the heart. The brainstem respiratory centers get compressed, causing erratic breathing. Three signs, one story \u2014 the brain trying to save itself."
+  },
+  {
+    id:6, section:"Foundations", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Decorticate posturing (hands pulled toward the CORE of the body) indicates damage to which area?",
+    choices:["Brainstem","Cerebellum","Cortex","Spinal cord"],
+    correct:[2],
+    explanation:"<strong>Cortex.</strong> Memory hook: De-<strong>COR</strong>-ticate = toward the CORE = cortical damage. Decerebrate = arms extend AWAY from the core = brainstem damage (worse prognosis, closer to herniation)."
+  },
+
+  // ── STROKE (7-13) ──
+  {
+    id:7, section:"Stroke", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What is the MOST COMMON mechanism for ischemic stroke?",
+    choices:["Rupture of a cerebral artery","Embolus from the left atrium (often due to AFib) that travels to the brain","Vasospasm from migraine","Venous thrombosis in the jugular vein"],
+    correct:[1],
+    explanation:"<strong>Embolus from the left atrium in AFib.</strong> AFib \u2192 atria quiver instead of contract \u2192 blood pools in LA \u2192 clot forms \u2192 clot travels: LA \u2192 LV \u2192 aorta \u2192 carotid \u2192 brain. Ischemic stroke source logic: must come from L heart \u2014 cannot originate in a vein."
+  },
+  {
+    id:8, section:"Stroke", type:"mc", typeLabel:"Multiple Choice",
+    stem:"What does the F.A.S.T. acronym stand for in stroke recognition?",
+    choices:["Fever, Ataxia, Seizure, Tremor","Face, Arm, Speech, Time","Focal, Acute, Sudden, Terminal","Fibrinolytic, Aspirin, Statin, Thrombolytic"],
+    correct:[1],
+    explanation:"<strong>Face, Arm, Speech, Time.</strong> Face drooping, Arm drift, Speech slurred or garbled, Time (when did it start?). Taught to patients and families so they recognize stroke signs and call 911 within minutes, not hours."
+  },
+  {
+    id:9, section:"Stroke", type:"tf", typeLabel:"True / False",
+    stem:"Fibrinolytic therapy (clot-busters) can be given for BOTH ischemic and hemorrhagic strokes.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> Fibrinolytics are ONLY for ischemic strokes, and only within the 3-hour treatment window with a clear CT (no blood visible). Giving fibrinolytics to a hemorrhagic stroke would massively worsen the bleed. Confirming ischemic vs hemorrhagic with CT BEFORE treatment is critical."
+  },
+  {
+    id:10, section:"Stroke", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient presents with right-sided weakness, face drooping on the right, and slurred speech. Which hemisphere is most likely affected?",
+    choices:["Right hemisphere","Left hemisphere","Both hemispheres","Cerebellum"],
+    correct:[1],
+    explanation:"<strong>Left hemisphere.</strong> Motor control is contralateral \u2014 the LEFT side of the brain controls the RIGHT side of the body. Right-sided deficits point to a left hemisphere stroke. Broca's and Wernicke's (language areas) are also typically in the left hemisphere, which is why speech is affected."
+  },
+  {
+    id:11, section:"Stroke", type:"tf", typeLabel:"True / False",
+    stem:"TIA (transient ischemic attack) is a harmless \"mini-stroke\" that doesn't require urgent workup.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> TIA is NOT a mini-stroke \u2014 it causes no permanent damage \u2014 but it IS a warning shot. <strong>50% of untreated TIA patients will have a full stroke within 1 year.</strong> Every TIA gets a full workup: CT, carotid ultrasound, echo, EKG, labs."
+  },
+  {
+    id:12, section:"Stroke", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which level of prevention applies to a 55-year-old smoker with HTN who has never had a stroke?",
+    choices:["Primary prevention","Secondary prevention","Tertiary prevention","Quaternary prevention"],
+    correct:[0],
+    explanation:"<strong>Primary prevention.</strong> Primary = before any event. Goal: reduce modifiable risk factors (BP control, smoking cessation, diabetes control, cholesterol management, AFib screening). Memory hook: <strong>Primary prevents. Secondary screens. Tertiary rehabs.</strong>"
+  },
+  {
+    id:13, section:"Stroke", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which bleed type typically presents as a SUDDEN \"worst headache of my life\"?",
+    choices:["Epidural hematoma","Subdural hematoma","Subarachnoid hemorrhage","Chronic subdural"],
+    correct:[2],
+    explanation:"<strong>Subarachnoid hemorrhage.</strong> Usually from aneurysm rupture on the Circle of Willis. Sudden onset, severe headache \u2014 \"worst headache of life.\" Epidural = arterial, fast (hours, classic lucid interval). Subdural = venous, slow (days, common in elderly)."
+  },
+
+  // ── SEIZURES (14-19) ──
+  {
+    id:14, section:"Seizures", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A seizure is caused by:",
+    choices:["Loss of blood flow to the cerebellum","Abnormal electrical activity, usually starting in the motor cortex","Buildup of ammonia in the brain","Rupture of a cerebral aneurysm"],
+    correct:[1],
+    explanation:"<strong>Abnormal electrical activity, usually starting in the motor cortex.</strong> Seizures happen when the brain's normal electrical rhythm is disrupted. Measured with EEG (20 channels). Epilepsy = a pattern of abnormal neurons \u2014 often no known cause and no cure."
+  },
+  {
+    id:15, section:"Seizures", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A patient with chronic SIADH has serum Na\u207a of 118 mEq/L and develops a seizure. The mechanism is:",
+    choices:["Low Na\u207a directly damages motor cortex cells","Hyponatremia pulls water into brain cells \u2192 cellular swelling \u2192 abnormal firing","Low Na\u207a prevents insulin release \u2192 hyperglycemic seizure","Hyponatremia causes hypoxia \u2192 seizure"],
+    correct:[1],
+    explanation:"<strong>Hyponatremia pulls water into brain cells \u2192 cellular swelling \u2192 abnormal firing.</strong> Low serum Na\u207a makes blood hypotonic. Water shifts INTO brain cells \u2192 cerebral edema \u2192 disrupts electrical rhythm \u2192 seizure. Spiral to Ch. 6 sodium balance."
+  },
+  {
+    id:16, section:"Seizures", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The difference between a FOCAL and a GENERALIZED seizure is:",
+    choices:["Focal = 1 part of the brain; generalized = whole brain (with loss of consciousness)","Focal = adults; generalized = children","Focal = short duration; generalized = long duration","Focal = no aura; generalized = always has aura"],
+    correct:[0],
+    explanation:"<strong>Focal = 1 part of the brain; generalized = whole brain.</strong> Focal seizures start in one area and often produce symptoms in one part of the body. Generalized seizures involve both hemispheres and cause loss of consciousness."
+  },
+  {
+    id:17, section:"Seizures", type:"mc", typeLabel:"Multiple Choice",
+    stem:"The three phases of a seizure, in order, are:",
+    choices:["Ictal \u2192 Aura \u2192 Postictal","Aura \u2192 Ictal \u2192 Postictal","Prodromal \u2192 Convulsive \u2192 Recovery","Aura \u2192 Tonic \u2192 Clonic"],
+    correct:[1],
+    explanation:"<strong>Aura \u2192 Ictal \u2192 Postictal.</strong> Aura = warning (not always present). Ictal = active seizure. Postictal = recovery period \u2014 confusion, sleepiness. Let them rest until they wake up on their own."
+  },
+  {
+    id:18, section:"Seizures", type:"tf", typeLabel:"True / False",
+    stem:"During an active seizure, the nurse should place a bite block or padded tongue depressor in the patient's mouth to prevent tongue biting.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> <strong>NEVER put anything in the mouth.</strong> You can break teeth, block the airway, or get bitten. NEVER restrain either. The right actions: side-lying position, clear hazards, time it, protect the head, let it run. Their safety AND our safety."
+  },
+  {
+    id:19, section:"Seizures", type:"tf", typeLabel:"True / False",
+    stem:"Status epilepticus lasting longer than 20 minutes leads to acidosis and is a medical emergency.",
+    choices:["True","False"],
+    correct:[0],
+    explanation:"<strong>TRUE.</strong> Status epilepticus = continuous seizure activity > 20 minutes. Leads to metabolic acidosis, brain damage, and death if untreated. Requires IV medications to stop the seizure immediately."
+  },
+
+  // ── DEMENTIA (20-25) ──
+  {
+    id:20, section:"Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Approximately what percentage of all dementia cases are caused by Alzheimer's disease?",
+    choices:["10\u201320%","30\u201340%","50\u201380%","95\u2013100%"],
+    correct:[2],
+    explanation:"<strong>50\u201380%.</strong> Alzheimer's is the most common cause of dementia by a wide margin. Insidious onset over 10\u201320 years. Typically begins in 50s\u201360s. No cure."
+  },
+  {
+    id:21, section:"Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which three physical brain changes are characteristic of Alzheimer's disease?",
+    choices:["Hemorrhage, infarct, edema","\u03b2-amyloid plaques, neurofibrillary tangles, loss of neuronal connections","Demyelination, axon loss, Lewy bodies","Calcification, gliosis, necrosis"],
+    correct:[1],
+    explanation:"<strong>\u03b2-amyloid plaques, neurofibrillary tangles, and loss of neuronal connections.</strong> Together these cause atrophy and degeneration \u2014 CT shows brain atrophy with enlarged ventricles. Memory loss is a downstream result of losing cortical tissue and connections."
+  },
+  {
+    id:22, section:"Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"A family member says \"Mom started forgetting names a year ago, now she can't follow conversations.\" According to Alzheimer's progression, what is LIKELY next?",
+    choices:["Aggression and hallucinations","Disorientation to time and place","Loss of continence","Personality change"],
+    correct:[1],
+    explanation:"<strong>Disorientation to time and place.</strong> Alzheimer's progression: memory \u2192 conversations \u2192 <strong>disorientation</strong> \u2192 judgment \u2192 continence \u2192 personality \u2192 aggression \u2192 hallucinations. She's at the \"conversations\" step \u2014 disorientation is next."
+  },
+  {
+    id:23, section:"Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Which triad points toward Lewy body dementia rather than Alzheimer's?",
+    choices:["Slow insidious memory loss over 10\u201320 years","Fluctuating cognition + hallucinations + motor gait imbalance","Beta-amyloid plaques + neurofibrillary tangles + atrophy","Aggression + incontinence + personality change"],
+    correct:[1],
+    explanation:"<strong>Fluctuating cognition, hallucinations, and motor gait imbalance.</strong> Key differentiator: hallucinations in Alzheimer's are LATE; in Lewy body they're EARLY and prominent. Lewy body is slow but progressive, with good days and bad days."
+  },
+  {
+    id:24, section:"Dementia", type:"tf", typeLabel:"True / False",
+    stem:"Cholinesterase inhibitors can cure Alzheimer's disease if started early.",
+    choices:["True","False"],
+    correct:[1],
+    explanation:"<strong>FALSE.</strong> There is <strong>no cure</strong> for Alzheimer's. Cholinesterase inhibitors, vitamin E, and ginkgo can slow progression but cannot reverse it. That's why family teaching and safety planning matter so much \u2014 that's where nursing actually changes outcomes."
+  },
+  {
+    id:25, section:"Dementia", type:"mc", typeLabel:"Multiple Choice",
+    stem:"Mrs. Garcia has dementia, has left the stove on twice, and wanders outside. Which is the MOST important environmental safety teaching for her family?",
+    choices:["Encourage her to drive only during daylight","Disconnect the car battery, turn off the gas, remove throw rugs, provide supervision","Lock her in her room at night","Start a daily medication to prevent wandering"],
+    correct:[1],
+    explanation:"<strong>Disconnect the car battery, turn off the gas, remove throw rugs, supervision.</strong> Judgment loss + wandering + stove on = real safety risks RIGHT NOW. Nursing can't cure Alzheimer's but we CAN prevent the fire, the fall, and the car accident. Anchor: <strong>\"What is meaningful to them?\"</strong>"
+  }
+];
+
+// ── QUIZ ENGINE ──
+let currentQ=0, score=0, answered=0, userAnswers=[], results=[];
+const main=document.getElementById('mainContent'), progressArea=document.getElementById('progressArea'),
+  progressBar=document.getElementById('progressBar'), progressText=document.getElementById('progressText'),
+  scoreDisplay=document.getElementById('scoreDisplay');
+
+function init(){userAnswers=questions.map(()=>[]);results=[];score=0;answered=0;currentQ=0;showStart()}
+function showStart(){
+  progressArea.classList.add('hidden');
+  main.innerHTML=`<div class="start-screen"><h2>Ch 11 Neural Warm-Up</h2>
+    <p>25 rapid-fire questions &mdash; test your fundamentals</p>
+    <div class="start-details"><ul>
+      <li>Covers all of Chapter 11: Foundations, Stroke, Seizures, Dementia</li>
+      <li>Short, direct questions &mdash; no long clinical scenarios</li>
+      <li>Great for building confidence before the advanced quizzes</li>
+      <li>Brief explanations after every question</li>
+    </ul></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Begin Warm-Up</button></div>`;
+}
+function startQuiz(){progressArea.classList.remove('hidden');showQuestion()}
+function showQuestion(){
+  const q=questions[currentQ], pct=(currentQ/questions.length)*100;
+  progressBar.style.width=pct+'%';
+  progressText.textContent=`Question ${currentQ+1} of ${questions.length}`;
+  scoreDisplay.textContent=answered>0?`Score: ${score}/${answered}`:'Score: 0/0';
+  const isCB=(q.type==='sata'), ic=isCB?'choice-indicator checkbox-indicator':'choice-indicator';
+  let ch=q.choices.map((c,i)=>{const l=String.fromCharCode(65+i);return`<div class="choice-card" data-index="${i}" onclick="toggleChoice(${i},${isCB})"><div class="${ic}">${l}</div><div class="choice-text">${c}</div></div>`}).join('');
+  main.innerHTML=`<div class="question-card"><div class="question-meta"><span class="question-number">Question ${q.id} of ${questions.length}</span><span class="question-type">${q.typeLabel}</span>${q.section?`<span class="section-label">${q.section}</span>`:''}</div><div class="question-stem">${q.stem}</div><div class="choices" id="choicesContainer">${ch}</div><div class="button-row" id="buttonRow"><button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button></div><div id="explanationArea"></div></div>`;
+}
+function toggleChoice(i,cb){
+  const cards=document.querySelectorAll('.choice-card');if(cards[0].classList.contains('disabled'))return;
+  if(cb){cards[i].classList.toggle('selected')}else{cards.forEach(c=>c.classList.remove('selected'));cards[i].classList.add('selected')}
+  document.getElementById('submitBtn').disabled=!document.querySelector('.choice-card.selected');
+}
+function submitAnswer(){
+  const q=questions[currentQ],cards=document.querySelectorAll('.choice-card'),sel=[];
+  cards.forEach((c,i)=>{if(c.classList.contains('selected'))sel.push(i)});
+  userAnswers[currentQ]=sel;
+  const cs=new Set(q.correct),ss=new Set(sel);
+  let ok=cs.size===ss.size&&[...cs].every(v=>ss.has(v));
+  results.push({qIndex:currentQ,correct:ok});answered++;if(ok)score++;
+  cards.forEach((c,i)=>{c.classList.add('disabled');const ws=ss.has(i),ir=cs.has(i);
+    if(ws&&ir){c.classList.remove('selected');c.classList.add('correct-answer');c.querySelector('.choice-indicator').innerHTML='&#10003;'}
+    else if(ws&&!ir){c.classList.remove('selected');c.classList.add('incorrect-answer');c.querySelector('.choice-indicator').innerHTML='&#10007;'}
+    else if(!ws&&ir){c.classList.add('missed-correct');c.querySelector('.choice-indicator').innerHTML='&#10003;'}});
+  document.getElementById('explanationArea').innerHTML=`<div class="explanation ${ok?'':'wrong'}"><div class="explanation-title ${ok?'right':'wrong'}">${ok?'&#10003; Correct!':'&#10007; Incorrect'}</div><div class="explanation-body">${q.explanation}</div></div>`;
+  scoreDisplay.textContent=`Score: ${score}/${answered}`;
+  const br=document.getElementById('buttonRow');
+  br.innerHTML=currentQ<questions.length-1?`<button class="btn btn-primary" onclick="nextQuestion()">Next &rarr;</button>`:`<button class="btn btn-primary" onclick="showResults()">See Results &rarr;</button>`;
+}
+function nextQuestion(){currentQ++;showQuestion();window.scrollTo({top:0,behavior:'smooth'})}
+function showResults(){
+  progressBar.style.width='100%';progressText.textContent='Quiz Complete';
+  scoreDisplay.textContent=`Final: ${score}/${questions.length}`;
+  const pct=Math.round((score/questions.length)*100);
+  let msg='';
+  if(pct>=90)msg='Excellent! You have a solid foundation in neuro pathophysiology.';
+  else if(pct>=80)msg='Great work! Review the ones you missed and you\u2019re ready for the advanced quizzes.';
+  else if(pct>=70)msg='Good start! Revisit the review decks for the topics you missed.';
+  else if(pct>=60)msg='You\u2019re building your base. Review the explanations and try again.';
+  else msg='Spend some time with the review decks first, then come back and retake this warm-up.';
+  const missed=results.filter(r=>!r.correct);
+  let mh='';
+  if(missed.length>0){mh=`<div class="missed-list"><h3>Review Missed Questions (${missed.length})</h3>${missed.map(m=>{const q=questions[m.qIndex],cl=q.correct.map(c=>String.fromCharCode(65+c)).join(', '),ul=userAnswers[m.qIndex].map(c=>String.fromCharCode(65+c)).join(', ')||'None';return`<div class="missed-item"><div class="missed-item-q">Q${q.id} (${q.section}): ${q.stem.replace(/<[^>]*>/g,'')}</div><div class="missed-item-detail"><strong>Your answer:</strong> ${ul}<br><strong>Correct:</strong> ${cl}<br><br>${q.explanation}</div></div>`}).join('')}</div>`}
+  main.innerHTML=`<div class="results-screen"><div class="results-header"><div class="results-score">${score}/${questions.length}</div><div class="results-percent">${pct}%</div><div class="results-message">${msg}</div></div><div class="button-row" style="justify-content:center;margin-bottom:24px"><button class="btn btn-primary" onclick="init()">Retake Quiz</button>${missed.length>0?`<button class="btn btn-secondary" onclick="document.querySelector('.missed-list').scrollIntoView({behavior:'smooth'})">Review Missed</button>`:''}</div>${mh}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+init();
+</script>
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 11: Neurology — Foundations Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+}
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
+
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
+
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
+
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
+
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.2rem;color:var(--text-dim);max-width:700px;line-height:1.6}
+
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:flex-start;max-width:960px;margin:0 auto}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:24px;width:100%}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.slide.narrative ul{list-style:none;width:100%}
+.slide.narrative ul li{padding:10px 0 10px 28px;position:relative;font-size:1.05rem;line-height:1.55}
+.slide.narrative ul li::before{content:'';position:absolute;left:0;top:18px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
+
+/* ── COLUMNS LAYOUT ── */
+.content.cols{display:flex;gap:28px;width:100%}
+.content.cols .col{flex:1}
+.content.cols .col ul{list-style:none}
+.content.cols .col ul li{padding:8px 0 8px 20px;position:relative;font-size:0.98rem;line-height:1.5}
+.content.cols .col ul li::before{content:'';position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)} em.purple{font-style:normal;color:var(--purple)} em.teal{font-style:normal;color:var(--teal)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:860px}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:32px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-chain.horizontal{flex-direction:row}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:4px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 18px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.78rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:26px 22px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.1rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)} .compare-col.col-teal h4{color:var(--teal);border-color:var(--teal)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.compare-col ul li{font-size:0.93rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)} .compare-col.col-teal ul li::before{background:var(--teal)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK (QUIZ) ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.05rem,2vw,1.4rem);font-weight:700;max-width:800px;line-height:1.4;margin-bottom:30px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:750px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:16px 18px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.02rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CUSTOM: CELL CARDS (bullet content inside) ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;width:100%}
+.cell-cards .full-span{grid-column:1 / -1}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.cell-card .cell-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── CUSTOM: ANATOMICAL-MAP (SVG labeled diagrams) ── */
+.anatomical-map{width:100%;max-width:580px;margin:4px auto 12px;background:transparent}
+.anatomical-map svg{width:100%;height:auto;display:block}
+.anatomical-map text{font-family:'Inter',sans-serif}
+.anatomical-map .am-label{font-size:12.5px;fill:var(--text);font-weight:700}
+.anatomical-map .am-sub{font-size:10px;fill:var(--text-dim);font-weight:400}
+.anatomical-map .am-connector{stroke-width:1.2;opacity:0.55;fill:none;stroke-dasharray:3,3}
+
+/* ── CUSTOM: RULE-DECISION-TREE ── */
+.rule-decision-tree{display:grid;grid-template-columns:1fr 1.25fr;gap:24px;max-width:940px;width:100%;align-items:stretch}
+.rdt-rule{background:var(--bg-card);border:2px solid var(--yellow);border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.rdt-rule .rdt-label{font-size:11px;letter-spacing:2.5px;color:var(--yellow);font-weight:800;margin-bottom:10px}
+.rdt-rule .rdt-headline{font-size:1.05rem;font-weight:800;margin-bottom:10px;color:var(--text);line-height:1.4}
+.rdt-rule .rdt-body{font-size:0.92rem;color:var(--text-dim);line-height:1.55}
+.rdt-rule .rdt-body strong{color:var(--yellow)}
+.rdt-decisions{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.rdt-decisions .rdt-dec-label{font-size:11px;letter-spacing:2.5px;color:var(--blue);font-weight:800;margin-bottom:2px}
+.rdt-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;background:var(--bg-card);border-radius:10px;padding:12px 14px;border-left:4px solid}
+.rdt-row .rdt-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0}
+.rdt-row .rdt-if{line-height:1.3}
+.rdt-row .rdt-if .label{font-weight:700;font-size:0.92rem;display:block}
+.rdt-row .rdt-if .examples{font-size:0.78rem;color:var(--text-dim);display:block;margin-top:2px}
+.rdt-row .rdt-arrow{font-size:1.2rem;font-weight:800}
+.rdt-row .rdt-action{font-weight:800;font-size:0.9rem;letter-spacing:1px;white-space:nowrap;color:var(--red)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide.narrative ul li,.slide p,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .content.cols{flex-direction:column;gap:20px}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards{grid-template-columns:1fr}
+  .flow-chain.horizontal{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0}
+  .flow-chain.horizontal .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%}
+  .flow-chain.horizontal .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
+  .rule-decision-tree{grid-template-columns:1fr;gap:14px}
+  .rdt-row{grid-template-columns:auto 1fr;row-gap:6px}
+  .rdt-row .rdt-arrow{display:none}
+  .rdt-row .rdt-action{grid-column:2}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter">1 / 24</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
+
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>Neurology &mdash; Foundations</h1>
+  <div class="subtitle">Chapter 11 &middot; Foundational context for Stroke, Seizures, and Dementia</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ════════ SLIDE 2: SECTION DIVIDER — Protective Framework ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section A</div>
+  <h2>Neurons &amp; Their <em>Fuel</em></h2>
+  <div class="divider-sub">The brain is <em style="color:var(--text);font-style:normal;">precious</em> &mdash; and fragile. Start with what neurons need to stay alive, and how they fire.</div>
+</div>
+
+<!-- ════════ SLIDE 3: NARRATIVE + CELL-CARDS — Neurons Need Constant Fuel ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Neurons</div>
+  <h3 style="text-align:center;">Neurons Need <em>Constant Fuel</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card full-span" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">O&#8322;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Continuous O&#8322; &mdash; or they die</strong>
+        <ul>
+          <li>Neurons need a constant supply of oxygen</li>
+          <li>Any interruption &rarr; damage in minutes</li>
+          <li>This is why the stroke treatment window is hours, not days</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#127852;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Glucose &mdash; the brain&rsquo;s fuel</strong>
+        <ul>
+          <li>Neurons also need a steady supply of glucose</li>
+          <li>Hypoglycemia &rarr; altered mental status, seizures</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">CNS</div>
+      <div class="cell-text"><strong style="color:var(--red);">CNS neurons cannot regenerate</strong>
+        <ul>
+          <li>Once a CNS neuron dies, it is not replaced</li>
+          <li>Severed spinal cord &rarr; paralysis + sensation loss below injury</li>
+          <li>Other neurons may assume the role &mdash; but the original is gone</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">PNS</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Side note &mdash; peripheral nerves CAN regenerate</strong>
+        <ul>
+          <li>Severed peripheral nerves can reestablish connections over time</li>
+          <li>CNS is the one that doesn&rsquo;t get a second chance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 5: FLOW — Electrical Activity of Neurons (horizontal cascade) ════════ -->
+<div class="slide flow">
+  <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:8px;font-weight:600;">Electrical Activity</div>
+  <h3>How Neurons <em>Fire</em></h3>
+  <div class="flow-chain horizontal">
+    <div class="flow-step" style="border-color:rgba(56,189,248,0.4);color:var(--blue);">Resting<small>Na&#8314; outside</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(167,139,250,0.4);color:var(--purple);">Stimulus<small>arrives</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.5);color:var(--yellow);background:rgba(245,158,11,0.08);">Na&#8314; influx<small>depolarization</small></div>
+    <span class="flow-arrow" style="color:var(--yellow);">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(245,158,11,0.4);color:var(--yellow);">Wave travels<small>down axon</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(52,211,153,0.4);color:var(--green);">K&#8314; efflux<small>repolarization</small></div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step" style="border-color:rgba(56,189,248,0.4);color:var(--blue);">Back to<small>resting</small></div>
+  </div>
+  <div class="callout info" style="margin-top:28px;max-width:740px;">
+    <strong>Neurons fire through Na&#8314; and K&#8314; movement across the membrane.</strong> When this electrical rhythm is disrupted &mdash; by trauma, ischemia, low glucose, or electrolyte imbalance &mdash; you get a seizure. We&rsquo;ll come back to this in the Seizures deck.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 6: SECTION DIVIDER — Brain Regions ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section B</div>
+  <h2>Brain Regions &amp; <em>Functions</em></h2>
+  <div class="divider-sub">You know what guards the brain. Now learn what it <em style="color:var(--text);font-style:normal;">does</em> &mdash; so when damage hits, you&rsquo;ll know what was lost.</div>
+</div>
+
+<!-- ════════ SLIDE 7: NARRATIVE + ANATOMICAL MAP — Cerebral Lobes (Gray's Plate 728, public domain, recolored) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Cerebrum</div>
+  <h3 style="text-align:center;">The <em>Lobes</em> of the Cerebrum</h3>
+  <div class="anatomical-map" style="max-width:740px;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 732" fill-rule="evenodd" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" role="img" aria-labelledby="lobesTitle" style="display:block;margin:0 auto;width:100%;height:auto;">
+      <title id="lobesTitle">Lateral view of the cerebrum with color-coded lobes. Based on Gray's Anatomy Plate 728 (public domain), recolored for this deck.</title>
+      <defs>
+        <style type="text/css">
+          .str0,.str2,.str3{stroke:#cbd5e1;stroke-width:1.4;stroke-opacity:0.75}.str3{stroke-dasharray:5 7;stroke-opacity:0.5}.fil5{fill:none}.fil6{fill:#94a3b8}.fil2{fill:#1e293b;stroke:#cbd5e1;stroke-opacity:0.6}
+        </style>
+      </defs>
+      <path fill="#34d399" fill-opacity="0.32" d="M564 54c13-2 26-1 38 6 38-7 66-1 83 18 14-3 29 1 43 11 39 17 67 39 89 64 36 15 50 33 52 53 19 14 31 31 39 50L798 413l-343-43-103-161L564 54z"/>
+      <path fill="#a78bfa" fill-opacity="0.32" d="m573 52-15 38c-64 5-78 25-58 57 12 14-10 26-16 42-6 20-13 41-23 62 0 54-31 50-28 69l22 29-191 199c-95 15-146 7-160-20-29-10-47-42-53-96-15-16-16-31-11-47-2-6-3-12 1-18-8-26-4-40 1-53 2-20 12-37 27-52-1-25 14-38 34-46 16-51 88-86 117-94 19-17 45-27 77-31 16-7 31-12 46-14 28-18 60-21 92-21 26-9 53-12 81-6l57 2z"/>
+      <path fill="#1e293b" stroke="#cbd5e1" stroke-opacity="0.6" stroke-width="2" d="M518 579c7 28 20 47 41 55 30 14 53 48 77 78 13-7 27-13 38-23L560 553l-42 26z" class="fil2 str0"/>
+      <path fill="#1e293b" stroke="#cbd5e1" stroke-opacity="0.6" stroke-width="2" d="M551 571c0 6 1 12 7 18 2 34 15 45 33 45 80 51 141 54 187 24 19-11 49-22 51-33 22-11 35-22 47-33 19-16 19-44 11-79-190-6-286 19-336 58z" class="fil2 str0"/>
+      <path fill="#f59e0b" fill-opacity="0.32" d="m564 312 266 42c39 46 78 92 116 138-28 27-66 31-107 25-17 9-43 14-82 0-15 9-30 15-45 20-24 13-49 17-75 17-24 4-45 7-54 0-15 12-28 17-39 20-17 10-31 13-45 16-12 29-41 41-81 41-27 12-54 13-82-12-20-10-39-22-49-46-7-8-13-15-19-23-3-28 4-53 25-74 20-11 23-40 35-60 23-27 60-38 99-46 17-17 37-29 67-27 17-17 37-32 70-31z"/>
+      <path fill="#ef4444" fill-opacity="0.32" d="M905.55813 255.40242c-30.54457 25.82838-48 42-73 72-7 25-3 50 7 75-7.82326 9.7227-21.46081 18.0795-26.87713 27.47625-3.07324 5.33175-17.41927 44.70616-23.98828 48.24916-6.00733 3.24006-11.61249 3.68966-13.44478 9.80025-.22505.75054-11.43717 11.00398-12.9275 12.00546-9.45919 6.35645-13.84 6.04707-12.23856 8.5322 2.32615 3.60974 3.16585 5.9875 6.58798 7.41601 3.42214 1.42852 30.32142 8.8332 34.30371 8.3266 4.06809-.51753 19.74199 1.27118 23.67569 1.02461 3.86003-.24194 9.1993-2.09306 12.35817-2.92937 4.00987-1.06161 9.69306-5.98194 11.91162-5.8475 16.51772 1.00093 35.6613 1.33924 58.00849-1.45406 34.3121-8.8544 19.59419-4.1938 50.63059-21.59961 10-12 18-28 26-56 7-11 6-29 3-46 6-24-5-33-20-50-4-15-9-34-27-49 1-10-4-26-24-37z"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="4" d="M436 56c-31-2-66 4-96 21-15 1-31 9-44 15-29 2-54 12-76 29-19 6-39 13-56 28-32 19-53 41-63 68-21 7-32 23-32 45-15 13-25 30-27 52-8 17-7 34-2 51-1 6-5 13 0 19-5 11-3 22 2 33 3 0 4 13 8 15 2 29 9 48 18 62 10 16 20 30 36 34 16 32 82 30 162 19 7 11 14 19 21 27 11 23 29 37 51 46 18 16 40 27 81 11 39-2 70-11 80-41 10-1 23-6 44-16 15-3 27-11 38-20 11 8 34 4 57 0 36-2 61-7 73-17 17-5 34-10 47-20 30 10 58 14 81 0 67 7 120-7 134-79 11-12 8-30 3-48 11-18-4-33-19-49-2-21-12-36-27-49 2-14-3-26-23-36-8-24-22-39-39-50 0-25-21-41-52-53-24-29-54-50-89-65-14-11-28-12-42-10-16-20-44-25-82-18-10-7-21-7-31-7-23-2-43-3-60-3-29-6-53-2-76 6z" class="fil5"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M149 168c-11 10-11 17-4 21m33-34c49-34 85-37 110-20" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M254 184c19-14 27-41 42-60 20-30 58-5 82-7m-249 98c-12 14 3 26 3 39" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M91 256c17-9 13-29 29-43 11-14 47-15 60-34 14-21 32-28 53-24" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M217 174c11-11 19-22 26-33m42 35c11-8 16-18 15-29m-26-39c8 3 19 1 36-11" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M297 93c-4 5-7 10-7 14m51-30c2 4 5.84515 7 8.84515 7M369 65c-4 5-7 9-9 13m97-14c-8 1-16-1-24-8" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M471 124c-10-2-18-6-14-29 1-20-15-26-43-24-26 2-50 4-61 10-9 9-19 18-31 28" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M357 89c-7 7-8.73987 15.78038-6.73987 23.78038M431 82c-10 17-24 32-34 41-21 22-33.94356 46.84515-11.94356 72.84515" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M373.05644 169c-11 1-20.05644-6-27.05644-16-5-10-19-10-25-29m133 5c-49 2-48 33-72 44m104 7.081c4.26013-18.34113-7-24.081-32-23.081-12 1-24 1-33-4m40 29c-26 9-51 12-77 14-12-1-29 38-31 51M48 324c7-11 14-17 23-20" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M71 311c-4-17 27-22 36-32 6-5 11-24 42-31 17-6 31-24 51-42 8-9 24.05644-13 41.05644-14" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M211 167c-9 12-16 27-6 34m-36 34.15485c-2 12-2 24.84515-1 35.84515m31-14c-7 11-19 24-14 39" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M175 292c18 5 28 23 41 28m-31.47975-36.69937C178.52025 273.30063 169 267 157 276c-17 10-33 21-50 31-16 14-20.788713 28.84515-13.788713 42.84515" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M49 352c13-15 27-22 41-21" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M71 335c-3-3-8-4-14-5m46-11c24-13 36-10 40 3 10 54 23.13862 61.13862 38.13862 75.13862" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M156 299c-4 4-10 10-16 17m66-48c18-16 43-33-4-49" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M229 242c29-1 45 5 46 21 1 11-6 22-5 34" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M350 386c25-24 40-46 23-84-6-19-13-37-20-55-31 0-58 5-78 15" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M323 276c-15 14-47 23-45 48 1 47 18 57 29 68 4 3 8 15 18 27m-69-270c-5 19-26 39-7 61 7-5 26-5 35-7 16-10 59 7 76-5m76 71c8-30-7-48-36-57m53 134c-14-2-44-23-40-44-3-25-18-34-19-44-2-5 5-17-1-24" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M308 393c8-13 8-25-12-39m-53-79c1 14 2.26013 27.78038 8.26013 41.78038" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M278 324c-16-5-29-12-34-2-5 4-19 10-15 28-1 8-30 12-41 17m21 2c-9 7-6 21-10 31 2 21 26 25 51 28M96 366c6 6 17 11 41 14 10 2 9 9 32 16 9 1 20 2 30 4" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M111 336c-6 6-19 11-20 19-2 8-8 16-13 24-8 15-13 27-12 37 1 21 24 32 36 45m-55-90c-3-2-5-4-7-6m30-3c-7 7-14 14-19 23-4 11-3 20-5 39m4.739874-38.56076C50.739874 382.43924 49 382 47 380m4 52c2-6 11-12 6-19m13 82c2-4 1-9 3-11m31 44c6-10 7-16 3-17m7 4-6.0405-3.52025" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M87 449c-10 20 1 34 28 43m-31-98c22 12 45 37 65 44 22 8 53.21962 36 72.21962 23" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M250 446c-15 3-33 15-33 23 1 14 47.34113 23.47975 65.34113 19.47975M104 471c7 6 17 8 36-1 20-6 28.26772 1 42.26772 5" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M219 473c-24-2-36-1-44 7-14 9-28 7-33 8-6 2-23 19-47 7m59 52c33 2 68 1 104-4m-66-36c-8-2-12-6-12-13-1 14-9 17-15 23-7 5-6 13-12 20" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M228 488c-20 0-39-1-53-8m42 8c3 17 26 19 38 25" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M209 503c2-4 8-4 12-7m16 4c5-4 11.78038-7.0405 15.78038-12.0405M266 501c-9-15 19-20 26-36m-28-59c16 13 30.67599 17.39875 44.67599 21.39875" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M249 468c29 0 55-19 60-41 1-2 8-3 12-4M498 63c5-5 12-10 23-13m-5 23c-26 0-48 4-59 23m32-5c6 4 9.73987 9.30063 9.73987 14.30063M776 364c4-46-85-59-129 17-6 16-60 10-88 18-25 10-50 24-75 39-10 16-45-10-65-8-65 7-66 104-2 120" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M536 327c1 20-21 59 12 77m-73-35c11-4 14-21 21-30m-43 55c-5 11 1 15 12 16m30 171c39-35 33-98-28-94-21 2-36-3-46-13m104-1c14 25 28 19 45 19 30-1 47-31 26-63" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M546 492c-13 4-23 10-30 18m-23 4c-12 4-24 17-38 26-12 18-29 25-38 35-10 15-15 46-72 29m149-13c-28 16-73 2-79 9m152-148c-10-3-16-17-21-24m-154-17c22 12 41 9 60-6" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M418 418c-8 12-17 17-28 16-12-2-29 11-49 27-16 13-22 27-26 42-3 18-6 26-10 33" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M327 442c-2 12 2 20 10 23m-23 122c-10-3-22-13-30-16m72-29c-38 18-46 46-17 79" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M333 503c-2 13 7 22 16 30 8 4 8 15 10 18 12 17 14 28 15 38m237-231c14-16 39-3 58-5m-107 20c13.94164-13.64059 19.42706-27.126 8.87401-46.33953" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M586 365c-4-3-8-6-11-10m6 199c-4-10-1-20 9-29" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M562 548c3-5 11.9595-5.73987 17.9595-8.73987M639 509c-3 19 10 28 38 29m-47 2c5-20-8-39-34-58m35 46 9-6m43-55c-15-3-27-9-27-25-3-14-21-28-13-56m-31 94c12 12 36-3 58-3 54-2 68 27 42 59" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M724 512c26-1 44-11 55-32m-21 38-9-10m49-2c16 0 30 3 41 12" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M830 500c-5 3-11.0405 5.26013-16.0405 7.26013M856 507c-3-17 8-25 9-35m-190-69c8 7 18 13 16 21 3 17 24 19 36 21 24 10 46 21 33 41M549 310c-13-4-26.0405-14.081-38.0405-28.081" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M588 152c-9 6-19 18-33 27-14 8-29 15-36 40-2 22 0 37-5 51-4 13-6 25 0 34" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M524 140c33 8 44 18.52025 41 31.52025M727 434c6-10 6-19 6-29 10-16 64 6 71-39m-76-2c5 11 6 25 5 41M512 183c6 9 9 18 11 26m268 269c16-24 16-58.6903 45-68.6903m-83.26013 48.7308C754.73987 452.0405 758 446 761 442m42-113c-7-4-10-11-7-23" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M773 346c8-5 15-15 22-28m20-49c1 25 22.2427 28.69894 18.2427 56.69894M762 322c1-27 15-43 32-57 10-11 22-17 15-52 4-21 29-44 7-59-26-12-48-36-88-37M546 288c12-21 47-33 50-41 8-21 2-42 3-62 6-17 22-24 40-29 28-32 59.18283-35.21145 90.18283-11.21145" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M600 220c-4-5-9-8-14-11m7.69937 41c9-5 18.30063-7 27.30063-6M505 116c51 5 115 13 119 45m5-38c-7-10-24-15-32-22" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M597 77c7 12 11 23 18 35m-12-52c12 17 35.78855 17.211448 36 41.57711" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M634 85c2-3 4-5 6-8m34 54c-12-29-38-28-51-35m36 4c16 6 24 16 24 29m-48-62c20 5 37 13 51 27" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M671 106c5-13 28-16 57-17m-9 66c9-23 60-13 89 9m-183 16c16-8 35.63386-9.78871 54.63386 1.21129" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M695 140c-15 15-29 30-10 47 35 34 56 53 26 83m71-108c9 13 9 28 3 42" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M727 201c14 9 22 23 24 42 10 47-3 58-17 68m-93-18c30 7 52 8 57-8" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M673.36614 297.78872C680.36614 298.78872 688 302 693 306m39 21c11-15 .63387-23-45.36613-31M740 213c17-13 20-34 30-51m39 52c21-2 37 6 50 23m-18-38c6 2 16 5 28 8m43 83c-14 5-23 16-28 31-13 10-20 25-24 41m102 60c7 3 11 8 11 16m-32-110c-4 5-9 7-16 8-9 8-15 17-15 28 7 17 8 30 4 41" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M913 351.0405c0-6-2-14.0405-7-20.0405m31 72c6-9 10-19 10-34 1-12 4-22 9-28" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M947 378c10 1 13 7 12 15 7 6 10 15 13 23M677 197c-9 18-25 35-27 54-16 35-71 32-84 59" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-width="2" d="M530 160c-9-3-17-2-24 4" class="fil5 str0"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-dasharray="5 7" stroke-width="2" d="m567 312 263 41" class="fil5 str3"/>
+      <path fill="none" stroke="#cbd5e1" stroke-opacity="0.7" stroke-dasharray="5 7" stroke-width="2" d="m432 319 23 30" class="fil5 str3"/>
+
+      <!-- Overlaid lobe labels -->
+      <g font-family="Inter,sans-serif" pointer-events="none">
+        <text x="300" y="260" fill="#a78bfa" font-size="34" font-weight="900" text-anchor="middle" letter-spacing="2">FRONTAL</text>
+        <text x="660" y="230" fill="#34d399" font-size="34" font-weight="900" text-anchor="middle" letter-spacing="2">PARIETAL</text>
+        <text x="870" y="370" fill="#ef4444" font-size="28" font-weight="900" text-anchor="middle" letter-spacing="2">OCCIPITAL</text>
+        <text x="480" y="480" fill="#f59e0b" font-size="32" font-weight="900" text-anchor="middle" letter-spacing="2">TEMPORAL</text>
+      </g>
+    </svg>
+  </div>
+  <div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:20px;max-width:760px;">
+    <span style="font-size:0.9rem;color:var(--text-dim);"><strong style="color:var(--purple);">Frontal</strong> &mdash; motor &middot; decisions &middot; personality</span>
+    <span style="font-size:0.9rem;color:var(--text-dim);"><strong style="color:var(--green);">Parietal</strong> &mdash; sensation</span>
+    <span style="font-size:0.9rem;color:var(--text-dim);"><strong style="color:var(--yellow);">Temporal</strong> &mdash; hearing</span>
+    <span style="font-size:0.9rem;color:var(--text-dim);"><strong style="color:var(--red);">Occipital</strong> &mdash; vision</span>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 8: NARRATIVE + CELL-CARDS — Lobe Functions ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Cerebrum</div>
+  <h3 style="text-align:center;">What Each Lobe <em>Does</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">F</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Frontal</strong>
+        <ul>
+          <li>Thinking, decision-making</li>
+          <li>Primary motor area</li>
+          <li>Broca&rsquo;s &mdash; motor speech</li>
+          <li>Prefrontal &mdash; personality</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">P</div>
+      <div class="cell-text"><strong style="color:var(--green);">Parietal</strong>
+        <ul>
+          <li>Primary somatosensory</li>
+          <li>Interpretation of sensation (hot/cold, vibration, soft/hard)</li>
+          <li>Central sulcus divides from frontal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">T</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Temporal</strong>
+        <ul>
+          <li>Primary auditory</li>
+          <li>Wernicke&rsquo;s &mdash; understand speech, comprehension</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">O</div>
+      <div class="cell-text"><strong style="color:var(--red);">Occipital</strong>
+        <ul>
+          <li>Primary visual area</li>
+          <li>Visual interpretation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:740px;">
+    <strong>Teaching hook:</strong> take out the prefrontal cortex &rarr; lose personality and emotions. On the next slide we drop <em>below</em> the cortex.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 9: NARRATIVE + CELL-CARDS — Going Deeper (subcortical → brainstem → cerebellum) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Going Deeper</div>
+  <h3 style="text-align:center;">Below the <em>Cortex</em> <span style="font-size:0.85rem;color:var(--text-dim);font-weight:400;">(surface &rarr; depth, anatomical order)</span></h3>
+  <div class="cell-cards" style="max-width:820px;">
+
+    <!-- SUBCORTICAL -->
+    <div class="cell-card full-span" style="border-left-color:var(--blue);background:rgba(56,189,248,0.04);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">S1</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Thalamus &mdash; the relay station</strong>
+        <ul>
+          <li>Sensory info up to cortex, motor commands down</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--purple);background:rgba(167,139,250,0.04);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">S2</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Hypothalamus &mdash; the homeostasis hub</strong>
+        <ul>
+          <li>Sends messages to the anterior pituitary &rarr; body organs</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BRAINSTEM -->
+    <div class="cell-card full-span" style="border-left-color:var(--yellow);background:rgba(245,158,11,0.04);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">B1</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Reticular formation &mdash; alertness + gatekeeper</strong>
+        <ul>
+          <li>Controls awakeness; filters incoming/outgoing information</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--red);background:rgba(239,68,68,0.04);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">B2</div>
+      <div class="cell-text"><strong style="color:var(--red);">Medulla &mdash; where vital functions live</strong>
+        <ul>
+          <li>HR, vascular resistance, breathing, vomiting</li>
+          <li><strong style="color:var(--red);">Injury here = death faster.</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CEREBELLUM -->
+    <div class="cell-card full-span" style="border-left-color:var(--teal);background:rgba(34,211,238,0.04);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">C</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Cerebellum &mdash; coordination &amp; balance</strong>
+        <ul>
+          <li>Motor coordination, balance &middot; impacted by alcohol</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Why this matters for the next section:</strong> when ICP rises, the brain gets pushed <em>down</em> onto the brainstem. That&rsquo;s where HR and breathing live. Lose the brainstem &mdash; lose the patient.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 10: CHECK — Brain Regions ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient had a stroke and now cannot understand what family members are saying, though their hearing is intact. Which brain region was most likely affected?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Broca&rsquo;s area (frontal lobe)
+      <div class="explanation">No. Broca&rsquo;s controls motor speech output. The patient could speak but wouldn&rsquo;t understand &mdash; the opposite of this presentation.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Wernicke&rsquo;s area (temporal lobe)
+      <div class="explanation">Correct. Wernicke&rsquo;s is the speech-comprehension area. Damage &rarr; receptive aphasia: they hear sound but can&rsquo;t process meaning.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Occipital lobe
+      <div class="explanation">No. Occipital processes vision. Intact hearing rules out a primary visual issue.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Cerebellum
+      <div class="explanation">No. Cerebellum handles motor coordination and balance, not language comprehension.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 11: SECTION DIVIDER — Intracranial Pressure ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section C</div>
+  <h2>Intracranial <em>Pressure</em></h2>
+  <div class="divider-sub">The closed box <em style="color:var(--text);font-style:normal;">protects</em> &mdash; until something grows inside. Then pressure has nowhere to go, and the brainstem pays the price.</div>
+</div>
+
+<!-- ════════ SLIDE 12: ANCHOR — The Unifying Frame ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Regardless of Etiology &rarr; <em class="blue">&uarr;ICP is the Problem</em></h2>
+  <div class="subline">Bleeding, tumor, hydrocephalus, edema, ischemia &mdash; different causes, same final pathway. If you remember one thing from this deck, remember this.</div>
+</div>
+
+<!-- ════════ SLIDE 13: NARRATIVE + RULE-DECISION-TREE — Monroe-Kellie ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Monroe-Kellie</div>
+  <h3 style="text-align:center;">The <em class="yellow">Closed Box</em> Rule</h3>
+  <div class="rule-decision-tree">
+    <div class="rdt-rule">
+      <div class="rdt-label">THE RULE</div>
+      <div class="rdt-headline">The skull is a closed box.</div>
+      <div class="rdt-body">It holds three things: <strong>blood</strong>, <strong>brain tissue</strong>, and <strong>CSF</strong>. Total volume is fixed.</div>
+    </div>
+    <div class="rdt-decisions">
+      <div class="rdt-dec-label">CLINICAL DECISION</div>
+      <div class="rdt-row" style="border-left-color:var(--red);">
+        <div class="rdt-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128165;</div>
+        <div class="rdt-if" style="color:var(--red);">
+          <span class="label">IF blood &uarr;</span>
+          <span class="examples">hemorrhage</span>
+        </div>
+        <div class="rdt-arrow" style="color:var(--red);">&rarr;</div>
+        <div class="rdt-action" style="color:var(--red);">brain or CSF &darr; &middot; then &uarr;ICP</div>
+      </div>
+      <div class="rdt-row" style="border-left-color:var(--purple);">
+        <div class="rdt-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129504;</div>
+        <div class="rdt-if" style="color:var(--purple);">
+          <span class="label">IF tissue &uarr;</span>
+          <span class="examples">tumor &middot; edema</span>
+        </div>
+        <div class="rdt-arrow" style="color:var(--purple);">&rarr;</div>
+        <div class="rdt-action" style="color:var(--purple);">blood or CSF &darr; &middot; then &uarr;ICP</div>
+      </div>
+      <div class="rdt-row" style="border-left-color:var(--teal);">
+        <div class="rdt-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#128167;</div>
+        <div class="rdt-if" style="color:var(--teal);">
+          <span class="label">IF CSF &uarr;</span>
+          <span class="examples">hydrocephalus</span>
+        </div>
+        <div class="rdt-arrow" style="color:var(--teal);">&rarr;</div>
+        <div class="rdt-action" style="color:var(--teal);">blood or brain &darr; &middot; then &uarr;ICP</div>
+      </div>
+      <div class="rdt-row" style="border-left-color:var(--yellow);background:rgba(245,158,11,0.08);">
+        <div class="rdt-icon" style="background:rgba(245,158,11,0.2);color:var(--yellow);">&#9888;</div>
+        <div class="rdt-if" style="color:var(--yellow);">
+          <span class="label">IF nothing can compensate</span>
+          <span class="examples">limit reached</span>
+        </div>
+        <div class="rdt-arrow" style="color:var(--yellow);">&rarr;</div>
+        <div class="rdt-action" style="color:var(--yellow);">&uarr;ICP</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:860px;">
+    <strong>Treatment logic follows the rule:</strong> Excess blood &rarr; <strong>drain it.</strong> Excess fluid &rarr; <strong>drain it.</strong> Excess tissue &rarr; <strong>remove it.</strong> One principle, three surgical strategies.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 14: ANCHOR — Cushing's Triad ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-emergency">Emergency</div>
+  <h2>Cushing&rsquo;s Triad = <em class="red">&uarr;ICP URGENT</em></h2>
+  <div class="subline">Three signs, together, mean the brain is failing to compensate. This is not a drill &mdash; call the physician, mobilize the team.</div>
+</div>
+
+<!-- ════════ SLIDE 15: NARRATIVE — Why These 3 Signs (causal cascade, not parallel) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Cushing&rsquo;s Triad &mdash; The Mechanism</div>
+  <h3 style="text-align:center;">Why These <em class="red">Three Signs</em>, Together?</h3>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:680px;">
+
+    <!-- STEP 1: Rising ICP -->
+    <div class="flow-step" style="width:100%;white-space:normal;text-align:left;border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.06);">
+      <strong style="color:var(--red);font-size:1.02rem;">&uarr; ICP &mdash; the brain is being squeezed</strong>
+      <small>Compensation maxed out. Pressure rising inside the closed box.</small>
+    </div>
+    <div style="color:var(--red);font-size:1.5rem;line-height:1;margin:4px 0;">&darr;</div>
+
+    <!-- STEP 2 = SIGN 1 -->
+    <div class="flow-step" style="width:100%;white-space:normal;text-align:left;border-color:rgba(239,68,68,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;">
+        <strong style="color:var(--red);font-size:1.02rem;">Brain forces &uarr; BP &mdash; to push blood PAST the pressure</strong>
+        <span class="badge badge-red">Sign 1</span>
+      </div>
+      <small>Systolic rises, diastolic stays. <strong style="color:var(--text);">Widening pulse pressure.</strong></small>
+    </div>
+    <div style="color:var(--yellow);font-size:1.5rem;line-height:1;margin:4px 0;">&darr;</div>
+
+    <!-- STEP 3 = SIGN 2 -->
+    <div class="flow-step" style="width:100%;white-space:normal;text-align:left;border-color:rgba(245,158,11,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;">
+        <strong style="color:var(--yellow);font-size:1.02rem;">Baroreceptors sense &uarr; BP &rarr; slow the heart</strong>
+        <span class="badge badge-yellow">Sign 2</span>
+      </div>
+      <small>Reflex <strong style="color:var(--text);">bradycardia.</strong> Body&rsquo;s normal &ldquo;BP too high, slow the heart&rdquo; response.</small>
+    </div>
+    <div style="color:var(--purple);font-size:1.5rem;line-height:1;margin:4px 0;">&darr;</div>
+
+    <!-- STEP 4 = SIGN 3 -->
+    <div class="flow-step" style="width:100%;white-space:normal;text-align:left;border-color:rgba(167,139,250,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;">
+        <strong style="color:var(--purple);font-size:1.02rem;">Brainstem respiratory centers compressed &rarr; breathing breaks</strong>
+        <span class="badge" style="background:rgba(167,139,250,0.15);color:var(--purple);">Sign 3</span>
+      </div>
+      <small><strong style="color:var(--text);">Cheyne-Stokes:</strong> rapid &rarr; deep &rarr; shallow &rarr; none &rarr; repeat.</small>
+    </div>
+  </div>
+  <div class="callout danger" style="margin-top:16px;">
+    <strong>Three signs, one story</strong> &mdash; the brain trying to save itself. This specific trio doesn&rsquo;t happen in sepsis, shock, or anything else, which is why it points straight at &uarr;ICP.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 16: NARRATIVE + CELL-CARDS — Late/Ominous Signs ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Late Signs</div>
+  <h3 style="text-align:center;">When Compensation <em class="red">Fails</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#9995;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Decorticate posture</strong>
+        <ul>
+          <li>Hands pulled to center &mdash; toward the CORE</li>
+          <li>Cortical damage</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129307;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Decerebrate posture</strong>
+        <ul>
+          <li>Arms extended AWAY from core</li>
+          <li>Brainstem damage &mdash; worse than decorticate</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#127755;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Projectile vomiting</strong>
+        <ul>
+          <li>Sudden, forceful</li>
+          <li>Brainstem signal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128065;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Fixed &amp; dilated pupils</strong>
+        <ul>
+          <li>Non-recoverable</li>
+          <li>Herniation under way</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#128118;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Baby: bulging fontanelle</strong>
+        <ul>
+          <li>Pediatric &uarr;ICP sign</li>
+          <li>Skull hasn&rsquo;t fused &mdash; pressure pushes the soft spot out</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Herniation into the foramen magnum</strong> &rarr; brain forced onto brainstem &rarr; irreversible &rarr; death. These late signs mean herniation is imminent or in progress.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 17: COMPARE — Decorticate vs Decerebrate ════════ -->
+<div class="slide compare">
+  <h3>Decorticate <em class="yellow">vs.</em> Decerebrate <em style="color:var(--text);font-style:normal;">Posturing</em></h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Decorticate</h4>
+      <ul>
+        <li>Arms flexed, hands pulled toward chest (toward the <strong>CORE</strong>)</li>
+        <li>Legs extended, feet internally rotated</li>
+        <li>Indicates <strong>cortical</strong> damage</li>
+        <li><strong>Relatively</strong> better prognosis of the two</li>
+        <li>Memory hook: &ldquo;De-<strong>CORE</strong>-ticate &mdash; toward the core&rdquo;</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>Decerebrate</h4>
+      <ul>
+        <li>Arms extended and rotated outward, wrists flexed</li>
+        <li>Legs extended</li>
+        <li>Indicates <strong>brainstem</strong> damage</li>
+        <li><strong>Worse</strong> prognosis &mdash; brain is losing deeper function</li>
+        <li>Memory hook: &ldquo;Decerebrate &mdash; cerebrum out of the picture, brainstem in trouble&rdquo;</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 18: CHECK — ICP Recognition ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A patient 12 hours post-TBI is now showing <strong>BP 178/62</strong> (up from 128/78), <strong>HR 48</strong> (down from 82), and irregular breathing alternating between rapid and shallow. What is happening?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Early septic shock
+      <div class="explanation">No. Septic shock presents with hypotension and tachycardia, not widening pulse pressure and bradycardia.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Cushing&rsquo;s triad from rising ICP &mdash; emergency
+      <div class="explanation">Correct. &uarr;BP with widening pulse pressure + &darr;HR + Cheyne-Stokes = classic triad. The brain is failing to compensate. Call the physician now.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Normal post-TBI variation
+      <div class="explanation">No. This pattern is never normal. It&rsquo;s the body&rsquo;s last-ditch effort to perfuse a compressed brain.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Pain response to the injury
+      <div class="explanation">No. Pain typically raises HR, not lowers it. Bradycardia with hypertension points to intracranial pathology.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 19: SECTION DIVIDER — Bleeds & Blood Supply ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section D</div>
+  <h2>Bleeds &amp; <em>Blood Supply</em></h2>
+  <div class="divider-sub">The fastest way pressure rises: <em style="color:var(--text);font-style:normal;">blood where it shouldn&rsquo;t be</em>. Where it leaks determines how fast it kills.</div>
+</div>
+
+<!-- ════════ SLIDE 20: ANCHOR — Arterial vs Venous ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Arterial Bleeds Are <em class="red">More Serious</em> Than Venous Bleeds</h2>
+  <div class="subline">Higher pressure = faster accumulation = faster &uarr;ICP. Survival depends on getting to the source &mdash; and the skill of the facility that does.</div>
+</div>
+
+<!-- ════════ SLIDE 21: NARRATIVE + ANATOMICAL MAP — Meninges Layer Map (Where Bleeds Live) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">The Layers</div>
+  <h3 style="text-align:center;">Meninges &amp; <em>CSF</em> <span style="font-size:0.85rem;color:var(--text-dim);font-weight:400;">&mdash; the map for where bleeds live</span></h3>
+  <div class="anatomical-map">
+    <svg viewBox="0 0 640 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="meningesTitle">
+      <title id="meningesTitle">Cross-section of the cranial protective layers from outside to inside: skull, dura mater, arachnoid, subarachnoid space (CSF), pia mater, brain tissue.</title>
+      <defs>
+        <pattern id="bonePattern" width="14" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(10)">
+          <rect width="14" height="8" fill="#475569"/>
+          <line x1="0" y1="4" x2="14" y2="4" stroke="#334155" stroke-width="1"/>
+          <circle cx="4" cy="2" r="0.8" fill="#334155"/>
+          <circle cx="10" cy="6" r="0.8" fill="#334155"/>
+        </pattern>
+        <pattern id="arachnoidWeb" width="16" height="16" patternUnits="userSpaceOnUse">
+          <rect width="16" height="16" fill="rgba(245,158,11,0.2)"/>
+          <path d="M0,8 L16,8 M8,0 L8,16 M2,2 L14,14 M14,2 L2,14" stroke="rgba(245,158,11,0.5)" stroke-width="0.6"/>
+        </pattern>
+        <pattern id="brainGyri" width="40" height="20" patternUnits="userSpaceOnUse">
+          <rect width="40" height="20" fill="rgba(167,139,250,0.12)"/>
+          <path d="M0,10 Q10,4 20,10 T40,10" stroke="rgba(167,139,250,0.4)" stroke-width="1.2" fill="none"/>
+        </pattern>
+      </defs>
+
+      <!-- Skull (outermost) -->
+      <rect x="80" y="22" width="320" height="34" fill="url(#bonePattern)" stroke="#64748b" stroke-width="1.5"/>
+
+      <!-- Dura mater -->
+      <rect x="80" y="62" width="320" height="18" fill="rgba(239,68,68,0.35)" stroke="var(--red)" stroke-width="1.3"/>
+
+      <!-- Arachnoid -->
+      <rect x="80" y="84" width="320" height="16" fill="url(#arachnoidWeb)" stroke="var(--yellow)" stroke-width="1.3"/>
+
+      <!-- Subarachnoid space (CSF) -->
+      <rect x="80" y="104" width="320" height="36" fill="rgba(56,189,248,0.22)" stroke="rgba(56,189,248,0.45)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <!-- CSF drops -->
+      <text x="240" y="127" text-anchor="middle" fill="var(--blue)" font-size="11" font-weight="600">CSF</text>
+
+      <!-- Pia mater -->
+      <rect x="80" y="144" width="320" height="6" fill="rgba(34,211,238,0.6)" stroke="var(--teal)" stroke-width="1.3"/>
+
+      <!-- Brain tissue (with gyri pattern) -->
+      <path d="M 80,154 Q 100,148 120,154 Q 140,148 160,154 Q 180,148 200,154 Q 220,148 240,154 Q 260,148 280,154 Q 300,148 320,154 Q 340,148 360,154 Q 380,148 400,154 L 400,350 L 80,350 Z"
+        fill="url(#brainGyri)" stroke="var(--purple)" stroke-width="1.5"/>
+      <!-- Extra gyri lines inside brain -->
+      <path d="M 90,200 Q 120,190 150,200 Q 180,210 210,200 Q 240,190 270,200 Q 300,210 330,200 Q 360,190 390,200" stroke="rgba(167,139,250,0.5)" stroke-width="1.2" fill="none"/>
+      <path d="M 90,240 Q 130,232 170,240 Q 210,248 250,240 Q 290,232 330,240 Q 370,248 390,240" stroke="rgba(167,139,250,0.5)" stroke-width="1.2" fill="none"/>
+      <path d="M 90,280 Q 125,272 160,280 Q 200,288 240,280 Q 280,272 320,280 Q 360,288 390,280" stroke="rgba(167,139,250,0.5)" stroke-width="1.2" fill="none"/>
+      <path d="M 90,320 Q 130,312 170,320 Q 210,328 250,320 Q 290,312 330,320 Q 370,328 390,320" stroke="rgba(167,139,250,0.5)" stroke-width="1.2" fill="none"/>
+
+      <!-- LABELS with connector lines on the right -->
+      <!-- Skull -->
+      <line x1="400" y1="39" x2="440" y2="39" class="am-connector" stroke="var(--text-dim)"/>
+      <text x="445" y="36" class="am-label">Skull</text>
+      <text x="445" y="50" class="am-sub">bone protection</text>
+
+      <!-- Dura -->
+      <line x1="400" y1="71" x2="440" y2="71" class="am-connector" stroke="var(--red)"/>
+      <text x="445" y="68" class="am-label" fill="var(--red)">Dura mater</text>
+      <text x="445" y="82" class="am-sub">outer, tough</text>
+
+      <!-- Arachnoid -->
+      <line x1="400" y1="92" x2="440" y2="105" class="am-connector" stroke="var(--yellow)"/>
+      <text x="445" y="105" class="am-label" fill="var(--yellow)">Arachnoid</text>
+      <text x="445" y="118" class="am-sub">middle, web-like, vascular</text>
+
+      <!-- CSF subarachnoid space -->
+      <line x1="400" y1="122" x2="440" y2="135" class="am-connector" stroke="var(--blue)"/>
+      <text x="445" y="138" class="am-label" fill="var(--blue)">Subarachnoid space</text>
+      <text x="445" y="152" class="am-sub">CSF bathes the brain</text>
+
+      <!-- Pia -->
+      <line x1="400" y1="147" x2="440" y2="175" class="am-connector" stroke="var(--teal)"/>
+      <text x="445" y="178" class="am-label" fill="var(--teal)">Pia mater</text>
+      <text x="445" y="192" class="am-sub">inner, thin, on brain</text>
+
+      <!-- Brain -->
+      <line x1="400" y1="250" x2="440" y2="250" class="am-connector" stroke="var(--purple)"/>
+      <text x="445" y="247" class="am-label" fill="var(--purple)">Brain tissue</text>
+      <text x="445" y="261" class="am-sub">innermost; gyri/sulci</text>
+    </svg>
+  </div>
+  <div class="callout info">
+    <strong>Normal CSF: no blood cells, yes sugar.</strong> Next slide: each bleed sits between two of these layers &mdash; that&rsquo;s how it gets its name.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 22: NARRATIVE + CELL-CARDS — Three Extra-Cerebral Bleeds (outside-in) ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Hematoma Types</div>
+  <h3 style="text-align:center;">Where Is the <em>Bleed</em>? <span style="font-size:0.85rem;color:var(--text-dim);font-weight:400;">(outside &rarr; in)</span></h3>
+  <div class="cell-cards" style="grid-template-columns:1fr;max-width:820px;">
+    <div class="cell-card full-span" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">E</div>
+      <div class="cell-text"><strong style="color:var(--red);">Epidural &mdash; between skull &amp; dura</strong>
+        <ul>
+          <li><strong>Arterial</strong> &middot; fast (hours)</li>
+          <li>Classic: brief LOC &rarr; lucid interval &rarr; LOC</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">S</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Subdural &mdash; below dura, above arachnoid</strong>
+        <ul>
+          <li><strong>Venous</strong> &middot; slow (days)</li>
+          <li>Common in elderly (brain atrophy)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">SA</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Subarachnoid &mdash; below the arachnoid</strong>
+        <ul>
+          <li><strong>Aneurysm rupture</strong> (Circle of Willis)</li>
+          <li>Sudden &mdash; &ldquo;worst headache of my life&rdquo;</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 22: NARRATIVE + ANATOMICAL MAP — Circle of Willis ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Blood Supply</div>
+  <h3 style="text-align:center;">The <em>Circle of Willis</em></h3>
+  <div class="anatomical-map" style="max-width:560px;">
+    <svg viewBox="0 0 560 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cowTitle">
+      <title id="cowTitle">Top-down view of the arterial Circle of Willis at the base of the brain, showing carotids, anterior/middle/posterior cerebral arteries, and basilar artery with common aneurysm sites marked.</title>
+
+      <!-- FRONT / POSTERIOR labels -->
+      <text x="280" y="22" fill="var(--text-muted)" font-size="10" font-style="italic" text-anchor="middle">(anterior / front of brain)</text>
+      <text x="280" y="428" fill="var(--text-muted)" font-size="10" font-style="italic" text-anchor="middle">(posterior / back of brain)</text>
+
+      <!-- Anterior Cerebral Arteries (ACA) — forward top -->
+      <path d="M 220,95 Q 245,70 280,68 Q 315,70 340,95" stroke="var(--red)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- Anterior communicating artery (connecting ACAs) -->
+      <line x1="260" y1="80" x2="300" y2="80" stroke="var(--red)" stroke-width="3.5" stroke-linecap="round"/>
+
+      <!-- Internal Carotid Arteries (ICA) — entering from below, both sides -->
+      <path d="M 200,260 Q 195,180 220,130 Q 225,110 220,95" stroke="var(--red)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+      <path d="M 360,260 Q 365,180 340,130 Q 335,110 340,95" stroke="var(--red)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+
+      <!-- Middle Cerebral Arteries (MCA) — branching laterally from ICAs -->
+      <path d="M 208,155 Q 160,160 110,170" stroke="var(--red)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 352,155 Q 400,160 450,170" stroke="var(--red)" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+      <!-- Posterior communicating arteries (PComm) -->
+      <path d="M 210,225 Q 225,260 250,275" stroke="var(--red)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 350,225 Q 335,260 310,275" stroke="var(--red)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+
+      <!-- Posterior Cerebral Arteries (PCA) -->
+      <path d="M 250,275 Q 225,310 200,345" stroke="var(--red)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 310,275 Q 335,310 360,345" stroke="var(--red)" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+      <!-- Basilar artery -->
+      <path d="M 250,275 Q 280,290 310,275" stroke="var(--red)" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <line x1="280" y1="287" x2="280" y2="340" stroke="var(--red)" stroke-width="6" stroke-linecap="round"/>
+
+      <!-- Vertebral arteries feeding basilar -->
+      <path d="M 280,340 Q 255,360 240,385" stroke="var(--red)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 280,340 Q 305,360 320,385" stroke="var(--red)" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+      <!-- Aneurysm sites (2-3 common) -->
+      <!-- ACom aneurysm (most common) -->
+      <circle cx="280" cy="80" r="8" fill="rgba(245,158,11,0.5)" stroke="var(--yellow)" stroke-width="1.8"/>
+      <!-- MCA bifurcation -->
+      <circle cx="208" cy="155" r="7" fill="rgba(245,158,11,0.5)" stroke="var(--yellow)" stroke-width="1.8"/>
+      <!-- PComm origin -->
+      <circle cx="352" cy="225" r="7" fill="rgba(245,158,11,0.5)" stroke="var(--yellow)" stroke-width="1.8"/>
+
+      <!-- LABELS -->
+      <g font-family="Inter,sans-serif">
+        <!-- ACA label -->
+        <line x1="280" y1="65" x2="280" y2="40" class="am-connector" stroke="var(--red)"/>
+        <text x="280" y="36" class="am-label" fill="var(--red)" text-anchor="middle">ACA</text>
+        <text x="280" y="50" class="am-sub" text-anchor="middle">anterior cerebral</text>
+
+        <!-- MCA left -->
+        <text x="30" y="168" class="am-label" fill="var(--red)" text-anchor="start">MCA</text>
+        <text x="30" y="182" class="am-sub" text-anchor="start">middle cerebral</text>
+        <line x1="75" y1="172" x2="105" y2="170" class="am-connector" stroke="var(--red)"/>
+
+        <!-- MCA right -->
+        <text x="530" y="168" class="am-label" fill="var(--red)" text-anchor="end">MCA</text>
+        <text x="530" y="182" class="am-sub" text-anchor="end">most common stroke site</text>
+        <line x1="455" y1="172" x2="485" y2="170" class="am-connector" stroke="var(--red)"/>
+
+        <!-- ICA left -->
+        <line x1="200" y1="260" x2="125" y2="280" class="am-connector" stroke="var(--red)"/>
+        <text x="55" y="284" class="am-label" fill="var(--red)" text-anchor="start">ICA</text>
+        <text x="55" y="298" class="am-sub" text-anchor="start">internal carotid</text>
+
+        <!-- ICA right -->
+        <line x1="360" y1="260" x2="435" y2="280" class="am-connector" stroke="var(--red)"/>
+        <text x="505" y="284" class="am-label" fill="var(--red)" text-anchor="end">ICA</text>
+        <text x="505" y="298" class="am-sub" text-anchor="end">internal carotid</text>
+
+        <!-- PCA label -->
+        <line x1="280" y1="350" x2="280" y2="378" class="am-connector" stroke="var(--red)"/>
+        <text x="155" y="368" class="am-label" fill="var(--red)" text-anchor="start">PCA</text>
+        <text x="155" y="382" class="am-sub" text-anchor="start">posterior cerebral</text>
+
+        <!-- Basilar label -->
+        <text x="290" y="315" class="am-label" fill="var(--red)" text-anchor="start">Basilar</text>
+
+        <!-- Aneurysm legend -->
+        <circle cx="480" cy="400" r="6" fill="rgba(245,158,11,0.5)" stroke="var(--yellow)" stroke-width="1.5"/>
+        <text x="493" y="404" class="am-sub" fill="var(--yellow)" text-anchor="start">common aneurysm site</text>
+      </g>
+    </svg>
+  </div>
+  <ul style="max-width:800px;">
+    <li>Two carotids (R + L) feed the circle from below</li>
+    <li>Circle gives rise to <span class="hl-red">anterior</span>, <span class="hl-red">middle</span>, and <span class="hl-red">posterior</span> cerebral arteries</li>
+    <li>The circle is a <strong>backup system</strong> &mdash; if one feeder is blocked, others can sometimes compensate</li>
+    <li>Aneurysms most commonly form at <span class="hl-yellow">branch points</span> in or on the circle &mdash; this is why subarachnoid bleeds happen here</li>
+  </ul>
+  <div class="callout info">
+    <strong>The Circle of Willis is your bridge to the Stroke deck.</strong> Middle cerebral artery (MCA) strokes are the most common &mdash; and MCA territory maps roughly to the motor and Broca&rsquo;s area. Hence classic stroke presentations: contralateral face + arm weakness with aphasia.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 23: CHECK — Bleeds & Vascular Anatomy ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A 19-year-old soccer player is struck in the temple, <strong>loses consciousness briefly</strong>, wakes up feeling fine, then <strong>90 minutes later</strong> becomes confused and loses consciousness again. Which type of bleed is most likely?</div>
+  <div class="choices">
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Epidural hematoma
+      <div class="explanation">Correct. Classic pattern: brief LOC &rarr; lucid interval &rarr; deterioration. Arterial source (middle meningeal artery near the temporal skull) = fast accumulation. Emergency.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Subdural hematoma
+      <div class="explanation">No. Subdurals are venous and slow &mdash; symptoms typically develop over days, not 90 minutes.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Subarachnoid hemorrhage
+      <div class="explanation">No. Subarachnoid presents with sudden &ldquo;worst headache of life,&rdquo; often without a preceding trauma and without the classic lucid-interval pattern.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Intracerebral hemorrhage
+      <div class="explanation">No. Intracerebral bleeds are usually spontaneous from HTN or stroke, not this impact pattern with lucid interval.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 24: ANCHOR (Big Picture) — Foundations Recap ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Neuro Foundations &mdash; The <em>Big Picture</em></h2>
+  <div class="subline" style="max-width:780px;text-align:left;font-size:1.02rem;line-height:1.8;">
+    <span class="hl-blue">&bull;</span> <strong>Meninges + CSF</strong> protect the CNS. Dura &rarr; Arachnoid &rarr; Pia, with CSF bathing the brain.<br>
+    <span class="hl-blue">&bull;</span> <strong>Neurons</strong> in the CNS can&rsquo;t regenerate. They need <strong>constant O&#8322; and glucose</strong>. Neural firing runs on Na&#8314;/K&#8314; movement &mdash; disrupt it and you get a seizure.<br>
+    <span class="hl-yellow">&bull;</span> <strong>Brain regions</strong> determine deficits. Location = presentation.<br>
+    <span class="hl-red">&bull;</span> <strong>&uarr;ICP</strong> is the unifying problem. Monroe-Kellie: the skull is a closed box. Compensation eventually fails.<br>
+    <span class="hl-red">&bull;</span> <strong>Cushing&rsquo;s Triad</strong> (&uarr;BP widening pulse pressure + &darr;HR + Cheyne-Stokes) = emergency. Late signs (decorticate/decerebrate, fixed/dilated pupils, projectile vomiting) = herniation imminent.<br>
+    <span class="hl-purple">&bull;</span> <strong>Bleeds:</strong> Epidural (arterial, fast), Subdural (venous, slow), Subarachnoid (aneurysm, sudden &ldquo;worst headache&rdquo;). Arterial &gt; venous in seriousness.<br>
+    <span class="hl-teal">&bull;</span> <strong>Circle of Willis</strong> is the vascular backup system and the site of most aneurysms. Bridge to the Stroke deck.
+  </div>
+</div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
+<script>
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

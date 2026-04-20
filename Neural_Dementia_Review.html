@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 11: Neural — Dementia Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+}
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
+
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
+
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
+
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:560px}
+
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.15rem;color:var(--text-dim);max-width:720px;line-height:1.6}
+
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:center;max-width:960px;margin:0 auto;text-align:center}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:24px;text-align:center}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)} em.purple{font-style:normal;color:var(--purple)} em.teal{font-style:normal;color:var(--teal)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:820px;text-align:left}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:8px;font-weight:600}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-chain.horizontal{flex-direction:row;flex-wrap:wrap;justify-content:center}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:4px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:12px 16px;font-size:0.9rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.78rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.2rem;color:var(--blue);margin:0 4px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:30px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:26px 22px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.15rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)} .compare-col.col-teal h4{color:var(--teal);border-color:var(--teal)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.compare-col ul li{font-size:0.94rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)} .compare-col.col-teal ul li::before{background:var(--teal)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.05rem,2vw,1.4rem);font-weight:700;max-width:820px;line-height:1.4;margin-bottom:30px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:780px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:16px 18px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.02rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:22px 26px;max-width:780px;text-align:left;font-size:1.02rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:700;max-width:780px;line-height:1.4;margin-bottom:22px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CELL-CARDS ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;width:100%}
+.cell-cards.three-col{grid-template-columns:1fr 1fr 1fr;max-width:880px}
+.cell-cards .full-span{grid-column:1 / -1}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid;text-align:left}
+.cell-card .cell-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── FOUNDATIONS RECAP ── */
+.recap-card{background:rgba(56,189,248,0.06);border:1.5px dashed rgba(56,189,248,0.35);border-radius:14px;padding:24px;max-width:720px;width:100%;text-align:left}
+.recap-card h4{font-size:0.9rem;letter-spacing:2px;color:var(--blue);font-weight:800;margin-bottom:10px;text-transform:uppercase}
+.recap-card p{font-size:0.95rem;color:var(--text-dim);line-height:1.55}
+.recap-card strong{color:var(--text)}
+
+/* ── PROGRESSION TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:10px;max-width:780px;width:100%}
+.timeline-step{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:10px;padding:12px 16px;border-left:4px solid;text-align:left}
+.timeline-step .tl-num{background:rgba(167,139,250,0.15);color:var(--purple);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:0.9rem}
+.timeline-step .tl-text{font-size:0.95rem;color:var(--text-dim);line-height:1.4}
+.timeline-step .tl-text strong{color:var(--text);display:block;margin-bottom:2px;font-size:1rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .choices{grid-template-columns:1fr} .compare-grid{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.cell-cards.three-col{grid-template-columns:1fr}
+  .flow-chain.horizontal{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0}
+  .flow-chain.horizontal .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%}
+  .flow-chain.horizontal .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter">1 / 23</div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
+
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>Neural &mdash; Dementia</h1>
+  <div class="subtitle">Chapter 11 &middot; Cortical loss, Alzheimer&rsquo;s, progression, and family teaching</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ════════ SLIDE 2: FOUNDATIONS RECAP ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Before You Start</div>
+  <h3>If You Haven&rsquo;t Yet &mdash; <em>Skim the Foundations Deck</em></h3>
+  <div class="recap-card">
+    <h4>Quick Anchor</h4>
+    <p>Dementia lives in the <strong>cortex</strong> &mdash; the outer layer where higher-order thinking happens. Memory, language, judgment, personality &mdash; all cortical jobs. The <strong>prefrontal lobe</strong> handles behavior and impulse control. If you need a refresh on lobes and what each does, skim the <strong>Foundations deck</strong> first. This deck builds on that map.</p>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 3: SECTION A — What's Dementia? ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section A</div>
+  <h2>What&rsquo;s <em>Dementia</em>?</h2>
+  <div class="divider-sub">Cortical function loss &mdash; and what causes it</div>
+</div>
+
+<!-- ════════ SLIDE 4: ANCHOR — Dementia = Cortical Loss ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>Dementia = <em class="blue">&darr; Cortical Function</em></h2>
+  <div class="subline">Impaired <em class="blue">cognition</em> + <em class="purple">motor function</em>. Maybe memory. When behavior/personality changes show up &mdash; the <em class="yellow">prefrontal lobe</em> is involved.</div>
+</div>
+
+<!-- ════════ SLIDE 5: What Dementia Affects (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">What Breaks Down</div>
+  <h3>Dementia Hits the <em class="blue">Cortex</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#129504;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Cognition</strong>
+        <ul>
+          <li>Thinking, reasoning, language</li>
+          <li>Can&rsquo;t follow conversations</li>
+          <li>Judgment fails over time</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128373;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Motor Function</strong>
+        <ul>
+          <li>Gait changes, balance</li>
+          <li>Loss of fine motor skills</li>
+          <li>Eventually loss of ADLs</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">M</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Memory</strong>
+        <ul>
+          <li>Short-term hit first</li>
+          <li>Long-term preserved until late</li>
+          <li>Not always the first symptom</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128170;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Behavior / Personality</strong>
+        <ul>
+          <li>Prefrontal lobe involvement</li>
+          <li>Labile emotions, aggression</li>
+          <li>Loss of impulse control</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 6: Etiologies (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Etiology</div>
+  <h3>What <em class="red">Causes</em> Dementia</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128151;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Atherosclerosis</strong>
+        <ul>
+          <li>Altered blood flow to brain</li>
+          <li>Vascular dementia pathway</li>
+          <li>Spiral to Ch.4 CVD</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#129440;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Infections &amp; Toxins</strong>
+        <ul>
+          <li>Including AIDS patients</li>
+          <li>Chronic neurotoxin exposure</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#129516;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Genetic</strong>
+        <ul>
+          <li>Family history matters</li>
+          <li>Esp. early-onset Alzheimer&rsquo;s</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--text-dim);">
+      <div class="cell-icon" style="background:rgba(148,163,184,0.15);color:var(--text-dim);">?</div>
+      <div class="cell-text"><strong style="color:var(--text-dim);">Unknown</strong>
+        <ul>
+          <li>Many cases have no clear cause</li>
+          <li>Alzheimer&rsquo;s etiology still unclear</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 7: Risk Factors (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Risk Factors</div>
+  <h3>Who&rsquo;s at <em class="yellow">Risk</em>?</h3>
+  <div class="cell-cards three-col">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128337;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Age</strong>
+        <ul><li>Risk &uarr; with age</li><li>Strongest single factor</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Sex</strong>
+        <ul><li>Higher rates in women</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#127891;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">&darr; Education</strong>
+        <ul><li>Less cognitive reserve</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128106;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Family History</strong>
+        <ul><li>Genetic component</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129656;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Vascular (CVD)</strong>
+        <ul><li>HTN</li><li>&uarr; cholesterol</li><li>Diabetes</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#129504;</div>
+      <div class="cell-text"><strong style="color:var(--green);">TBI</strong>
+        <ul><li>Head trauma history</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Spiral:</strong> HTN, &uarr; cholesterol, and diabetes are the <em class="red">same modifiable risk factors</em> as CVD (Ch. 4). Vascular dementia shares the CVD risk profile.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 8: CHECK — Risk Factors ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">Which set of risk factors overlaps with <strong>cardiovascular disease</strong> and makes vascular dementia particularly concerning?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Age, female sex, low education
+      <div class="explanation">These are dementia risk factors, but they aren&rsquo;t the CVD-shared set. Look for modifiable vascular risks.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> HTN, &uarr; cholesterol, diabetes
+      <div class="explanation">Correct. Atherosclerosis &rarr; altered cerebral blood flow &rarr; vascular dementia. These are the same modifiable risks that drive CAD/stroke (spiral Ch. 4).</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Family history and TBI only
+      <div class="explanation">Both are risk factors, but neither is shared with CVD. Genetics and trauma don&rsquo;t overlap with vascular risk.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> AIDS and chronic toxin exposure
+      <div class="explanation">Infections/toxins cause dementia but aren&rsquo;t CVD risk factors.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 9: SECTION B — Alzheimer's ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section B</div>
+  <h2><em>Alzheimer&rsquo;s Disease</em></h2>
+  <div class="divider-sub">The most common dementia &mdash; slow, insidious, no cure</div>
+</div>
+
+<!-- ════════ SLIDE 10: ANCHOR — 50-80% ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-pearl">Frequency Anchor</div>
+  <h2><em class="blue">50&ndash;80%</em> of All Dementia is <em class="purple">Alzheimer&rsquo;s</em></h2>
+  <div class="subline">Insidious onset &mdash; <em class="yellow">10 to 20 years</em> of slow decline. Often starts in 50s&ndash;60s. Early exam looks normal; patient forgets recent events. Late stages: behavior changes, aggression.</div>
+</div>
+
+<!-- ════════ SLIDE 11: Brain Changes (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Physical Brain Changes</div>
+  <h3>What You&rsquo;d See on <em class="blue">CT / Autopsy</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&beta;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Beta-Amyloid Plaques</strong>
+        <ul>
+          <li>Protein clumps between neurons</li>
+          <li>Block communication</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&tau;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Neurofibrillary Tangles</strong>
+        <ul>
+          <li>Twisted tau protein inside neurons</li>
+          <li>Neuron dies</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#9889;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Loss of Neural Connections</strong>
+        <ul>
+          <li>Synapses fail &mdash; signals don&rsquo;t travel</li>
+          <li>Cortex &amp; mid-brain affected</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">CT</div>
+      <div class="cell-text"><strong style="color:var(--blue);">CT Findings</strong>
+        <ul>
+          <li>Brain atrophy (shrinkage)</li>
+          <li>Enlarged ventricles</li>
+          <li>Change in cortex &rarr; &darr; memory</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    All three pathologies together &rarr; <strong>atrophy &amp; degeneration</strong>. Memory loss is a downstream result of losing cortical tissue and connections.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 12: CHECK — Brain Changes ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A CT scan on a 74F with suspected Alzheimer&rsquo;s would MOST likely show:</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> A focal hemorrhage in the frontal lobe
+      <div class="explanation">That&rsquo;s a hemorrhagic stroke pattern, not Alzheimer&rsquo;s. Alzheimer&rsquo;s is diffuse atrophy, not a bleed.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Normal brain tissue with no abnormalities
+      <div class="explanation">Early in the disease this can look normal, but by the time dementia is clinically suspected, atrophy is usually visible.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Brain atrophy with enlarged ventricles
+      <div class="explanation">Correct. Loss of cortical tissue &rarr; brain shrinks &rarr; the CSF spaces (ventricles) expand to fill the room. Classic CT appearance in advanced Alzheimer&rsquo;s.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> A midline shift with effacement of sulci
+      <div class="explanation">That&rsquo;s a mass effect/&uarr;ICP picture. Alzheimer&rsquo;s is the opposite &mdash; tissue loss, not expansion.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 13: SECTION C — Progression ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section C</div>
+  <h2><em>Progression</em></h2>
+  <div class="divider-sub">The order symptoms appear &mdash; a true temporal cascade</div>
+</div>
+
+<!-- ════════ SLIDE 14: Progression Timeline (compact) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Alzheimer&rsquo;s Progression</div>
+  <h3>The <em class="purple">Cascade</em> of Loss <span style="font-size:0.85rem;color:var(--text-dim);font-weight:400;">&mdash; order matters</span></h3>
+  <div class="timeline" style="max-width:660px;gap:6px;">
+    <div class="timeline-step" style="border-left-color:var(--blue);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">1</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Loss of abstract thought</strong> &mdash; exam may still look normal</div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--blue);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">2</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Can&rsquo;t follow conversations</strong> &mdash; family notices first</div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--teal);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">3</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Disorientation</strong> &mdash; time first, then place</div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--yellow);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">4</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Loss of judgment</strong> &mdash; stove on, wanders, unsafe</div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--yellow);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">5</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Loss of continence</strong></div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--purple);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">6</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Personality change</strong> &mdash; prefrontal involvement</div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--red);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">7</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Aggression</strong></div>
+    </div>
+    <div class="timeline-step" style="border-left-color:var(--red);padding:8px 14px;">
+      <div class="tl-num" style="width:28px;height:28px;font-size:0.85rem;">8</div>
+      <div class="tl-text" style="font-size:0.9rem;line-height:1.35;"><strong style="display:inline;font-size:0.95rem;margin:0;">Hallucinations</strong> &mdash; cortical function nearly gone</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 15: CHECK — Progression Order ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A family says &ldquo;Mom started forgetting names a year ago, now she can&rsquo;t follow conversations. What&rsquo;s likely next?&rdquo;</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Aggression and hallucinations
+      <div class="explanation">These are later-stage findings. She&rsquo;s still early. Several steps need to come first.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Disorientation to time and place
+      <div class="explanation">Correct. Progression is: memory &rarr; conversations &rarr; <strong>disorientation</strong> &rarr; judgment &rarr; continence &rarr; personality &rarr; aggression &rarr; hallucinations. She&rsquo;s at the &ldquo;conversations&rdquo; step &mdash; disorientation is next.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Loss of continence
+      <div class="explanation">Continence loss comes later, after judgment fails.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Personality change
+      <div class="explanation">Personality change is late &mdash; after disorientation, judgment loss, and continence loss.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 16: SECTION D — Other Dementias + Treatment ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section D</div>
+  <h2>Other <em>Dementias</em> &amp; Treatment</h2>
+  <div class="divider-sub">Lewy body &mdash; and what we can (and can&rsquo;t) do about any of them</div>
+</div>
+
+<!-- ════════ SLIDE 17: Alzheimer's vs Lewy Body (compare) ════════ -->
+<div class="slide compare">
+  <h3>Alzheimer&rsquo;s vs <em style="color:var(--teal);font-style:normal;">Lewy Body</em></h3>
+  <div class="compare-grid">
+    <div class="compare-col col-purple">
+      <h4>Alzheimer&rsquo;s</h4>
+      <ul>
+        <li><strong>50&ndash;80%</strong> of all dementia</li>
+        <li>Insidious &mdash; 10 to 20 years</li>
+        <li>Memory loss <em class="purple">dominates early</em></li>
+        <li>&beta;-amyloid plaques + neurofibrillary tangles</li>
+        <li>Atrophy + enlarged ventricles on CT</li>
+        <li>Steady, predictable decline</li>
+      </ul>
+    </div>
+    <div class="compare-col col-teal">
+      <h4>Lewy Body Dementia</h4>
+      <ul>
+        <li>Slow but progressive</li>
+        <li><em class="teal">Fluctuation</em> in cognition (good days + bad days)</li>
+        <li><em class="teal">Hallucinations</em> &mdash; often early and prominent</li>
+        <li>Motor gait imbalance</li>
+        <li>Lewy body protein deposits</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout info">
+    <strong>Key differentiator:</strong> if you&rsquo;re seeing <em class="teal">fluctuation + hallucinations + motor gait</em> &mdash; think <strong>Lewy body</strong>, not Alzheimer&rsquo;s. Hallucinations in Alzheimer&rsquo;s come <em>late</em>; in Lewy body they come <em>early</em>.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 18: Treatment (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Treatment</div>
+  <h3><em class="red">No Cure</em> &mdash; Only Slow the Decline</h3>
+  <div class="cell-cards three-col">
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Cholinesterase Inhibitors</strong>
+        <ul>
+          <li>Slows acetylcholine breakdown</li>
+          <li>Slows progression, doesn&rsquo;t reverse</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">E</div>
+      <div class="cell-text"><strong style="color:var(--green);">Vitamin E</strong>
+        <ul>
+          <li>Antioxidant support</li>
+          <li>May slow cellular damage</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#127793;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Ginkgo</strong>
+        <ul>
+          <li>Herbal supplement</li>
+          <li>May support cognition</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout danger">
+    <strong>There is no cure.</strong> Every treatment we have only slows progression. That&rsquo;s why <em>family teaching and safety planning</em> matter so much &mdash; that&rsquo;s where we actually change outcomes.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 19: SECTION E — Safety & Family Teaching ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section E</div>
+  <h2>Safety &amp; <em>Family Teaching</em></h2>
+  <div class="divider-sub">Where nursing makes the biggest difference</div>
+</div>
+
+<!-- ════════ SLIDE 20: ANCHOR — "What is meaningful to them?" ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-pearl">Care Anchor</div>
+  <h2>&ldquo;What is <em class="teal">meaningful</em> to them?&rdquo;</h2>
+  <div class="subline">The guiding question for every decision. Use what they care about &mdash; familiar TV shows, a beloved watch, photos of grandkids, a calendar routine &mdash; as <em class="blue">environmental clues to identity</em>. Cognitive stimulation works best when it&rsquo;s personal.</div>
+</div>
+
+<!-- ════════ SLIDE 21: Environmental Safety (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Environmental Safety</div>
+  <h3>Keep Them <em class="red">Safe</em> at Home</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128663;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Disconnect the Car Battery</strong>
+        <ul>
+          <li>They may try to drive</li>
+          <li>Removes the option entirely</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#129531;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Remove Throw Rugs</strong>
+        <ul>
+          <li>Motor changes &rarr; fall risk</li>
+          <li>One of the simplest wins</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128293;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Turn Off the Gas</strong>
+        <ul>
+          <li>Stove left on is a top danger</li>
+          <li>Judgment loss = fire risk</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#128106;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Supervision + Help with Meds</strong>
+        <ul>
+          <li>Multi-generational household helps</li>
+          <li>Keep environment calm</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cell-card full-span" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#128221;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Orientation Clues &amp; Routine</strong>
+        <ul>
+          <li>Calendar, familiar TV, newspaper</li>
+          <li>Clues about identity &mdash; watch, photos of loved ones</li>
+          <li>Remind to eat &middot; physical activity &middot; advanced planning</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 22: Cognitive Stimulation (cell-cards) ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Cognitive Stimulation</div>
+  <h3>Keep the <em class="purple">Brain</em> Engaged</h3>
+  <div class="cell-cards three-col">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">&#128221;</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Crosswords</strong>
+        <ul><li>Language + recall</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#127921;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Match Games</strong>
+        <ul><li>Short-term memory exercise</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#129513;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Puzzles</strong>
+        <ul><li>Visuospatial + patience</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">&#127912;</div>
+      <div class="cell-text"><strong style="color:var(--green);">Crafts</strong>
+        <ul><li>Fine motor + creativity</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#128247;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Photos of Loved Ones</strong>
+        <ul><li>Identity + connection</li></ul>
+      </div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--red);">
+      <div class="cell-icon" style="background:rgba(239,68,68,0.15);color:var(--red);">&#128694;</div>
+      <div class="cell-text"><strong style="color:var(--red);">Physical Activity</strong>
+        <ul><li>Prevents immobility complications</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Complications of prolonged immobility:</strong> infections, falls, malnutrition/anorexia, dehydration. Keep moving &mdash; body AND brain.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 23: SECTION F — Clinical Application ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section F</div>
+  <h2><em>Clinical Application</em></h2>
+  <div class="divider-sub">Mrs. Garcia, 74F &mdash; put it together</div>
+</div>
+
+<!-- ════════ SLIDE 24: CASE — Mrs. Garcia ════════ -->
+<div class="slide case">
+  <div class="case-label">Case Study</div>
+  <div class="case-scenario">
+    <strong>Mrs. Garcia, 74F</strong>, brought by her daughter. <em class="yellow">2-year</em> progressive memory loss &mdash; now getting lost in her neighborhood, leaving the stove on, recently hit her husband (never aggressive before).<br><br>
+    <strong>Exam:</strong> disoriented to time + place &middot; poor short-term memory, long-term intact &middot; ADL difficulty, occasional incontinence.<br>
+    <strong>CT:</strong> brain atrophy, enlarged ventricles.<br>
+    <strong>Risks:</strong> age 74, female, mother had Alzheimer&rsquo;s, HTN.
+  </div>
+  <div class="question">Given the <strong>stove incidents and wandering</strong>, what is the nurse&rsquo;s <strong>most important</strong> teaching priority for the family?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Reassure the family that cholinesterase inhibitors will reverse the decline
+      <div class="explanation">Incorrect on two counts. There is <strong>no cure</strong> &mdash; meds only slow progression. And reassurance about reversal is false hope.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Environmental safety &mdash; disconnect the car battery, turn off gas, supervision, remove fall hazards
+      <div class="explanation">Correct. Judgment loss + wandering + stove on = <em class="red">real safety risks right now</em>. Nursing can&rsquo;t cure Alzheimer&rsquo;s, but we CAN prevent the fire, the fall, and the car accident through environmental teaching. Most important priority.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Encourage the family to place her in a memory care facility this week
+      <div class="explanation">Too soon and not our call. Advanced planning matters, but forcing placement isn&rsquo;t priority teaching &mdash; safety in her current environment is.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Increase her cognitive stimulation activities to prevent the aggression
+      <div class="explanation">Cognitive stimulation is part of care, but aggression is progression of the disease, not something puzzles fix. Safety is the immediate priority.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 25: ANCHOR — Summary ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Dementia &mdash; The <em>Big Picture</em></h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.02rem;line-height:1.8;">
+    <span class="hl-blue">&bull;</span> <strong>Dementia = &darr; cortical function.</strong> Cognition + motor. Behavior/personality &rarr; prefrontal.<br>
+    <span class="hl-red">&bull;</span> <strong>Etiologies:</strong> atherosclerosis, infections/toxins (incl. AIDS), genetic, unknown.<br>
+    <span class="hl-purple">&bull;</span> <strong>Alzheimer&rsquo;s = 50&ndash;80%</strong> of all dementia. Insidious 10&ndash;20 yr decline. &beta;-amyloid + tangles + lost connections &rarr; atrophy + enlarged ventricles.<br>
+    <span class="hl-yellow">&bull;</span> <strong>Progression:</strong> memory &rarr; conversations &rarr; orientation &rarr; judgment &rarr; continence &rarr; personality &rarr; aggression &rarr; hallucinations.<br>
+    <span class="hl-teal">&bull;</span> <strong>Lewy body</strong> = fluctuation + hallucinations + motor gait. Hallucinations <em>early</em>, not late.<br>
+    <span class="hl-red">&bull;</span> <strong>No cure.</strong> Cholinesterase inhibitors, Vit E, ginkgo slow progression only.<br>
+    <span class="hl-green">&bull;</span> <strong>Safety:</strong> disconnect car battery, remove throw rugs, turn off gas, supervision.<br>
+    <span class="hl-blue">&bull;</span> <strong>&ldquo;What is meaningful to them?&rdquo;</strong> &mdash; the care anchor.
+  </div>
+</div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
+<script>
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>
