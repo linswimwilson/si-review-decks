@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NURS 308 Rapid Fire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #F8FAFC;
+    color: #1E293B;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  #root { min-height: 100vh; padding: 20px 0 60px; }
+  .boot-msg { max-width: 600px; margin: 60px auto; padding: 24px; text-align: center; color: #1E293B; font-size: 18px; }
+  .boot-err { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 12px; padding: 16px; margin: 24px auto; max-width: 600px; font-size: 13px; text-align: left; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div class="boot-msg">Loading…</div>
+</div>
+
+<script>
+window.addEventListener('error', function(e) {
+  var root = document.getElementById('root');
+  if (root) root.innerHTML = '<div class="boot-err"><b>JS error:</b><br>' + ((e.message || e) + '\n' + (e.filename || '') + ':' + (e.lineno || '')) + '</div>';
+});
+</script>
+
+<script src="react.production.min.js"></script>
+<script src="react-dom.production.min.js"></script>
+
+<script>
+const { useState, useEffect, useRef } = React;
+const font = "'DM Sans', system-ui, sans-serif";
+const VALUES_QUESTIONS = [{
+  id: "v01",
+  cat: "Electrolytes",
+  stem: "Sodium: 128 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "135–145",
+  explain: "Hyponatremia. Risk of confusion, seizures, cerebral edema."
+}, {
+  id: "v02",
+  cat: "Electrolytes",
+  stem: "Sodium: 141 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "135–145",
+  explain: "Within normal range."
+}, {
+  id: "v03",
+  cat: "Electrolytes",
+  stem: "Sodium: 152 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "135–145",
+  explain: "Hypernatremia. Likely dehydration. Thirst, dry mucous membranes, confusion."
+}, {
+  id: "v04",
+  cat: "Electrolytes",
+  stem: "Potassium: 2.9 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "3.5–5.0",
+  explain: "CRITICAL hypokalemia. Cardiac emergency — flat T waves, U waves, risk of fatal dysrhythmias."
+}, {
+  id: "v05",
+  cat: "Electrolytes",
+  stem: "Potassium: 4.3 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "3.5–5.0",
+  explain: "Normal. Cardiac conduction stable."
+}, {
+  id: "v06",
+  cat: "Electrolytes",
+  stem: "Potassium: 6.2 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "3.5–5.0",
+  explain: "CRITICAL hyperkalemia. Peaked T waves → widened QRS → V-fib. Get ECG immediately."
+}, {
+  id: "v07",
+  cat: "Electrolytes",
+  stem: "Calcium: 7.6 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "8.5–10.5",
+  explain: "Hypocalcemia. Risk of tetany, Trousseau's, Chvostek's, numbness/tingling."
+}, {
+  id: "v08",
+  cat: "Electrolytes",
+  stem: "Calcium: 9.4 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "8.5–10.5",
+  explain: "Normal calcium level."
+}, {
+  id: "v09",
+  cat: "Electrolytes",
+  stem: "Calcium: 11.8 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "8.5–10.5",
+  explain: "Hypercalcemia. Bones, stones, groans, moans. Think hyperparathyroidism or malignancy."
+}, {
+  id: "v10",
+  cat: "Hematology",
+  stem: "WBC: 14,200/mm³",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "5,000–10,000",
+  explain: "Leukocytosis. Infection, inflammation, or stress response. Assess for source."
+}, {
+  id: "v11",
+  cat: "Hematology",
+  stem: "WBC: 7,400/mm³",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "5,000–10,000",
+  explain: "Normal WBC count."
+}, {
+  id: "v12",
+  cat: "Hematology",
+  stem: "WBC: 2,100/mm³",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "5,000–10,000",
+  explain: "Leukopenia. Immunocompromised — HIGH infection risk. Neutropenic precautions."
+}, {
+  id: "v13",
+  cat: "Hematology",
+  stem: "Hemoglobin: 8.4 g/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "14",
+  explain: "Significant anemia. Expect fatigue, tachycardia, pallor. May need transfusion."
+}, {
+  id: "v14",
+  cat: "Hematology",
+  stem: "Hemoglobin: 14.2 g/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "14",
+  explain: "Normal hemoglobin."
+}, {
+  id: "v15",
+  cat: "Hematology",
+  stem: "Hematocrit: 28%",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "45%",
+  explain: "Low — anemia or blood loss. Should be ~3× the hemoglobin."
+}, {
+  id: "v16",
+  cat: "Hematology",
+  stem: "Hematocrit: 44%",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "45%",
+  explain: "Normal range."
+}, {
+  id: "v17",
+  cat: "Hematology",
+  stem: "Platelets: 38,000/mm³",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "150,000–400,000",
+  explain: "Severe thrombocytopenia. HIGH bleeding risk. Bleeding precautions immediately."
+}, {
+  id: "v18",
+  cat: "Hematology",
+  stem: "Platelets: 210,000/mm³",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "150,000–400,000",
+  explain: "Normal platelet count."
+}, {
+  id: "v19",
+  cat: "WBC Differential",
+  stem: "Neutrophils: 82%",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "55–70%",
+  explain: "Elevated — suggests acute bacterial infection. Assess for infection source."
+}, {
+  id: "v20",
+  cat: "WBC Differential",
+  stem: "Lymphocytes: 52%",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "20–40%",
+  explain: "Elevated — suggests viral infection."
+}, {
+  id: "v21",
+  cat: "WBC Differential",
+  stem: "Eosinophils: 9%",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "1–4%",
+  explain: "Elevated — think parasitic infection or allergic reaction."
+}, {
+  id: "v22",
+  cat: "WBC Differential",
+  stem: "Neutrophils: 62%",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "55–70%",
+  explain: "Normal neutrophil percentage."
+}, {
+  id: "v23",
+  cat: "ABGs",
+  stem: "pH: 7.32",
+  options: ["Acidosis", "Normal", "Alkalosis"],
+  correct: 0,
+  normal: "7.35–7.45",
+  explain: "Acidotic. Next: check CO₂ and HCO₃ to determine respiratory vs metabolic."
+}, {
+  id: "v24",
+  cat: "ABGs",
+  stem: "pH: 7.41",
+  options: ["Acidosis", "Normal", "Alkalosis"],
+  correct: 1,
+  normal: "7.35–7.45",
+  explain: "Normal pH."
+}, {
+  id: "v25",
+  cat: "ABGs",
+  stem: "pH: 7.52",
+  options: ["Acidosis", "Normal", "Alkalosis"],
+  correct: 2,
+  normal: "7.35–7.45",
+  explain: "Alkalotic. Next: check CO₂ and HCO₃ to determine respiratory vs metabolic."
+}, {
+  id: "v26",
+  cat: "ABGs",
+  stem: "PaCO₂: 58 mmHg",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "35–45",
+  explain: "Elevated CO₂ = respiratory acidosis. Patient retaining CO₂ — hypoventilating."
+}, {
+  id: "v27",
+  cat: "ABGs",
+  stem: "PaCO₂: 28 mmHg",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "35–45",
+  explain: "Low CO₂ = respiratory alkalosis OR compensation for metabolic acidosis. Patient is hyperventilating."
+}, {
+  id: "v28",
+  cat: "ABGs",
+  stem: "HCO₃: 16 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "22–26",
+  explain: "Low bicarbonate = metabolic acidosis. Body losing base or accumulating acid."
+}, {
+  id: "v29",
+  cat: "ABGs",
+  stem: "HCO₃: 32 mEq/L",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "22–26",
+  explain: "High bicarbonate = metabolic alkalosis OR compensation for respiratory acidosis."
+}, {
+  id: "v30",
+  cat: "ABGs",
+  stem: "PaO₂: 58 mmHg",
+  options: ["Low", "Normal", "High"],
+  correct: 0,
+  normal: "80–100",
+  explain: "Severe hypoxemia. Supplemental O₂ needed. Below 60 is critical."
+}, {
+  id: "v31",
+  cat: "Glucose",
+  stem: "Fasting blood sugar: 132 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "70–100",
+  explain: "Elevated. ≥126 on two occasions = diabetes. 100–125 = pre-diabetes."
+}, {
+  id: "v32",
+  cat: "Glucose",
+  stem: "Fasting blood sugar: 88 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 1,
+  normal: "70–100",
+  explain: "Normal fasting glucose."
+}, {
+  id: "v33",
+  cat: "Glucose",
+  stem: "Random blood sugar: 248 mg/dL",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "< 200",
+  explain: "Elevated. ≥200 with symptoms = diabetes diagnosis."
+}, {
+  id: "v34",
+  cat: "Glucose",
+  stem: "HbA1c: 8.9%",
+  options: ["Normal", "Pre-diabetes", "Poorly controlled diabetes"],
+  correct: 2,
+  normal: "< 5.7% normal",
+  explain: "Well above target. Average blood glucose has been significantly elevated for 2–3 months. Goal <7% for diabetics."
+}, {
+  id: "v35",
+  cat: "Glucose",
+  stem: "HbA1c: 6.1%",
+  options: ["Normal", "Pre-diabetes", "Diabetes"],
+  correct: 1,
+  normal: "5.7–6.4% = pre-DM",
+  explain: "Pre-diabetes range. Lifestyle interventions recommended."
+}, {
+  id: "v36",
+  cat: "Glucose",
+  stem: "Blood glucose: 52 mg/dL",
+  options: ["Hypoglycemia", "Normal", "Hyperglycemia"],
+  correct: 0,
+  normal: "70–100",
+  explain: "Hypoglycemia! Emergency. Rule of 15: 15g fast-acting carbs, recheck in 15 min. If unconscious → IV dextrose or IM glucagon."
+}, {
+  id: "v37",
+  cat: "Lipids",
+  stem: "Total cholesterol: 244 mg/dL",
+  options: ["Desirable", "Borderline", "High"],
+  correct: 2,
+  normal: "< 200 desirable",
+  explain: "High. Increased cardiovascular risk. ≥240 = high."
+}, {
+  id: "v38",
+  cat: "Lipids",
+  stem: "HDL: 34 mg/dL",
+  options: ["Low (bad)", "Normal", "High (good)"],
+  correct: 0,
+  normal: "> 40",
+  explain: "Low HDL = increased CV risk. HDL is 'good' cholesterol — higher is better."
+}, {
+  id: "v39",
+  cat: "Lipids",
+  stem: "LDL: 168 mg/dL",
+  options: ["Optimal", "Borderline", "High"],
+  correct: 2,
+  normal: "< 100 optimal",
+  explain: "High LDL = increased CV risk. LDL is 'bad' cholesterol — lower is better."
+}, {
+  id: "v40",
+  cat: "Renal",
+  stem: "GFR: 42 mL/min",
+  options: ["Normal", "Reduced", "Severely reduced"],
+  correct: 1,
+  normal: "≥ 90 normal",
+  explain: "Stage 3 CKD. Kidney function significantly reduced. <60 for 3+ months = CKD."
+}, {
+  id: "v41",
+  cat: "Renal",
+  stem: "Serum osmolarity: 312 mOsm/kg",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "275–295",
+  explain: "Elevated — blood is concentrated. Dehydration or hyperglycemia. Body needs fluid."
+}, {
+  id: "v42",
+  cat: "Renal",
+  stem: "Urine protein: positive",
+  options: ["Normal", "Abnormal"],
+  correct: 1,
+  normal: "Negative",
+  explain: "Proteinuria = kidney damage. Glomeruli are leaking protein. Common in diabetes and hypertension."
+}, {
+  id: "v43",
+  cat: "Renal",
+  stem: "Urine nitrites: positive",
+  options: ["Normal", "Abnormal"],
+  correct: 1,
+  normal: "Negative",
+  explain: "Strong indicator of UTI — bacteria converting nitrates to nitrites."
+}, {
+  id: "v44",
+  cat: "Renal",
+  stem: "Urine ketones: positive",
+  options: ["Normal", "Abnormal"],
+  correct: 1,
+  normal: "Negative",
+  explain: "Body burning fat for fuel. Think DKA in diabetics, or starvation/very low-carb diets."
+}, {
+  id: "v45",
+  cat: "Vital Signs",
+  stem: "Heart rate: 112 bpm",
+  options: ["Bradycardia", "Normal", "Tachycardia"],
+  correct: 2,
+  normal: "60–100",
+  explain: "Tachycardia. Compensatory? Pain? Fever? Anxiety? Hypovolemia? Investigate the cause."
+}, {
+  id: "v46",
+  cat: "Vital Signs",
+  stem: "Heart rate: 48 bpm",
+  options: ["Bradycardia", "Normal", "Tachycardia"],
+  correct: 0,
+  normal: "60–100",
+  explain: "Bradycardia. Is the patient symptomatic (dizzy, hypotensive, confused)? May need intervention."
+}, {
+  id: "v47",
+  cat: "Vital Signs",
+  stem: "BP: 168/98 mmHg",
+  options: ["Normal", "Elevated", "Stage 2 HTN"],
+  correct: 2,
+  normal: "< 120/80",
+  explain: "Stage 2 hypertension (≥140/≥90). Assess for end-organ damage symptoms."
+}, {
+  id: "v48",
+  cat: "Vital Signs",
+  stem: "O₂ sat: 88%",
+  options: ["Normal", "Low", "Critical"],
+  correct: 1,
+  normal: "95–100%",
+  explain: "Hypoxemia. Supplemental O₂ needed. <90% is critical. Exception: COPD baseline may be 88–92%."
+}, {
+  id: "v49",
+  cat: "Vital Signs",
+  stem: "Respiratory rate: 24 breaths/min",
+  options: ["Low", "Normal", "High"],
+  correct: 2,
+  normal: "12–20",
+  explain: "Tachypnea. Compensation for acidosis? Hypoxia? Pain? Anxiety? Find the cause."
+}, {
+  id: "v50",
+  cat: "Vital Signs",
+  stem: "Temperature: 101.2°F",
+  options: ["Normal", "Fever"],
+  correct: 1,
+  normal: "97.8–99.1°F",
+  explain: "Fever (≥100.4°F). Assess for infection source. Especially dangerous in immunocompromised patients."
+}];
+const PURPOSE_QUESTIONS = [{
+  id: "p01",
+  cat: "Coagulation",
+  stem: "INR",
+  options: ["Monitors warfarin therapy (extrinsic pathway)", "Monitors heparin therapy", "Detects clot breakdown", "Measures cardiac damage"],
+  correct: 0,
+  explain: "INR monitors warfarin (Coumadin). Therapeutic range usually 2.0–3.0. Elevated = increased bleeding risk."
+}, {
+  id: "p02",
+  cat: "Coagulation",
+  stem: "aPTT",
+  options: ["Monitors warfarin therapy", "Monitors heparin therapy (intrinsic pathway)", "Screens for anemia", "Measures liver function"],
+  correct: 1,
+  explain: "aPTT monitors heparin. Prolonged = increased bleeding risk. Different pathway than INR/PT."
+}, {
+  id: "p03",
+  cat: "Coagulation",
+  stem: "D-dimer",
+  options: ["Monitors anticoagulant therapy", "Measures platelet function", "Detects fibrin degradation products — used to rule out DVT/PE/DIC", "Screens for cancer"],
+  correct: 2,
+  explain: "D-dimer detects clot breakdown products. Elevated when the body is actively breaking down clots. Sensitive but not specific — helps RULE OUT, not diagnose."
+}, {
+  id: "p04",
+  cat: "Coagulation",
+  stem: "PT (Prothrombin Time)",
+  options: ["Monitors heparin", "Measures extrinsic clotting pathway — used with INR", "Counts white blood cells", "Tests kidney function"],
+  correct: 1,
+  explain: "PT measures extrinsic pathway. Elevated in liver disease, vitamin K deficiency, warfarin use. Used alongside INR."
+}, {
+  id: "p05",
+  cat: "Cardiac Markers",
+  stem: "Troponin",
+  options: ["Monitors cholesterol levels", "Gold standard for detecting myocardial cell damage/death", "Measures cardiac rhythm", "Tests for heart valve function"],
+  correct: 1,
+  explain: "Troponin is THE biomarker for MI. Rises 3–6 hrs after injury, peaks 12–24 hrs. Most specific marker of myocardial damage."
+}, {
+  id: "p06",
+  cat: "Cardiac Markers",
+  stem: "CPK-MB",
+  options: ["Measures kidney function", "Cardiac-specific enzyme — rises 4–8 hrs after MI", "Tests thyroid function", "Monitors anticoagulation"],
+  correct: 1,
+  explain: "CPK-MB is a cardiac isoenzyme. Used alongside troponin. Particularly useful for detecting reinfarction because it clears faster than troponin."
+}, {
+  id: "p07",
+  cat: "Liver Function",
+  stem: "Bilirubin",
+  options: ["Measures kidney filtration", "Byproduct of RBC breakdown processed by liver — elevated in liver dysfunction or hemolysis", "Tests for infection", "Monitors blood sugar"],
+  correct: 1,
+  explain: "Bilirubin is processed by the liver. Elevated = liver can't process it (liver disease) or too much is being produced (hemolysis). Causes jaundice."
+}, {
+  id: "p08",
+  cat: "Liver Function",
+  stem: "Ammonia",
+  options: ["Measures oxygen in blood", "Tests for UTI", "Toxic metabolite cleared by liver — elevated in liver failure causing hepatic encephalopathy", "Monitors heparin"],
+  correct: 2,
+  explain: "The liver clears ammonia from protein metabolism. When the liver fails, ammonia builds up → crosses blood-brain barrier → hepatic encephalopathy (confusion, asterixis/liver flap)."
+}, {
+  id: "p09",
+  cat: "Liver Function",
+  stem: "Albumin (Total Protein)",
+  options: ["Produced by liver — low levels indicate liver failure or malnutrition, causing edema/ascites", "Measures blood clotting", "Detects cardiac damage", "Tests for diabetes"],
+  correct: 0,
+  explain: "Albumin maintains oncotic pressure. Low albumin = fluid leaks from vessels → edema, ascites. The liver produces it — so liver failure = low albumin."
+}, {
+  id: "p10",
+  cat: "Thyroid",
+  stem: "TSH",
+  options: ["Measures thyroid hormone directly", "Best screening test for thyroid disorders — high = hypo, low = hyper", "Tests for diabetes", "Monitors kidney function"],
+  correct: 1,
+  explain: "TSH is the FIRST test ordered. High TSH = pituitary screaming at a failing thyroid (hypothyroid). Low TSH = thyroid overproducing, pituitary backs off (hyperthyroid)."
+}, {
+  id: "p11",
+  cat: "Thyroid",
+  stem: "T3 and T4",
+  options: ["Pituitary hormones", "Actual thyroid hormone levels — confirm hyper/hypothyroidism after TSH", "Adrenal hormones", "Pancreatic hormones"],
+  correct: 1,
+  explain: "T4 is the primary thyroid output, T3 is more active. Used to confirm thyroid status after TSH screening. High T3/T4 = hyperthyroid. Low = hypothyroid."
+}, {
+  id: "p12",
+  cat: "Endocrine",
+  stem: "Cortisol",
+  options: ["Tests thyroid function", "Adrenal hormone — elevated in Cushing's, low in Addison's", "Measures blood glucose", "Tests for anemia"],
+  correct: 1,
+  explain: "Cortisol follows a diurnal pattern (highest AM, lowest midnight). Elevated = Cushing's (or exogenous steroids). Low = Addison's (adrenal insufficiency)."
+}, {
+  id: "p13",
+  cat: "Endocrine",
+  stem: "ACTH",
+  options: ["Monitors diabetes treatment", "Pituitary hormone — differentiates Cushing's DISEASE (high ACTH, pituitary tumor) from Cushing's SYNDROME (low ACTH, adrenal tumor)", "Tests for infection", "Measures cardiac output"],
+  correct: 1,
+  explain: "ACTH from pituitary stimulates cortisol release. If cortisol is high AND ACTH is high → pituitary is the problem (disease). If cortisol is high BUT ACTH is low → adrenal tumor making cortisol independently."
+}, {
+  id: "p14",
+  cat: "Screening",
+  stem: "CEA (Carcinoembryonic Antigen)",
+  options: ["Screens for prostate cancer", "Monitors colorectal cancer treatment response and recurrence — NOT a screening tool", "Tests for liver function", "Diagnoses diabetes"],
+  correct: 1,
+  explain: "CEA monitors treatment response in colorectal (and some other) cancers. NOT used for initial screening — it's not specific enough. A rising CEA after treatment suggests recurrence."
+}, {
+  id: "p15",
+  cat: "Screening",
+  stem: "PSA (Prostate-Specific Antigen)",
+  options: ["Tests for colon cancer", "Screens for and monitors prostate cancer — also elevated in BPH and prostatitis", "Measures kidney function", "Tests thyroid"],
+  correct: 1,
+  explain: "PSA screens for prostate cancer but isn't perfectly specific — BPH and prostatitis also elevate it. A rising TREND is more concerning than a single value."
+}, {
+  id: "p16",
+  cat: "Screening",
+  stem: "CRP (C-Reactive Protein)",
+  options: ["Specific marker for cancer", "Non-specific marker of inflammation — elevated in infection, autoimmune disease, and CV risk assessment", "Measures blood oxygen", "Tests for diabetes"],
+  correct: 1,
+  explain: "CRP rises with any inflammation. Used in cardiovascular risk assessment (chronic low-grade inflammation contributes to atherosclerosis) and to monitor disease activity in autoimmune conditions."
+}, {
+  id: "p17",
+  cat: "GI",
+  stem: "Occult blood test (Guaiac/FIT)",
+  options: ["Tests for UTI", "Detects hidden blood in stool/GI secretions — indicates GI bleeding", "Measures liver function", "Screens for diabetes"],
+  correct: 1,
+  explain: "Positive occult blood = bleeding somewhere in the GI tract. Could be ulcers, polyps, cancer, varices, hemorrhoids. Requires further investigation (endoscopy, colonoscopy)."
+}, {
+  id: "p18",
+  cat: "General",
+  stem: "Culture & Sensitivity",
+  options: ["Measures inflammation", "Identifies the specific organism AND which antibiotics will kill it — obtain BEFORE starting antibiotics", "Tests for cancer", "Monitors kidney function"],
+  correct: 1,
+  explain: "Cultures identify WHAT is causing the infection. Sensitivity tells you WHICH antibiotics it responds to. Always collect before starting antibiotics — the drugs can kill organisms and cause a false negative."
+}];
+const DIAGNOSTIC_QUESTIONS = [{
+  id: "d01",
+  cat: "Cardiac",
+  stem: "A patient has peaked T waves and a widened QRS complex on their ECG. What electrolyte abnormality does this suggest?",
+  options: ["Hypokalemia", "Hyperkalemia", "Hypocalcemia", "Hypernatremia"],
+  correct: 1,
+  explain: "Peaked T waves → widened QRS → potential V-fib/asystole is the classic ECG progression of hyperkalemia. This is a cardiac emergency. Check serum K+ immediately."
+}, {
+  id: "d02",
+  cat: "Cardiac",
+  stem: "An ECG shows ST-segment ELEVATION in leads II, III, and aVF. This finding is most consistent with:",
+  options: ["Normal sinus rhythm", "Hyperkalemia", "Acute myocardial infarction (inferior wall)", "Atrial fibrillation"],
+  correct: 2,
+  explain: "ST elevation = acute MI until proven otherwise. Leads II, III, aVF correspond to the inferior wall of the heart (supplied by the right coronary artery). This patient needs emergent cardiac catheterization."
+}, {
+  id: "d03",
+  cat: "Cardiac",
+  stem: "An ECG shows an irregularly irregular rhythm with no identifiable P waves. This is:",
+  options: ["Sinus bradycardia", "Sinus tachycardia", "Atrial fibrillation", "Ventricular tachycardia"],
+  correct: 2,
+  explain: "Irregularly irregular + no P waves = atrial fibrillation. The atria are firing chaotically. Key concern: blood pooling in the fibrillating atria can form clots → stroke risk. Many A-fib patients are on anticoagulation."
+}, {
+  id: "d04",
+  cat: "Cardiac",
+  stem: "An ECG shows flattened T waves and the presence of U waves. This suggests:",
+  options: ["Hyperkalemia", "Hypokalemia", "Myocardial infarction", "Normal variant"],
+  correct: 1,
+  explain: "Flattened/inverted T waves and U waves (extra wave after T) are hallmarks of hypokalemia. The heart's electrical system is destabilized by low potassium. Check K+ level and replace as needed."
+}, {
+  id: "d05",
+  cat: "Cardiac",
+  stem: "A patient presents with chest pain. What is the FIRST diagnostic test the nurse should anticipate?",
+  options: ["MRI of the chest", "Cardiac catheterization", "12-lead ECG", "Echocardiogram"],
+  correct: 2,
+  explain: "12-lead ECG is fast, non-invasive, and immediately tells you if there are signs of ischemia (ST depression), acute MI (ST elevation), or dysrhythmias. It's the first test in any chest pain workup. Cardiac cath may follow if MI is confirmed."
+}, {
+  id: "d06",
+  cat: "Neuro",
+  stem: "A patient presents with sudden-onset neurological deficits. Which imaging test is needed FIRST and why?",
+  options: ["MRI — more detailed brain imaging", "CT scan without contrast — quickly distinguishes ischemic from hemorrhagic stroke, which determines whether tPA can be given", "EEG — to check for seizures", "X-ray of the skull"],
+  correct: 1,
+  explain: "Non-contrast CT is the FIRST test in acute stroke. It's fast (minutes) and can immediately show hemorrhage (blood appears bright white). If no hemorrhage is seen, it's presumed ischemic and tPA may be given. You MUST rule out hemorrhage before tPA — giving a clot-buster to a hemorrhagic stroke would be fatal."
+}, {
+  id: "d07",
+  cat: "Neuro",
+  stem: "An EEG is ordered for a patient with suspected epilepsy. The purpose of this test is to:",
+  options: ["Visualize the brain structures", "Record the brain's electrical activity to identify abnormal patterns associated with seizure disorders", "Measure blood flow to the brain", "Test muscle function"],
+  correct: 1,
+  explain: "EEG records electrical activity of the brain via scalp electrodes. It can identify seizure foci (where seizures originate), classify seizure types, and help guide treatment. During a seizure, EEG shows excessive synchronized neuronal firing."
+}, {
+  id: "d08",
+  cat: "Cardiac",
+  stem: "A patient is scheduled for cardiac catheterization (angiogram). The nurse explains that this test will:",
+  options: ["Record the heart's electrical activity", "Inject contrast dye to directly visualize coronary artery blockages, and potentially treat them with stent placement during the same procedure", "Measure oxygen levels in the blood", "Take an X-ray of the chest"],
+  correct: 1,
+  explain: "Cardiac cath is the gold standard for visualizing coronary arteries. A catheter is threaded to the coronary arteries, dye is injected, and blockages are directly visualized. If a significant blockage is found, a stent can be placed during the same procedure (PCI — percutaneous coronary intervention)."
+}, {
+  id: "d09",
+  cat: "Neuro",
+  stem: "An EMG is ordered for a patient with progressive weakness. This test evaluates:",
+  options: ["Brain electrical activity", "Electrical activity of muscles and nerves to differentiate neuromuscular disorders", "Heart rhythm", "Kidney function"],
+  correct: 1,
+  explain: "EMG tests the electrical activity in muscles and the speed of nerve conduction. It helps determine if weakness is from a nerve problem (neuropathy, nerve compression) or a muscle problem (myopathy). Essential for diagnosing conditions like peripheral neuropathy, carpal tunnel, and ALS."
+}, {
+  id: "d10",
+  cat: "General",
+  stem: "A patient with suspected peripheral artery disease is scheduled for a peripheral angiogram. This test will:",
+  options: ["Measure blood pressure in the legs", "Inject contrast to visualize arterial blood flow in the extremities and identify blockages", "Record the electrical activity of leg muscles", "Ultrasound the veins for blood clots"],
+  correct: 1,
+  explain: "Peripheral angiography injects contrast into the arterial system of the legs to visualize blood flow and identify the location and severity of arterial blockages. It can guide decisions about surgical vs. medical management and may allow intervention (angioplasty/stenting) during the procedure."
+}, {
+  id: "d11",
+  cat: "Cardiac",
+  stem: "A patient's ECG shows ST-segment DEPRESSION during a stress test. This finding suggests:",
+  options: ["Normal cardiac response to exercise", "Myocardial ischemia — the heart muscle is not getting adequate blood flow during increased demand", "Hyperkalemia", "Atrial fibrillation"],
+  correct: 1,
+  explain: "ST depression during stress testing indicates myocardial ischemia — the coronary arteries can't supply enough blood during increased demand. At rest, supply may be adequate (normal resting ECG), but under stress the narrowed arteries can't keep up. This is the supply-demand mismatch that causes angina."
+}, {
+  id: "d12",
+  cat: "General",
+  stem: "A CT scan with contrast is ordered for a patient. Before the test, the nurse should assess for:",
+  options: ["History of seizures", "Allergy to iodine/shellfish and kidney function (contrast is nephrotoxic)", "Ability to hold breath for 30 minutes", "Whether the patient has eaten breakfast"],
+  correct: 1,
+  explain: "Contrast dye contains iodine — patients with iodine/shellfish allergies may have allergic reactions (ranging from mild to anaphylaxis). Contrast is also cleared by the kidneys and can be nephrotoxic, so kidney function (GFR, creatinine) must be assessed first. Patients with impaired renal function need pre-hydration or alternative imaging."
+}];
+const FOOD_QUESTIONS = [{
+  id: "f01",
+  cat: "Foods",
+  stem: "A patient with hyperkalemia should AVOID which foods?",
+  options: ["Apples, rice, white bread", "Bananas, oranges, potatoes, spinach", "Chicken breast, lettuce, grapes", "Pasta, berries, cucumber"],
+  correct: 1,
+  explain: "Bananas, oranges, potatoes, tomatoes, avocados, and spinach are HIGH in potassium. These must be avoided in hyperkalemia and often restricted in kidney disease."
+}, {
+  id: "f02",
+  cat: "Foods",
+  stem: "A patient with iron deficiency anemia should increase intake of:",
+  options: ["Dairy products and cheese", "Red meat, liver, spinach, beans, fortified cereals", "White bread and pasta", "Bananas and oranges"],
+  correct: 1,
+  explain: "Iron-rich foods: red meat (best absorbed — heme iron), liver, spinach, beans, lentils, fortified cereals. Pair with vitamin C to enhance absorption. Avoid taking with calcium/dairy (blocks absorption)."
+}, {
+  id: "f03",
+  cat: "Foods",
+  stem: "A patient with heart failure is told to limit sodium. Which meal is HIGHEST in sodium?",
+  options: ["Grilled chicken with steamed broccoli and brown rice", "Canned soup with deli turkey sandwich and pickles", "Fresh salmon with roasted vegetables", "Oatmeal with fresh berries"],
+  correct: 1,
+  explain: "Canned soup, deli meats, and pickles are all extremely high in sodium. Processed and pre-packaged foods are the biggest sodium sources. Fresh, home-cooked meals with herbs/spices instead of salt are the low-sodium alternative."
+}, {
+  id: "f04",
+  cat: "Foods",
+  stem: "A patient with B-12 deficiency asks what to eat. The nurse recommends:",
+  options: ["Fruits and vegetables only", "Meat, fish, poultry, eggs, dairy, fortified cereals", "Rice and beans", "Nuts and seeds"],
+  correct: 1,
+  explain: "B-12 is found almost exclusively in animal products. Vegans are at high risk for deficiency and may need supplements or fortified foods. Also at risk: elderly (decreased absorption) and those with pernicious anemia (lack intrinsic factor)."
+}, {
+  id: "f05",
+  cat: "Foods",
+  stem: "A patient with hypokalemia needs to increase potassium intake. Which snack is best?",
+  options: ["Apple slices with peanut butter", "A banana with a glass of orange juice", "White crackers with cheese", "A bowl of white rice"],
+  correct: 1,
+  explain: "Bananas and oranges are potassium powerhouses. Other high-K foods: potatoes, tomatoes, avocados, spinach, beans, dairy. Apples, rice, and white bread are LOW in potassium."
+}, {
+  id: "f06",
+  cat: "Foods",
+  stem: "A patient needs more calcium in their diet. Which food group is the RICHEST source?",
+  options: ["Grains and cereals", "Dairy — milk, yogurt, cheese", "Red meat and poultry", "Citrus fruits"],
+  correct: 1,
+  explain: "Dairy is the richest calcium source. Non-dairy alternatives: broccoli, kale, sardines (with bones), fortified orange juice, fortified plant milks. Important for bone health, muscle contraction, and nerve function."
+}];
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function RapidFireQuiz() {
+  const [mode, setMode] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [score, setScore] = useState({
+    correct: 0,
+    total: 0
+  });
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [timerOn, setTimerOn] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const timerRef = useRef(null);
+  const startQuiz = m => {
+    let pool;
+    if (m === "values") pool = shuffle(VALUES_QUESTIONS);else if (m === "purpose") pool = shuffle(PURPOSE_QUESTIONS);else if (m === "diagnostic") pool = shuffle(DIAGNOSTIC_QUESTIONS);else if (m === "foods") pool = shuffle(FOOD_QUESTIONS);else pool = shuffle([...VALUES_QUESTIONS, ...PURPOSE_QUESTIONS, ...DIAGNOSTIC_QUESTIONS, ...FOOD_QUESTIONS]);
+    setQuestions(pool);
+    setIdx(0);
+    setSelected(null);
+    setShowAnswer(false);
+    setScore({
+      correct: 0,
+      total: 0
+    });
+    setStreak(0);
+    setBestStreak(0);
+    setTimeLeft(15);
+    setMode(m);
+  };
+  useEffect(() => {
+    if (mode && timerOn && !showAnswer && questions.length > 0) {
+      setTimeLeft(15);
+      clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setShowAnswer(true);
+            setScore(s => ({
+              ...s,
+              total: s.total + 1
+            }));
+            setStreak(0);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [idx, mode, timerOn, showAnswer]);
+  const handleSelect = i => {
+    if (showAnswer) return;
+    clearInterval(timerRef.current);
+    setSelected(i);
+    setShowAnswer(true);
+    const q = questions[idx];
+    const isCorrect = i === q.correct;
+    setScore(s => ({
+      correct: s.correct + (isCorrect ? 1 : 0),
+      total: s.total + 1
+    }));
+    if (isCorrect) {
+      const ns = streak + 1;
+      setStreak(ns);
+      if (ns > bestStreak) setBestStreak(ns);
+    } else {
+      setStreak(0);
+    }
+  };
+  const nextQ = () => {
+    if (idx + 1 >= questions.length) {
+      setMode(null);
+      return;
+    }
+    setIdx(idx + 1);
+    setSelected(null);
+    setShowAnswer(false);
+  };
+  if (!mode) {
+    const pct = score.total > 0 ? Math.round(score.correct / score.total * 100) : null;
+    return React.createElement("div", {
+      style: {
+        fontFamily: font,
+        maxWidth: 520,
+        margin: "0 auto",
+        padding: 20
+      }
+    }, React.createElement("div", {
+      style: {
+        textAlign: "center",
+        marginBottom: 24
+      }
+    }, React.createElement("span", {
+      style: {
+        fontSize: 36
+      }
+    }, "\u26A1"), React.createElement("h1", {
+      style: {
+        fontSize: 22,
+        fontWeight: 800,
+        color: "#1E293B",
+        margin: "8px 0 4px"
+      }
+    }, "Rapid Fire"), React.createElement("p", {
+      style: {
+        fontSize: 13,
+        color: "#64748B",
+        margin: 0
+      }
+    }, "Lab Values \xB7 Test Purposes \xB7 Diagnostics \xB7 Foods")), pct !== null && React.createElement("div", {
+      style: {
+        textAlign: "center",
+        padding: 16,
+        borderRadius: 12,
+        background: pct >= 80 ? "#F0FDF4" : "#FFF7ED",
+        border: `1px solid ${pct >= 80 ? "#BBF7D0" : "#FED7AA"}`,
+        marginBottom: 20
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 24,
+        fontWeight: 800,
+        color: pct >= 80 ? "#166534" : "#9A3412"
+      }
+    }, pct, "%"), React.createElement("div", {
+      style: {
+        fontSize: 13,
+        color: "#475569"
+      }
+    }, score.correct, "/", score.total, " \xB7 Best streak: ", bestStreak, " \uD83D\uDD25")), React.createElement("div", {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 10
+      }
+    }, [{
+      key: "values",
+      icon: "📊",
+      label: "Lab Values",
+      desc: `${VALUES_QUESTIONS.length} Qs — Is it normal, high, or low?`,
+      color: "#2563EB"
+    }, {
+      key: "purpose",
+      icon: "🧪",
+      label: "Test Purposes",
+      desc: `${PURPOSE_QUESTIONS.length} Qs — What does this test measure?`,
+      color: "#7C3AED"
+    }, {
+      key: "diagnostic",
+      icon: "🏥",
+      label: "Diagnostic Tests",
+      desc: `${DIAGNOSTIC_QUESTIONS.length} Qs — Clinical application of ECG, CT, EEG & more`,
+      color: "#059669"
+    }, {
+      key: "foods",
+      icon: "🥗",
+      label: "Food Knowledge",
+      desc: `${FOOD_QUESTIONS.length} Qs — High/low sodium, potassium, iron, calcium, B12`,
+      color: "#D97706"
+    }, {
+      key: "all",
+      icon: "🔥",
+      label: "ALL — Full Rapid Fire",
+      desc: `${VALUES_QUESTIONS.length + PURPOSE_QUESTIONS.length + DIAGNOSTIC_QUESTIONS.length + FOOD_QUESTIONS.length} Qs — Everything shuffled together`,
+      color: "#DC2626"
+    }].map(opt => React.createElement("button", {
+      key: opt.key,
+      onClick: () => startQuiz(opt.key),
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        padding: "16px 18px",
+        borderRadius: 14,
+        border: `1.5px solid ${opt.color}25`,
+        background: "#fff",
+        cursor: "pointer",
+        textAlign: "left",
+        borderLeft: `4px solid ${opt.color}`
+      }
+    }, React.createElement("span", {
+      style: {
+        fontSize: 28
+      }
+    }, opt.icon), React.createElement("div", {
+      style: {
+        flex: 1
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 700,
+        color: "#1E293B"
+      }
+    }, opt.label), React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: "#64748B",
+        marginTop: 2
+      }
+    }, opt.desc))))), React.createElement("label", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginTop: 16,
+        justifyContent: "center",
+        cursor: "pointer"
+      }
+    }, React.createElement("input", {
+      type: "checkbox",
+      checked: timerOn,
+      onChange: e => setTimerOn(e.target.checked)
+    }), React.createElement("span", {
+      style: {
+        fontSize: 13,
+        color: "#475569"
+      }
+    }, "15-second timer per question")));
+  }
+  const q = questions[idx];
+  if (!q) {
+    setMode(null);
+    return null;
+  }
+  const pct = score.total > 0 ? Math.round(score.correct / score.total * 100) : 0;
+  const isCorrect = selected === q.correct;
+  const timedOut = showAnswer && selected === null;
+  return React.createElement("div", {
+    style: {
+      fontFamily: font,
+      maxWidth: 520,
+      margin: "0 auto",
+      padding: "12px 16px"
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8
+    }
+  }, React.createElement("button", {
+    onClick: () => setMode(null),
+    style: {
+      fontSize: 12,
+      color: "#64748B",
+      background: "none",
+      border: "1px solid #E2E8F0",
+      borderRadius: 6,
+      padding: "4px 10px",
+      cursor: "pointer"
+    }
+  }, "\u2190 Back"), React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, streak >= 3 && React.createElement("span", {
+    style: {
+      fontSize: 12,
+      fontWeight: 700,
+      color: "#D97706"
+    }
+  }, "\uD83D\uDD25 ", streak), React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: "#1E293B"
+    }
+  }, score.correct, "/", score.total), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94A3B8"
+    }
+  }, idx + 1, "/", questions.length))), timerOn && React.createElement("div", {
+    style: {
+      height: 4,
+      background: "#E2E8F0",
+      borderRadius: 2,
+      marginBottom: 12,
+      overflow: "hidden"
+    }
+  }, React.createElement("div", {
+    style: {
+      height: "100%",
+      borderRadius: 2,
+      transition: showAnswer ? "none" : "width 1s linear",
+      width: showAnswer ? `${timeLeft / 15 * 100}%` : `${timeLeft / 15 * 100}%`,
+      background: timeLeft <= 5 ? "#DC2626" : timeLeft <= 10 ? "#D97706" : "#059669"
+    }
+  })), React.createElement("div", {
+    style: {
+      padding: 24,
+      background: "#fff",
+      borderRadius: 16,
+      border: "1.5px solid #E2E8F0",
+      marginBottom: 12
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: "#94A3B8",
+      textTransform: "uppercase",
+      letterSpacing: "0.05em",
+      marginBottom: 8
+    }
+  }, q.cat), React.createElement("p", {
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: "#1E293B",
+      lineHeight: 1.4,
+      margin: "0 0 20px"
+    }
+  }, q.stem), React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, q.options.map((opt, i) => {
+    let bg = selected === i ? "#EEF2FF" : "#FAFAFA";
+    let border = selected === i ? "#818CF8" : "#E2E8F0";
+    let textColor = "#334155";
+    if (showAnswer) {
+      if (i === q.correct) {
+        bg = "#F0FDF4";
+        border = "#22C55E";
+        textColor = "#166534";
+      } else if (selected === i) {
+        bg = "#FEF2F2";
+        border = "#EF4444";
+        textColor = "#991B1B";
+      } else {
+        bg = "#FAFAFA";
+        border = "#E2E8F0";
+        textColor = "#94A3B8";
+      }
+    }
+    return React.createElement("button", {
+      key: i,
+      onClick: () => handleSelect(i),
+      style: {
+        padding: "14px 16px",
+        borderRadius: 12,
+        border: `2px solid ${border}`,
+        background: bg,
+        cursor: showAnswer ? "default" : "pointer",
+        fontSize: 15,
+        fontWeight: 600,
+        color: textColor,
+        textAlign: "left",
+        transition: "all 0.15s"
+      }
+    }, showAnswer && i === q.correct && "✓ ", opt);
+  })), showAnswer && React.createElement("div", {
+    style: {
+      marginTop: 16,
+      padding: 14,
+      borderRadius: 10,
+      background: timedOut ? "#FEF2F2" : isCorrect ? "#F0FDF4" : "#FFF7ED",
+      border: `1px solid ${timedOut ? "#FECACA" : isCorrect ? "#BBF7D0" : "#FED7AA"}`
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: timedOut ? "#991B1B" : isCorrect ? "#166534" : "#9A3412",
+      marginBottom: 4
+    }
+  }, timedOut ? "⏰ Time's up!" : isCorrect ? "✅ Correct!" : "❌ Not quite"), q.normal && React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#475569",
+      marginBottom: 4
+    }
+  }, "Normal: ", React.createElement("strong", null, q.normal)), React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: 13,
+      color: "#334155",
+      lineHeight: 1.6
+    }
+  }, q.explain)), showAnswer && React.createElement("button", {
+    onClick: nextQ,
+    style: {
+      marginTop: 14,
+      width: "100%",
+      padding: "12px",
+      borderRadius: 10,
+      border: "none",
+      background: "#1E293B",
+      color: "#fff",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: "pointer"
+    }
+  }, idx + 1 < questions.length ? "Next →" : "See Results →")));
+}
+const rootEl = document.getElementById("root");
+rootEl.innerHTML = "";
+ReactDOM.createRoot(rootEl).render(React.createElement(RapidFireQuiz, null));
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

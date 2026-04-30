@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NURS 308 Advanced Mock Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #F8FAFC;
+    color: #1E293B;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  #root { min-height: 100vh; padding: 20px 0 60px; }
+  .boot-msg {
+    max-width: 600px; margin: 60px auto; padding: 24px;
+    text-align: center; color: #64748B; font-size: 14px;
+  }
+  .boot-err {
+    background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B;
+    border-radius: 12px; padding: 16px; margin: 24px auto; max-width: 600px;
+    font-size: 13px; text-align: left; white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div class="boot-msg" style="font-size:18px;color:#1E293B;">Loading mock exam…</div>
+</div>
+
+<script>
+window.addEventListener('error', function(e) {
+  var root = document.getElementById('root');
+  if (root) root.innerHTML = '<div class="boot-err"><b>JS error:</b><br>' +
+    ((e.message || e) + '\n' + (e.filename || '') + ':' + (e.lineno || '')) + '</div>';
+});
+</script>
+
+<!-- React (local copies — no CDN dependency) -->
+<script src="react.production.min.js"></script>
+<script src="react-dom.production.min.js"></script>
+
+<!-- Question bank (sets window.NURS308_ADVANCED_BANK) -->
+<script src="nurs308-advanced-exam-bank.js"></script>
+
+<!-- Mock Exam Component -->
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+const CHAPTERS = {
+  0: {
+    label: "Multi-System / Cross-Chapter",
+    color: "#475569"
+  },
+  1: {
+    label: "Ch 1: Intro & Cellular",
+    color: "#6D28D9"
+  },
+  2: {
+    label: "Ch 2: Inflammation & Immunity",
+    color: "#0D9488"
+  },
+  3: {
+    label: "Ch 3: Hematopoietic",
+    color: "#DC2626"
+  },
+  4: {
+    label: "Ch 4: Cardiovascular",
+    color: "#2563EB"
+  },
+  5: {
+    label: "Ch 5: Respiratory",
+    color: "#D97706"
+  },
+  6: {
+    label: "Ch 6: Fluids & ABGs",
+    color: "#059669"
+  },
+  7: {
+    label: "Ch 7: Urinary",
+    color: "#7C3AED"
+  },
+  9: {
+    label: "Ch 9: GI",
+    color: "#B45309"
+  },
+  10: {
+    label: "Ch 10: Endocrine & DM",
+    color: "#BE185D"
+  },
+  11: {
+    label: "Ch 11: Neuro",
+    color: "#4338CA"
+  }
+};
+const font = "'DM Sans', system-ui, sans-serif";
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function Timer({
+  startTime,
+  durationMs,
+  onExpire
+}) {
+  const [remaining, setRemaining] = useState(durationMs);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const left = Math.max(0, durationMs - elapsed);
+      setRemaining(left);
+      if (left <= 0) {
+        clearInterval(interval);
+        onExpire && onExpire();
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTime, durationMs]);
+  const hrs = Math.floor(remaining / 3600000);
+  const mins = Math.floor(remaining % 3600000 / 60000);
+  const secs = Math.floor(remaining % 60000 / 1000);
+  const isLow = remaining < 600000;
+  return React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      fontVariantNumeric: "tabular-nums",
+      color: isLow ? "#DC2626" : "#475569"
+    }
+  }, hrs, ":", String(mins).padStart(2, "0"), ":", String(secs).padStart(2, "0"));
+}
+function OrderingInput({
+  options,
+  value,
+  onChange,
+  disabled
+}) {
+  const [dragIdx, setDragIdx] = useState(null);
+  const moveItem = (from, to) => {
+    const next = [...value];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  };
+  return React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 6
+    }
+  }, React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#7C3AED",
+      fontWeight: 600,
+      margin: "0 0 4px"
+    }
+  }, "Drag to reorder, or use the arrows"), value.map((optIdx, pos) => React.createElement("div", {
+    key: optIdx,
+    draggable: !disabled,
+    onDragStart: () => setDragIdx(pos),
+    onDragOver: e => e.preventDefault(),
+    onDrop: () => {
+      if (dragIdx !== null && dragIdx !== pos) moveItem(dragIdx, pos);
+      setDragIdx(null);
+    },
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "10px 12px",
+      borderRadius: 10,
+      background: disabled ? "#F8FAFC" : dragIdx === pos ? "#EEF2FF" : "#fff",
+      border: `1.5px solid ${dragIdx === pos ? "#818CF8" : "#E2E8F0"}`,
+      cursor: disabled ? "default" : "grab",
+      transition: "all 0.15s"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 800,
+      color: "#94A3B8",
+      minWidth: 20
+    }
+  }, pos + 1), React.createElement("span", {
+    style: {
+      flex: 1,
+      fontSize: 14,
+      color: "#334155",
+      lineHeight: 1.5
+    }
+  }, options[optIdx]), !disabled && React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2
+    }
+  }, React.createElement("button", {
+    disabled: pos === 0,
+    onClick: () => moveItem(pos, pos - 1),
+    style: {
+      fontSize: 10,
+      padding: "2px 6px",
+      borderRadius: 4,
+      border: "1px solid #E2E8F0",
+      background: "#fff",
+      cursor: pos === 0 ? "default" : "pointer",
+      color: pos === 0 ? "#CBD5E1" : "#475569"
+    }
+  }, "\u25B2"), React.createElement("button", {
+    disabled: pos === value.length - 1,
+    onClick: () => moveItem(pos, pos + 1),
+    style: {
+      fontSize: 10,
+      padding: "2px 6px",
+      borderRadius: 4,
+      border: "1px solid #E2E8F0",
+      background: "#fff",
+      cursor: pos === value.length - 1 ? "default" : "pointer",
+      color: pos === value.length - 1 ? "#CBD5E1" : "#475569"
+    }
+  }, "\u25BC")))));
+}
+function MockExam() {
+  const [mode, setMode] = useState("setup");
+  const [questions, setQuestions] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [examConfig, setExamConfig] = useState({
+    timed: true,
+    reviewMode: false,
+    chapters: "all"
+  });
+  const [flagged, setFlagged] = useState(new Set());
+  const q = questions[idx];
+  if (mode === "setup") {
+    return React.createElement("div", {
+      style: {
+        fontFamily: font,
+        maxWidth: 600,
+        margin: "0 auto",
+        padding: 24
+      }
+    }, React.createElement("div", {
+      style: {
+        textAlign: "center",
+        marginBottom: 32
+      }
+    }, React.createElement("h1", {
+      style: {
+        fontSize: 24,
+        fontWeight: 800,
+        color: "#1E293B",
+        margin: "0 0 4px"
+      }
+    }, "NURS 308 Advanced Mock Exam"), React.createElement("p", {
+      style: {
+        fontSize: 14,
+        color: "#64748B",
+        margin: 0
+      }
+    }, "Pathophysiology \xB7 USC Upstate \xB7 Spring 2026")), React.createElement("div", {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 16
+      }
+    }, React.createElement("div", {
+      style: {
+        padding: 20,
+        borderRadius: 14,
+        border: "1px solid #E2E8F0",
+        background: "#fff"
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: "#475569",
+        marginBottom: 10
+      }
+    }, "EXAM MODE"), React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 8,
+        flexWrap: "wrap"
+      }
+    }, [{
+      key: "full",
+      label: "Full Advanced Exam (57 Qs, 2 hrs)",
+      desc: "All scenario-based questions"
+    }, {
+      key: "quick",
+      label: "Quick 25 (Random)",
+      desc: "Fast practice"
+    }].map(opt => React.createElement("button", {
+      key: opt.key,
+      onClick: () => setExamConfig(p => ({
+        ...p,
+        chapters: opt.key
+      })),
+      style: {
+        flex: "1 1 45%",
+        padding: "12px 14px",
+        borderRadius: 10,
+        textAlign: "left",
+        border: `2px solid ${examConfig.chapters === opt.key ? "#6D28D9" : "#E2E8F0"}`,
+        background: examConfig.chapters === opt.key ? "#F5F3FF" : "#fff",
+        cursor: "pointer"
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: examConfig.chapters === opt.key ? "#6D28D9" : "#1E293B"
+      }
+    }, opt.label), React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "#94A3B8",
+        marginTop: 2
+      }
+    }, opt.desc))))), React.createElement("div", {
+      style: {
+        padding: 20,
+        borderRadius: 14,
+        border: "1px solid #E2E8F0",
+        background: "#fff"
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: "#475569",
+        marginBottom: 10
+      }
+    }, "OPTIONS"), React.createElement("label", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        cursor: "pointer",
+        marginBottom: 8
+      }
+    }, React.createElement("input", {
+      type: "checkbox",
+      checked: examConfig.timed,
+      onChange: e => setExamConfig(p => ({
+        ...p,
+        timed: e.target.checked
+      }))
+    }), React.createElement("span", {
+      style: {
+        fontSize: 14,
+        color: "#334155"
+      }
+    }, "Timed (3 hours for full exam)")), React.createElement("label", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        cursor: "pointer"
+      }
+    }, React.createElement("input", {
+      type: "checkbox",
+      checked: examConfig.reviewMode,
+      onChange: e => setExamConfig(p => ({
+        ...p,
+        reviewMode: e.target.checked
+      }))
+    }), React.createElement("span", {
+      style: {
+        fontSize: 14,
+        color: "#334155"
+      }
+    }, "Study mode (show rationale after each question)"))), React.createElement("div", {
+      style: {
+        padding: 14,
+        borderRadius: 10,
+        background: "#F8FAFC",
+        border: "1px solid #E2E8F0",
+        fontSize: 13,
+        color: "#64748B",
+        textAlign: "center"
+      }
+    }, examConfig.chapters === "full" && "57 questions · Scenario-based · ~2 min per question", examConfig.chapters === "quick" && "25 random questions · Quick practice"), React.createElement("button", {
+      onClick: () => {
+        let pool;
+        if (examConfig.chapters === "chapters1-7") pool = NURS308_ADVANCED_BANK.filter(q => q.chapter <= 7);else if (examConfig.chapters === "chapters9-11") pool = NURS308_ADVANCED_BANK.filter(q => q.chapter >= 9);else if (examConfig.chapters === "quick") pool = shuffle(NURS308_ADVANCED_BANK).slice(0, 25);else pool = [...NURS308_ADVANCED_BANK];
+        setQuestions(shuffle(pool));
+        setAnswers({});
+        setIdx(0);
+        setShowAnswer(false);
+        setFlagged(new Set());
+        setStartTime(Date.now());
+        setMode("exam");
+      },
+      style: {
+        padding: "16px 24px",
+        borderRadius: 12,
+        border: "none",
+        background: "#6D28D9",
+        color: "#fff",
+        fontWeight: 700,
+        fontSize: 16,
+        cursor: "pointer",
+        transition: "all 0.15s"
+      }
+    }, "Start Exam \u2192")));
+  }
+  if (mode === "results") {
+    const total = questions.length;
+    const results = questions.map(q => {
+      const ans = answers[q.id];
+      if (ans == null) return {
+        q,
+        correct: false,
+        answered: false
+      };
+      if (q.type === "mc") return {
+        q,
+        correct: ans === q.correct,
+        answered: true
+      };
+      if (q.type === "sata") {
+        const correctSet = new Set(q.correct);
+        const ansSet = new Set(ans);
+        return {
+          q,
+          correct: correctSet.size === ansSet.size && [...correctSet].every(c => ansSet.has(c)),
+          answered: true
+        };
+      }
+      if (q.type === "ordering") {
+        return {
+          q,
+          correct: JSON.stringify(ans) === JSON.stringify(q.correct),
+          answered: true
+        };
+      }
+      return {
+        q,
+        correct: false,
+        answered: true
+      };
+    });
+    const correctCount = results.filter(r => r.correct).length;
+    const answeredCount = results.filter(r => r.answered).length;
+    const pct = total > 0 ? Math.round(correctCount / total * 100) : 0;
+    const byChapter = {};
+    results.forEach(r => {
+      const ch = r.q.chapter;
+      if (!byChapter[ch]) byChapter[ch] = {
+        total: 0,
+        correct: 0
+      };
+      byChapter[ch].total++;
+      if (r.correct) byChapter[ch].correct++;
+    });
+    return React.createElement("div", {
+      style: {
+        fontFamily: font,
+        maxWidth: 700,
+        margin: "0 auto",
+        padding: 24
+      }
+    }, React.createElement("div", {
+      style: {
+        textAlign: "center",
+        marginBottom: 24
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 48,
+        marginBottom: 8
+      }
+    }, pct >= 80 ? "🎉" : pct >= 60 ? "📚" : "💪"), React.createElement("h2", {
+      style: {
+        margin: "0 0 4px",
+        fontSize: 24,
+        fontWeight: 800
+      }
+    }, "Exam Complete"), React.createElement("p", {
+      style: {
+        fontSize: 28,
+        fontWeight: 800,
+        color: pct >= 80 ? "#059669" : pct >= 60 ? "#D97706" : "#DC2626",
+        margin: "8px 0"
+      }
+    }, pct, "%"), React.createElement("p", {
+      style: {
+        fontSize: 14,
+        color: "#64748B"
+      }
+    }, correctCount, " correct out of ", answeredCount, " answered (", total, " total)")), results.filter(r => !r.correct && r.answered).length > 0 && React.createElement("div", {
+      style: {
+        marginBottom: 24
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: "#DC2626",
+        marginBottom: 8
+      }
+    }, "\u274C Missed Questions (", results.filter(r => !r.correct && r.answered).length, ")"), React.createElement("div", {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 6
+      }
+    }, results.filter(r => !r.correct && r.answered).map((r, i) => React.createElement("button", {
+      key: r.q.id,
+      onClick: () => {
+        setIdx(questions.indexOf(r.q));
+        setShowAnswer(true);
+        setMode("review");
+      },
+      style: {
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10,
+        padding: "10px 12px",
+        borderRadius: 8,
+        border: "1px solid #FECACA",
+        background: "#FEF2F2",
+        cursor: "pointer",
+        textAlign: "left"
+      }
+    }, React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        color: "#DC2626",
+        minWidth: 20
+      }
+    }, i + 1), React.createElement("span", {
+      style: {
+        fontSize: 12,
+        color: "#334155",
+        lineHeight: 1.4
+      }
+    }, r.q.stem.slice(0, 100), "..."))))), React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 10,
+        flexWrap: "wrap"
+      }
+    }, React.createElement("button", {
+      onClick: () => {
+        setMode("review");
+        setIdx(0);
+        setShowAnswer(true);
+      },
+      style: {
+        flex: 1,
+        padding: "14px",
+        borderRadius: 10,
+        border: "none",
+        background: "#2563EB",
+        color: "#fff",
+        fontWeight: 700,
+        fontSize: 14,
+        cursor: "pointer"
+      }
+    }, "Review All Answers"), React.createElement("button", {
+      onClick: () => setMode("setup"),
+      style: {
+        flex: 1,
+        padding: "14px",
+        borderRadius: 10,
+        border: "1px solid #E2E8F0",
+        background: "#fff",
+        color: "#475569",
+        fontWeight: 600,
+        fontSize: 14,
+        cursor: "pointer"
+      }
+    }, "New Exam")));
+  }
+  if (!q) {
+    setMode("results");
+    return null;
+  }
+  const chInfo = CHAPTERS[q.chapter];
+  const isReview = mode === "review";
+  const currentAnswer = answers[q.id];
+  const isFlagged = flagged.has(q.id);
+  const durationMs = examConfig.chapters === "full" ? 7200000 : 2700000;
+  const checkAnswer = () => {
+    if (currentAnswer == null) return;
+    if (examConfig.reviewMode || isReview) {
+      setShowAnswer(true);
+      return;
+    }
+    if (idx < questions.length - 1) setIdx(idx + 1);else setMode("results");
+  };
+  const isCorrect = () => {
+    if (!showAnswer || currentAnswer == null) return null;
+    if (q.type === "mc") return currentAnswer === q.correct;
+    if (q.type === "sata") {
+      const cs = new Set(q.correct);
+      const as = new Set(currentAnswer);
+      return cs.size === as.size && [...cs].every(c => as.has(c));
+    }
+    if (q.type === "ordering") return JSON.stringify(currentAnswer) === JSON.stringify(q.correct);
+    return false;
+  };
+  const goNext = () => {
+    setShowAnswer(false);
+    if (idx < questions.length - 1) setIdx(idx + 1);else setMode("results");
+  };
+  return React.createElement("div", {
+    style: {
+      fontFamily: font,
+      maxWidth: 700,
+      margin: "0 auto",
+      padding: "12px 16px"
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12
+    }
+  }, React.createElement("div", null, React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: "#1E293B"
+    }
+  }, isReview ? "Review" : "Mock Exam"), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94A3B8",
+      marginLeft: 8
+    }
+  }, idx + 1, " / ", questions.length)), React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, examConfig.timed && !isReview && startTime && React.createElement(Timer, {
+    startTime: startTime,
+    durationMs: durationMs,
+    onExpire: () => setMode("results")
+  }), !isReview && React.createElement("button", {
+    onClick: () => setMode("results"),
+    style: {
+      fontSize: 12,
+      color: "#64748B",
+      background: "none",
+      border: "1px solid #E2E8F0",
+      borderRadius: 6,
+      padding: "4px 10px",
+      cursor: "pointer"
+    }
+  }, "End Exam"))), React.createElement("div", {
+    style: {
+      height: 4,
+      background: "#E2E8F0",
+      borderRadius: 2,
+      marginBottom: 16
+    }
+  }, React.createElement("div", {
+    style: {
+      height: "100%",
+      width: `${(idx + 1) / questions.length * 100}%`,
+      background: chInfo && chInfo.color || "#6D28D9",
+      borderRadius: 2,
+      transition: "width 0.3s"
+    }
+  })), React.createElement("div", {
+    style: {
+      padding: 20,
+      background: "#fff",
+      borderRadius: 16,
+      border: `1.5px solid ${chInfo && chInfo.color || "#6D28D9"}20`,
+      marginBottom: 12
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      marginBottom: 12,
+      flexWrap: "wrap",
+      alignItems: "center"
+    }
+  }, React.createElement("span", {
+    style: {
+      padding: "3px 10px",
+      borderRadius: 6,
+      background: (chInfo && chInfo.color || "#6D28D9") + "15",
+      fontSize: 11,
+      fontWeight: 700,
+      color: chInfo && chInfo.color || "#6D28D9"
+    }
+  }, chInfo && chInfo.label || `Chapter ${q.chapter}`), React.createElement("span", {
+    style: {
+      padding: "3px 8px",
+      borderRadius: 6,
+      background: "#F1F5F9",
+      fontSize: 11,
+      fontWeight: 600,
+      color: "#475569"
+    }
+  }, q.type === "mc" ? "Multiple Choice" : q.type === "sata" ? "Select All That Apply" : "Ordering"), React.createElement("button", {
+    onClick: () => setFlagged(prev => {
+      const n = new Set(prev);
+      n.has(q.id) ? n.delete(q.id) : n.add(q.id);
+      return n;
+    }),
+    style: {
+      marginLeft: "auto",
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      fontSize: 16
+    }
+  }, isFlagged ? "🚩" : "⚐")), React.createElement("p", {
+    style: {
+      fontSize: 15,
+      fontWeight: 600,
+      color: "#1E293B",
+      lineHeight: 1.7,
+      margin: "0 0 16px"
+    }
+  }, q.stem), q.type === "mc" && React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, q.options.map((opt, i) => {
+    const sel = currentAnswer === i;
+    const isCorr = i === q.correct;
+    let bg = sel ? "#EEF2FF" : "#FAFAFA";
+    let border = sel ? "#818CF8" : "#E2E8F0";
+    if (showAnswer) {
+      if (isCorr) {
+        bg = "#F0FDF4";
+        border = "#22C55E";
+      } else if (sel && !isCorr) {
+        bg = "#FEF2F2";
+        border = "#EF4444";
+      } else {
+        bg = "#FAFAFA";
+        border = "#E2E8F0";
+      }
+    }
+    return React.createElement("button", {
+      key: i,
+      onClick: () => {
+        if (!showAnswer) setAnswers(p => ({
+          ...p,
+          [q.id]: i
+        }));
+      },
+      style: {
+        padding: "12px 14px",
+        borderRadius: 10,
+        border: `1.5px solid ${border}`,
+        background: bg,
+        cursor: showAnswer ? "default" : "pointer",
+        textAlign: "left",
+        fontSize: 14,
+        color: "#334155",
+        lineHeight: 1.5,
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10
+      }
+    }, React.createElement("span", {
+      style: {
+        minWidth: 22,
+        height: 22,
+        borderRadius: 11,
+        border: `2px solid ${sel ? "#818CF8" : "#CBD5E1"}`,
+        background: sel ? "#818CF8" : "transparent",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 10,
+        color: "#fff",
+        fontWeight: 700,
+        flexShrink: 0,
+        marginTop: 1
+      }
+    }, sel && "✓"), opt);
+  })), q.type === "sata" && React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#7C3AED",
+      fontWeight: 600,
+      margin: "-8px 0 8px"
+    }
+  }, "Select ALL that apply"), q.options.map((opt, i) => {
+    const selected = (currentAnswer || []).includes(i);
+    const isCorr = q.correct.includes(i);
+    let bg = selected ? "#EEF2FF" : "#FAFAFA";
+    let border = selected ? "#818CF8" : "#E2E8F0";
+    if (showAnswer) {
+      if (isCorr && selected) {
+        bg = "#F0FDF4";
+        border = "#22C55E";
+      } else if (isCorr && !selected) {
+        bg = "#FFFBEB";
+        border = "#F59E0B";
+      } else if (!isCorr && selected) {
+        bg = "#FEF2F2";
+        border = "#EF4444";
+      } else {
+        bg = "#FAFAFA";
+        border = "#E2E8F0";
+      }
+    }
+    return React.createElement("button", {
+      key: i,
+      onClick: () => {
+        if (showAnswer) return;
+        setAnswers(p => {
+          const curr = p[q.id] || [];
+          return {
+            ...p,
+            [q.id]: curr.includes(i) ? curr.filter(x => x !== i) : [...curr, i]
+          };
+        });
+      },
+      style: {
+        padding: "12px 14px",
+        borderRadius: 10,
+        border: `1.5px solid ${border}`,
+        background: bg,
+        cursor: showAnswer ? "default" : "pointer",
+        textAlign: "left",
+        fontSize: 14,
+        color: "#334155",
+        lineHeight: 1.5,
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10
+      }
+    }, React.createElement("span", {
+      style: {
+        minWidth: 22,
+        height: 22,
+        borderRadius: 4,
+        border: `2px solid ${selected ? "#818CF8" : "#CBD5E1"}`,
+        background: selected ? "#818CF8" : "transparent",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 10,
+        color: "#fff",
+        fontWeight: 700,
+        flexShrink: 0,
+        marginTop: 1
+      }
+    }, selected && "✓"), opt, showAnswer && isCorr && !selected && React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: "#D97706",
+        fontWeight: 600,
+        marginLeft: "auto"
+      }
+    }, "\u2190 missed"));
+  })), q.type === "ordering" && React.createElement(OrderingInput, {
+    options: q.options,
+    value: currentAnswer || q.options.map((_, i) => i),
+    onChange: newOrder => setAnswers(p => ({
+      ...p,
+      [q.id]: newOrder
+    })),
+    disabled: showAnswer
+  }), showAnswer && React.createElement("div", {
+    style: {
+      marginTop: 16,
+      padding: 16,
+      borderRadius: 12,
+      background: isCorrect() ? "#F0FDF4" : "#FFF7ED",
+      border: `1px solid ${isCorrect() ? "#BBF7D0" : "#FED7AA"}`
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: isCorrect() ? "#166534" : "#9A3412",
+      marginBottom: 6
+    }
+  }, isCorrect() ? "✅ Correct!" : "❌ Incorrect"), React.createElement("p", {
+    style: {
+      margin: "0 0 8px",
+      fontSize: 13,
+      color: "#334155",
+      lineHeight: 1.7
+    }
+  }, q.rationale), React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#94A3B8",
+      fontStyle: "italic"
+    }
+  }, "Objective: ", q.objective)), React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginTop: 16
+    }
+  }, !showAnswer ? React.createElement("button", {
+    onClick: checkAnswer,
+    disabled: currentAnswer == null,
+    style: {
+      flex: 1,
+      padding: "12px",
+      borderRadius: 10,
+      border: "none",
+      background: currentAnswer == null ? "#E2E8F0" : chInfo && chInfo.color || "#6D28D9",
+      color: currentAnswer == null ? "#94A3B8" : "#fff",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: currentAnswer == null ? "default" : "pointer"
+    }
+  }, examConfig.reviewMode || isReview ? "Check Answer" : "Next →") : React.createElement("button", {
+    onClick: goNext,
+    style: {
+      flex: 1,
+      padding: "12px",
+      borderRadius: 10,
+      border: "none",
+      background: chInfo && chInfo.color || "#6D28D9",
+      color: "#fff",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: "pointer"
+    }
+  }, idx < questions.length - 1 ? "Next Question →" : "See Results →"))), React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 3,
+      justifyContent: "center",
+      marginTop: 8
+    }
+  }, questions.map((_, i) => {
+    const ans = answers[questions[i].id];
+    const isAnswered = ans != null;
+    const isCurrent = i === idx;
+    const isFl = flagged.has(questions[i].id);
+    return React.createElement("button", {
+      key: i,
+      onClick: () => {
+        setIdx(i);
+        setShowAnswer(isReview);
+      },
+      style: {
+        width: 18,
+        height: 18,
+        borderRadius: 4,
+        border: "none",
+        cursor: "pointer",
+        fontSize: 8,
+        fontWeight: 700,
+        background: isCurrent ? chInfo && chInfo.color || "#6D28D9" : isAnswered ? "#CBD5E1" : "#F1F5F9",
+        color: isCurrent ? "#fff" : isAnswered ? "#fff" : "#94A3B8",
+        position: "relative"
+      }
+    }, isFl && React.createElement("span", {
+      style: {
+        position: "absolute",
+        top: -3,
+        right: -3,
+        fontSize: 8
+      }
+    }, "\uD83D\uDEA9"), i + 1);
+  })));
+}
+const rootEl = document.getElementById("root");
+rootEl.innerHTML = "";
+if (!window.NURS308_ADVANCED_BANK || !Array.isArray(window.NURS308_ADVANCED_BANK)) {
+  rootEl.innerHTML = '<div class="boot-err">Failed to load exam bank (nurs308-advanced-exam-bank.js).</div>';
+} else {
+  ReactDOM.createRoot(rootEl).render(React.createElement(MockExam, null));
+}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>

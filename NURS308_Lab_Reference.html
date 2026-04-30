@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NURS 308 Lab Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #F8FAFC;
+    color: #1E293B;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  #root { min-height: 100vh; padding: 20px 0 60px; }
+  .boot-msg { max-width: 600px; margin: 60px auto; padding: 24px; text-align: center; color: #1E293B; font-size: 18px; }
+  .boot-err { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 12px; padding: 16px; margin: 24px auto; max-width: 600px; font-size: 13px; text-align: left; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div class="boot-msg">Loading…</div>
+</div>
+
+<script>
+window.addEventListener('error', function(e) {
+  var root = document.getElementById('root');
+  if (root) root.innerHTML = '<div class="boot-err"><b>JS error:</b><br>' + ((e.message || e) + '\n' + (e.filename || '') + ':' + (e.lineno || '')) + '</div>';
+});
+</script>
+
+<script src="react.production.min.js"></script>
+<script src="react-dom.production.min.js"></script>
+
+<script>
+const { useState, useEffect, useRef } = React;
+const font = "'DM Sans', system-ui, sans-serif";
+const categories = [{
+  title: "Electrolytes",
+  icon: "⚡",
+  color: "#2563EB",
+  items: [{
+    name: "Sodium (Na+)",
+    value: "135–145 mEq/L",
+    note: "Major extracellular cation. Regulates fluid balance. Where Na+ goes, water follows.",
+    high: "Hypernatremia: thirst, dry mucous membranes, confusion",
+    low: "Hyponatremia: confusion, seizures, cerebral edema"
+  }, {
+    name: "Potassium (K+)",
+    value: "3.5–5.0 mEq/L",
+    note: "Major intracellular cation. Critical for cardiac rhythm & muscle contraction.",
+    high: "Hyperkalemia: peaked T waves → wide QRS → V-fib/asystole. EMERGENCY at >6.0",
+    low: "Hypokalemia: flattened T waves, U waves, muscle weakness, dysrhythmias"
+  }, {
+    name: "Calcium (Ca²+)",
+    value: "8.5–10.5 mg/dL",
+    note: "Bone health, muscle contraction, nerve function, clotting.",
+    high: "Hypercalcemia: 'bones, stones, groans, moans' — bone pain, kidney stones, constipation, confusion",
+    low: "Hypocalcemia: tetany, Trousseau's sign, Chvostek's sign, numbness/tingling"
+  }]
+}, {
+  title: "Hematology (CBC)",
+  icon: "🩸",
+  color: "#DC2626",
+  items: [{
+    name: "WBC (White Blood Cells)",
+    value: "5,000–10,000/mm³",
+    note: "Infection & immunity. Elevated = infection/inflammation. Low = immunocompromised."
+  }, {
+    name: "WBC Differential — Neutrophils",
+    value: "55–70%",
+    note: "First responders. Elevated in bacterial infection. 'Left shift' = immature bands released."
+  }, {
+    name: "WBC Differential — Lymphocytes",
+    value: "20–40%",
+    note: "Adaptive immunity (T cells, B cells). Elevated in viral infections."
+  }, {
+    name: "WBC Differential — Monocytes",
+    value: "2–8%",
+    note: "Become macrophages. Chronic inflammation & cleanup."
+  }, {
+    name: "WBC Differential — Eosinophils",
+    value: "1–4%",
+    note: "Elevated in parasitic infections & allergic reactions."
+  }, {
+    name: "WBC Differential — Basophils",
+    value: "0.5–1%",
+    note: "Release histamine & heparin. Role in allergic responses."
+  }, {
+    name: "Hemoglobin (Hgb)",
+    value: "14 g/dL",
+    note: "Oxygen-carrying protein in RBCs. Low = anemia."
+  }, {
+    name: "Hematocrit (HCT)",
+    value: "45%",
+    note: "% of blood volume that is RBCs. Roughly 3× the hemoglobin."
+  }, {
+    name: "Platelets",
+    value: "150,000–400,000/mm³",
+    note: "Hemostasis. Low (<150K) = thrombocytopenia → bleeding risk. <50K = significant risk. <20K = spontaneous bleeding."
+  }]
+}, {
+  title: "ABGs (Arterial Blood Gases)",
+  icon: "🫁",
+  color: "#059669",
+  items: [{
+    name: "pH",
+    value: "7.35–7.45",
+    note: "<7.35 = acidosis. >7.45 = alkalosis. Life incompatible below 6.8 or above 7.8."
+  }, {
+    name: "PaCO₂",
+    value: "35–45 mmHg",
+    note: "Respiratory component. High = respiratory acidosis (retaining CO₂). Low = respiratory alkalosis (blowing off CO₂)."
+  }, {
+    name: "HCO₃⁻ (Bicarbonate)",
+    value: "22–26 mEq/L",
+    note: "Metabolic component. High = metabolic alkalosis. Low = metabolic acidosis."
+  }, {
+    name: "PaO₂",
+    value: "80–100 mmHg",
+    note: "Oxygen level in arterial blood. <80 = hypoxemia. <60 = severe, may need supplemental O₂."
+  }]
+}, {
+  title: "Glucose & Diabetes",
+  icon: "🍬",
+  color: "#D97706",
+  items: [{
+    name: "Fasting Blood Sugar (FBS)",
+    value: "70–100 mg/dL",
+    note: "100–125 = pre-diabetes. ≥126 on two occasions = diabetes."
+  }, {
+    name: "Random Blood Sugar",
+    value: "< 200 mg/dL",
+    note: "≥200 with symptoms = diabetes. No fasting required."
+  }, {
+    name: "HbA1c (Glycosylated Hgb)",
+    value: "< 5.7% normal\n5.7–6.4% pre-DM\n≥ 6.5% diabetes",
+    note: "Average glucose over 2–3 months (RBC lifespan). Goal for diabetics: <7%."
+  }]
+}, {
+  title: "Lipids / Cholesterol",
+  icon: "🫀",
+  color: "#7C3AED",
+  items: [{
+    name: "Total Cholesterol",
+    value: "< 200 mg/dL desirable",
+    note: "200–239 = borderline high. ≥240 = high."
+  }, {
+    name: "HDL ('good')",
+    value: "> 40 mg/dL (M)\n> 50 mg/dL (F)",
+    note: "Higher is better. Protective — removes LDL from arteries. Exercise raises HDL."
+  }, {
+    name: "LDL ('bad')",
+    value: "< 100 mg/dL optimal",
+    note: "Lower is better. Deposits in arterial walls → atherosclerosis. Primary target for treatment."
+  }]
+}, {
+  title: "Renal",
+  icon: "🫘",
+  color: "#0D9488",
+  items: [{
+    name: "Serum Osmolarity",
+    value: "275–295 mOsm/kg",
+    note: "Measures concentration of blood. High = dehydrated or hyperglycemia. Low = fluid overload or hyponatremia."
+  }, {
+    name: "GFR (Glomerular Filtration Rate)",
+    value: "≥ 90 mL/min normal",
+    note: "Best indicator of kidney function. <60 for 3+ months = CKD. <15 = end-stage."
+  }, {
+    name: "Urinalysis — pH",
+    value: "4.5–8.0",
+    note: "Varies with diet and metabolic state."
+  }, {
+    name: "Urinalysis — Specific Gravity",
+    value: "1.005–1.030",
+    note: "Concentration of urine. High = concentrated (dehydrated). Low = dilute."
+  }, {
+    name: "Urinalysis — Glucose",
+    value: "Negative",
+    note: "Positive = glucosuria → blood glucose exceeded renal threshold (~180 mg/dL). Think diabetes."
+  }, {
+    name: "Urinalysis — Protein",
+    value: "Negative",
+    note: "Positive = proteinuria → kidney damage (glomeruli leaking)."
+  }, {
+    name: "Urinalysis — Blood",
+    value: "Negative",
+    note: "Positive = hematuria → infection, stones, trauma, or malignancy."
+  }, {
+    name: "Urinalysis — WBCs / Leukocyte Esterase",
+    value: "Negative",
+    note: "Positive = pyuria → infection or inflammation."
+  }, {
+    name: "Urinalysis — Nitrites",
+    value: "Negative",
+    note: "Positive = bacteria converting nitrates → nitrites. Strong indicator of UTI."
+  }, {
+    name: "Urinalysis — Ketones",
+    value: "Negative",
+    note: "Positive = body burning fat for fuel. DKA, starvation, very low-carb diets."
+  }]
+}, {
+  title: "Vital Signs",
+  icon: "📊",
+  color: "#BE185D",
+  items: [{
+    name: "Heart Rate",
+    value: "60–100 bpm",
+    note: "<60 = bradycardia. >100 = tachycardia."
+  }, {
+    name: "Blood Pressure",
+    value: "< 120/80 mmHg normal",
+    note: "120–129/<80 = elevated. 130–139/80–89 = Stage 1 HTN. ≥140/≥90 = Stage 2 HTN."
+  }, {
+    name: "Respiratory Rate",
+    value: "12–20 breaths/min",
+    note: "<12 = bradypnea. >20 = tachypnea. Normal tidal volume ~500 mL."
+  }, {
+    name: "Temperature",
+    value: "97.8–99.1°F (36.5–37.3°C)",
+    note: "≥100.4°F (38°C) = fever."
+  }, {
+    name: "O₂ Saturation (SpO₂)",
+    value: "95–100%",
+    note: "<95% = hypoxemia. <90% = critical. COPD patients may have baseline 88–92%."
+  }]
+}, {
+  title: "Foods to Know",
+  icon: "🥗",
+  color: "#16A34A",
+  items: [{
+    name: "High Sodium Foods",
+    value: "Canned soups, processed meats (bacon, deli), chips, fast food, soy sauce, pickles, cheese",
+    note: "Avoid in HTN, heart failure, kidney disease, fluid restrictions."
+  }, {
+    name: "Low Sodium Alternatives",
+    value: "Fresh fruits & vegetables, unsalted nuts, fresh meats, herbs & spices instead of salt",
+    note: "Recommended daily limit: <2,300 mg (ideally <1,500 mg for HTN)."
+  }, {
+    name: "High Potassium Foods",
+    value: "Bananas, oranges, potatoes, tomatoes, avocados, spinach, beans, dairy",
+    note: "Encourage in hypokalemia. AVOID in hyperkalemia or renal failure."
+  }, {
+    name: "Low Potassium Foods",
+    value: "Apples, berries, grapes, rice, pasta, white bread, lettuce",
+    note: "Appropriate for patients on potassium restrictions (CKD, hyperkalemia)."
+  }, {
+    name: "Iron-Rich Foods",
+    value: "Red meat, liver, spinach, beans, fortified cereals, lentils",
+    note: "Pair with vitamin C to enhance absorption. Avoid with calcium/dairy (blocks absorption)."
+  }, {
+    name: "Calcium-Rich Foods",
+    value: "Dairy (milk, yogurt, cheese), broccoli, kale, fortified OJ, sardines",
+    note: "Important for bone health, muscle function, nerve signaling."
+  }, {
+    name: "B-12-Rich Foods",
+    value: "Meat, fish, poultry, eggs, dairy, fortified cereals",
+    note: "Deficiency common in vegans, elderly, patients with pernicious anemia or GI absorption issues."
+  }]
+}];
+const purposeTests = [{
+  title: "Coagulation Tests (know the PURPOSE)",
+  icon: "🩹",
+  color: "#DC2626",
+  items: [{
+    name: "INR (International Normalized Ratio)",
+    purpose: "Monitors warfarin (Coumadin) therapy. Measures extrinsic pathway. Therapeutic range usually 2.0–3.0."
+  }, {
+    name: "aPTT (Activated Partial Thromboplastin Time)",
+    purpose: "Monitors heparin therapy. Measures intrinsic pathway. Therapeutic range varies by protocol."
+  }, {
+    name: "aPT (Prothrombin Time)",
+    purpose: "Measures extrinsic pathway of clotting. Used with INR. Elevated in liver disease, vitamin K deficiency, warfarin use."
+  }, {
+    name: "D-dimer (FSP — Fibrin Split Products)",
+    purpose: "Detects clot breakdown products. Elevated when the body is breaking down blood clots. Used to rule out DVT, PE, DIC. Sensitive but not specific."
+  }]
+}, {
+  title: "Cardiac Markers",
+  icon: "❤️",
+  color: "#E11D48",
+  items: [{
+    name: "Troponin (I and T)",
+    purpose: "GOLD STANDARD for detecting myocardial cell damage/death. Rises 3–6 hrs after MI, peaks 12–24 hrs. Most specific cardiac biomarker."
+  }, {
+    name: "CPK-MB (Creatine Phosphokinase-MB)",
+    purpose: "Cardiac-specific isoenzyme. Rises 4–8 hrs after MI. Used alongside troponin. Useful for detecting reinfarction."
+  }]
+}, {
+  title: "Liver Function Tests",
+  icon: "🫙",
+  color: "#B45309",
+  items: [{
+    name: "Bilirubin",
+    purpose: "Byproduct of RBC breakdown, processed by liver. Elevated = liver dysfunction or hemolysis. Causes jaundice when elevated."
+  }, {
+    name: "Ammonia",
+    purpose: "Toxic byproduct of protein metabolism, normally cleared by liver. Elevated in liver failure → hepatic encephalopathy (confusion, asterixis)."
+  }, {
+    name: "Total Protein / Albumin",
+    purpose: "Produced by the liver. Low albumin = liver failure, malnutrition. Low albumin → low oncotic pressure → edema/ascites."
+  }]
+}, {
+  title: "Thyroid & Endocrine Tests",
+  icon: "🦋",
+  color: "#7C3AED",
+  items: [{
+    name: "TSH",
+    purpose: "Best SCREENING test for thyroid disorders. High TSH = hypothyroid (pituitary screaming at failing thyroid). Low TSH = hyperthyroid (negative feedback)."
+  }, {
+    name: "T3 and T4",
+    purpose: "Actual thyroid hormone levels. T4 is the primary output; T3 is the more active form. Confirm hyper/hypo after TSH screen."
+  }, {
+    name: "T7 (Free Thyroxine Index)",
+    purpose: "Estimate of free T4. Adjusts for protein binding variations. Helps confirm thyroid status."
+  }, {
+    name: "Cortisol",
+    purpose: "Adrenal hormone. Elevated in Cushing's. Low in Addison's. Follows diurnal pattern (highest AM, lowest midnight)."
+  }, {
+    name: "ACTH",
+    purpose: "Pituitary hormone that stimulates cortisol release. Helps differentiate Cushing's DISEASE (pituitary tumor → high ACTH) from Cushing's SYNDROME (adrenal tumor → low ACTH)."
+  }]
+}, {
+  title: "Tumor Markers & Screening",
+  icon: "🔬",
+  color: "#4338CA",
+  items: [{
+    name: "CEA (Carcinoembryonic Antigen)",
+    purpose: "Tumor marker for colorectal cancer (also lung, breast, pancreas). Used to MONITOR treatment response and detect recurrence. NOT a screening tool."
+  }, {
+    name: "PSA (Prostate-Specific Antigen)",
+    purpose: "Screening & monitoring for prostate cancer. Elevated in prostate cancer, BPH, and prostatitis. Rising trend is more significant than a single value."
+  }, {
+    name: "CRP (C-Reactive Protein)",
+    purpose: "Non-specific marker of inflammation. Elevated in infection, autoimmune disease, tissue injury, and cardiovascular disease risk assessment."
+  }]
+}, {
+  title: "GI Tests",
+  icon: "🔍",
+  color: "#059669",
+  items: [{
+    name: "Occult Blood (Guaiac / FIT)",
+    purpose: "Detects hidden (occult) blood in GI secretions/stool. Positive = GI bleeding — could be ulcers, polyps, cancer, varices. Requires further investigation."
+  }, {
+    name: "Cultures (blood, urine, wound, sputum)",
+    purpose: "Identifies specific organism causing infection AND tests antibiotic sensitivity. Obtain BEFORE starting antibiotics for most accurate results."
+  }]
+}];
+const diagnosticTests = [{
+  name: "EKG / ECG",
+  purpose: "Records cardiac electrical activity. Normal: P wave (atrial depolarization) → QRS (ventricular depolarization) → T wave (ventricular repolarization). Can detect: dysrhythmias, ischemia (ST depression), MI (ST elevation), electrolyte effects (peaked T = hyperkalemia, flat T/U wave = hypokalemia), atrial fibrillation (irregularly irregular, no P waves).",
+  color: "#DC2626"
+}, {
+  name: "X-Ray",
+  purpose: "Quick imaging for bones, lungs, and gross abnormalities. Chest X-ray: detect pneumonia, heart enlargement, pleural effusion, pneumothorax, lung masses.",
+  color: "#2563EB"
+}, {
+  name: "CT Scan / MRI",
+  purpose: "CT: fast, detailed cross-sectional imaging. Best for acute stroke (distinguish ischemic from hemorrhagic — MUST know before giving tPA), trauma, tumors, abscesses. MRI: more detailed soft tissue imaging, no radiation, but slower. Best for brain, spinal cord, soft tissue detail.",
+  color: "#7C3AED"
+}, {
+  name: "Angiogram / Cardiac Catheterization",
+  purpose: "Injects contrast dye to visualize blood vessels. Cardiac cath: gold standard for visualizing coronary artery blockages, can place stents during the procedure. Cerebral angiogram: visualize brain vessel blockages or aneurysms. Peripheral angiogram: assess PAD severity.",
+  color: "#D97706"
+}, {
+  name: "EEG (Electroencephalogram)",
+  purpose: "Records brain electrical activity. Used to diagnose seizure disorders/epilepsy, classify seizure types, evaluate altered consciousness, and confirm brain death. Abnormal patterns during seizures show excessive synchronized neuronal firing.",
+  color: "#059669"
+}, {
+  name: "EMG (Electromyography)",
+  purpose: "Records electrical activity of muscles and nerves. Used to diagnose neuromuscular disorders: neuropathy, myopathy, nerve compression, ALS. Helps differentiate between nerve and muscle problems.",
+  color: "#BE185D"
+}];
+function LabReference() {
+  const [activeTab, setActiveTab] = useState("values");
+  const [expanded, setExpanded] = useState({});
+  const toggle = key => setExpanded(p => ({
+    ...p,
+    [key]: !p[key]
+  }));
+  return React.createElement("div", {
+    style: {
+      fontFamily: font,
+      maxWidth: 800,
+      margin: "0 auto",
+      padding: 16
+    }
+  }, React.createElement("h1", {
+    style: {
+      fontSize: 22,
+      fontWeight: 800,
+      color: "#1E293B",
+      margin: "0 0 4px"
+    }
+  }, "NURS 308 \u2014 Lab Values & Diagnostic Tests"), React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: "#64748B",
+      margin: "0 0 16px"
+    }
+  }, "Everything your instructor said to have in your \"internal brain\" for the final"), React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 4,
+      marginBottom: 20
+    }
+  }, [{
+    key: "values",
+    label: "📊 Lab Values"
+  }, {
+    key: "purpose",
+    label: "🧪 Know the Purpose"
+  }, {
+    key: "diagnostic",
+    label: "🏥 Diagnostic Tests"
+  }].map(t => React.createElement("button", {
+    key: t.key,
+    onClick: () => setActiveTab(t.key),
+    style: {
+      padding: "8px 16px",
+      borderRadius: 8,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: activeTab === t.key ? 700 : 500,
+      background: activeTab === t.key ? "#1E293B" : "#F1F5F9",
+      color: activeTab === t.key ? "#fff" : "#475569"
+    }
+  }, t.label))), activeTab === "values" && categories.map((cat, ci) => React.createElement("div", {
+    key: ci,
+    style: {
+      marginBottom: 16
+    }
+  }, React.createElement("button", {
+    onClick: () => toggle(`val_${ci}`),
+    style: {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "12px 16px",
+      borderRadius: 12,
+      border: `1.5px solid ${cat.color}30`,
+      background: "#fff",
+      cursor: "pointer",
+      textAlign: "left",
+      borderLeft: `4px solid ${cat.color}`
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 22
+    }
+  }, cat.icon), React.createElement("span", {
+    style: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: 700,
+      color: "#1E293B"
+    }
+  }, cat.title), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94A3B8"
+    }
+  }, cat.items.length, " items ", expanded[`val_${ci}`] ? "▲" : "▼")), expanded[`val_${ci}`] && React.createElement("div", {
+    style: {
+      marginTop: 6,
+      display: "flex",
+      flexDirection: "column",
+      gap: 6
+    }
+  }, cat.items.map((item, ii) => React.createElement("div", {
+    key: ii,
+    style: {
+      padding: "12px 16px",
+      borderRadius: 10,
+      background: "#FAFAFA",
+      border: "1px solid #E2E8F0",
+      marginLeft: 16
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: 12,
+      flexWrap: "wrap"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: "#1E293B"
+    }
+  }, item.name), React.createElement("span", {
+    style: {
+      fontSize: 14,
+      fontWeight: 800,
+      color: cat.color,
+      whiteSpace: "pre-line",
+      textAlign: "right"
+    }
+  }, item.value || "")), React.createElement("p", {
+    style: {
+      margin: "6px 0 0",
+      fontSize: 12,
+      color: "#475569",
+      lineHeight: 1.6
+    }
+  }, item.note), item.high && React.createElement("p", {
+    style: {
+      margin: "4px 0 0",
+      fontSize: 12,
+      color: "#DC2626",
+      lineHeight: 1.5
+    }
+  }, "\u2191 ", item.high), item.low && React.createElement("p", {
+    style: {
+      margin: "2px 0 0",
+      fontSize: 12,
+      color: "#2563EB",
+      lineHeight: 1.5
+    }
+  }, "\u2193 ", item.low)))))), activeTab === "purpose" && purposeTests.map((cat, ci) => React.createElement("div", {
+    key: ci,
+    style: {
+      marginBottom: 16
+    }
+  }, React.createElement("button", {
+    onClick: () => toggle(`pur_${ci}`),
+    style: {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "12px 16px",
+      borderRadius: 12,
+      border: `1.5px solid ${cat.color}30`,
+      background: "#fff",
+      cursor: "pointer",
+      textAlign: "left",
+      borderLeft: `4px solid ${cat.color}`
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 22
+    }
+  }, cat.icon), React.createElement("span", {
+    style: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: 700,
+      color: "#1E293B"
+    }
+  }, cat.title), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94A3B8"
+    }
+  }, cat.items.length, " items ", expanded[`pur_${ci}`] ? "▲" : "▼")), expanded[`pur_${ci}`] && React.createElement("div", {
+    style: {
+      marginTop: 6,
+      display: "flex",
+      flexDirection: "column",
+      gap: 6
+    }
+  }, cat.items.map((item, ii) => React.createElement("div", {
+    key: ii,
+    style: {
+      padding: "12px 16px",
+      borderRadius: 10,
+      background: "#FAFAFA",
+      border: "1px solid #E2E8F0",
+      marginLeft: 16
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: "#1E293B",
+      marginBottom: 4
+    }
+  }, item.name), React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: 13,
+      color: "#334155",
+      lineHeight: 1.7
+    }
+  }, item.purpose)))))), activeTab === "diagnostic" && React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 10
+    }
+  }, diagnosticTests.map((test, i) => React.createElement("div", {
+    key: i,
+    style: {
+      padding: "16px",
+      borderRadius: 12,
+      background: "#fff",
+      border: `1.5px solid ${test.color}30`,
+      borderLeft: `4px solid ${test.color}`
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      color: "#1E293B",
+      marginBottom: 6
+    }
+  }, test.name), React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: 13,
+      color: "#334155",
+      lineHeight: 1.7
+    }
+  }, test.purpose)))), React.createElement("div", {
+    style: {
+      marginTop: 24,
+      padding: 14,
+      background: "#FFF7ED",
+      borderRadius: 10,
+      border: "1px solid #FED7AA"
+    }
+  }, React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: 12,
+      color: "#9A3412",
+      lineHeight: 1.6
+    }
+  }, "\uD83D\uDCA1 ", React.createElement("strong", null, "Instructor's note:"), " You won't be asked \"What is the normal sodium level?\" directly. But lab values WILL appear embedded in clinical scenarios, and you need to recognize normal vs. abnormal instantly to answer correctly. These values need to be in your internal brain \u2014 no looking them up during the exam.")));
+}
+const rootEl = document.getElementById("root");
+rootEl.innerHTML = "";
+ReactDOM.createRoot(rootEl).render(React.createElement(LabReference, null));
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>
