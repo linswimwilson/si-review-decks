@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chapter 7: Urinary — Disorders Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #0f172a; --bg-card: #1e293b;
+  --blue: #38bdf8; --yellow: #f59e0b; --red: #ef4444;
+  --purple: #a78bfa; --teal: #22d3ee; --green: #34d399;
+  --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+}
+html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg-dark); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none; }
+
+/* ── SCROLLBAR ── */
+.slide::-webkit-scrollbar{width:6px} .slide::-webkit-scrollbar-track{background:transparent} .slide::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.3);border-radius:3px}
+
+/* ── PROGRESS + NAV ── */
+#progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width 0.4s ease;z-index:1000}
+#slide-counter{position:fixed;bottom:18px;right:24px;font-size:0.85rem;color:var(--text-muted);z-index:1000;font-variant-numeric:tabular-nums}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim);width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1000;transition:all 0.2s;backdrop-filter:blur(8px)}
+.nav-btn:hover{background:rgba(56,189,248,0.15);color:var(--blue);border-color:var(--blue)}
+#prev-btn{left:16px} #next-btn{right:16px}
+
+/* ── SLIDES BASE ── */
+.slide{display:none;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:0;overflow-y:auto;padding:48px 60px 80px;animation:fadeIn 0.35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,0.3) transparent}
+.slide.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TITLE ── */
+.slide.title{text-align:center}
+.slide.title h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:12px}
+.slide.title .subtitle{font-size:1.15rem;color:var(--text-dim);margin-bottom:28px}
+.slide.title .meta{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
+.start-hint{font-size:0.8rem;color:var(--text-muted);margin-top:28px;opacity:0.7}
+
+/* ── SECTION DIVIDER ── */
+.slide.section-divider{text-align:center;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.slide.section-divider .section-num{font-size:14px;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:16px}
+.slide.section-divider h2{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;margin-bottom:12px}
+.slide.section-divider h2 em{font-style:normal;color:var(--blue)}
+.slide.section-divider .divider-sub{font-size:1.15rem;color:var(--text-dim);max-width:500px}
+
+/* ── ANCHOR ── */
+.slide.anchor{text-align:center}
+.slide.anchor .tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.tag-concept{color:var(--blue);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25)}
+.tag-pearl{color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25)}
+.tag-red{color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)}
+.tag-emergency{color:#fff;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4)}
+.tag-warn{color:var(--yellow);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25)}
+.slide.anchor h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.15;margin-bottom:18px}
+.slide.anchor h2 em{font-style:normal}
+.slide.anchor .subline{font-size:1.2rem;color:var(--text-dim);max-width:700px;line-height:1.6}
+
+/* ── NARRATIVE ── */
+.slide.narrative{align-items:flex-start;max-width:960px;margin:0 auto}
+.slide.narrative .section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.slide.narrative h3{font-size:1.6rem;font-weight:700;margin-bottom:28px;width:100%}
+.slide.narrative h3 em{font-style:normal;color:var(--blue)}
+.slide.narrative ul{list-style:none;width:100%}
+.slide.narrative ul li{padding:10px 0 10px 28px;position:relative;font-size:1.05rem;line-height:1.55}
+.slide.narrative ul li::before{content:'';position:absolute;left:0;top:18px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)} .badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow)} .badge-blue{background:rgba(56,189,248,0.15);color:var(--blue)}
+
+/* ── COLUMNS LAYOUT ── */
+.content.cols{display:flex;gap:28px;width:100%}
+.content.cols .col{flex:1}
+.content.cols .col ul{list-style:none}
+.content.cols .col ul li{padding:8px 0 8px 20px;position:relative;font-size:0.98rem;line-height:1.5}
+.content.cols .col ul li::before{content:'';position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+
+/* ── HIGHLIGHT HELPERS ── */
+.hl-blue{color:var(--blue);font-weight:600} .hl-yellow{color:var(--yellow);font-weight:600} .hl-red{color:var(--red);font-weight:600} .hl-green{color:var(--green);font-weight:600} .hl-purple{color:var(--purple);font-weight:600} .hl-teal{color:var(--teal);font-weight:600}
+em.red{font-style:normal;color:var(--red)} em.yellow{font-style:normal;color:var(--yellow)} em.blue{font-style:normal;color:var(--blue)} em.green{font-style:normal;color:var(--green)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:18px;padding:14px 20px;border-radius:10px;font-size:0.95rem;line-height:1.55;width:100%;max-width:860px}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--text-dim)}
+.callout.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--yellow)}
+.callout.danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+
+/* ── FLOW ── */
+.slide.flow{text-align:center}
+.slide.flow h3{font-size:1.5rem;font-weight:700;margin-bottom:36px}
+.flow-chain{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;overflow-x:auto;max-width:100%;padding:10px 0}
+.flow-step{background:var(--bg-card);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:14px 20px;font-size:0.95rem;font-weight:500;white-space:nowrap;min-width:fit-content}
+.flow-step small{display:block;font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:2px}
+.flow-arrow{font-size:1.4rem;color:var(--blue);margin:0 6px;flex-shrink:0}
+
+/* ── COMPARE ── */
+.slide.compare{text-align:center}
+.slide.compare h3{font-size:1.5rem;font-weight:700;margin-bottom:32px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:880px;width:100%}
+.compare-grid.three{grid-template-columns:1fr 1fr 1fr;max-width:1000px}
+.compare-col{background:var(--bg-card);border-radius:14px;padding:24px 20px;text-align:left;border:1px solid rgba(148,163,184,0.12)}
+.compare-col h4{font-size:1.1rem;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid}
+.compare-col.col-blue h4{color:var(--blue);border-color:var(--blue)} .compare-col.col-red h4{color:var(--red);border-color:var(--red)} .compare-col.col-yellow h4{color:var(--yellow);border-color:var(--yellow)} .compare-col.col-green h4{color:var(--green);border-color:var(--green)} .compare-col.col-purple h4{color:var(--purple);border-color:var(--purple)} .compare-col.col-teal h4{color:var(--teal);border-color:var(--teal)}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.compare-col ul li{font-size:0.9rem;color:var(--text-dim);padding-left:18px;position:relative;line-height:1.45}
+.compare-col ul li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.compare-col.col-blue ul li::before{background:var(--blue)} .compare-col.col-red ul li::before{background:var(--red)} .compare-col.col-yellow ul li::before{background:var(--yellow)} .compare-col.col-green ul li::before{background:var(--green)} .compare-col.col-purple ul li::before{background:var(--purple)} .compare-col.col-teal ul li::before{background:var(--teal)}
+.compare-col ul li strong{color:var(--text);font-weight:600}
+
+/* ── CHECK (QUIZ) ── */
+.slide.check{text-align:center}
+.slide.check .check-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.slide.check .question{font-size:clamp(1.1rem,2vw,1.5rem);font-weight:700;max-width:800px;line-height:1.4;margin-bottom:32px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:750px;width:100%}
+.choice-btn{background:var(--bg-card);border:2px solid rgba(148,163,184,0.15);border-radius:12px;padding:18px 20px;color:var(--text);font-size:clamp(0.9rem,1.3vw,1.05rem);text-align:left;cursor:pointer;transition:all 0.2s;line-height:1.4}
+.choice-btn:hover:not(.revealed){border-color:var(--purple);background:rgba(167,139,250,0.08)}
+.choice-btn .choice-letter{display:inline-block;font-weight:700;color:var(--purple);margin-right:8px}
+.choice-btn .explanation{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,0.15);font-size:0.88em;line-height:1.5}
+.choice-btn.revealed .explanation{display:block}
+.choice-btn.correct{border-color:var(--green);background:rgba(74,222,128,0.1)} .choice-btn.correct .explanation{color:var(--green)}
+.choice-btn.incorrect{border-color:var(--red);background:rgba(239,68,68,0.06)} .choice-btn.incorrect .explanation{color:var(--red)}
+
+/* ── CASE ── */
+.slide.case{text-align:center}
+.slide.case .case-label{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:6px 18px;border-radius:20px;margin-bottom:20px}
+.case-scenario{background:var(--bg-card);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:24px 28px;max-width:750px;text-align:left;font-size:1.05rem;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.case-scenario strong{color:var(--teal)}
+.slide.case .question{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:700;max-width:750px;line-height:1.4;margin-bottom:24px}
+.slide.case .choices .choice-btn:hover:not(.revealed){border-color:var(--teal);background:rgba(34,211,238,0.08)}
+.slide.case .choice-btn .choice-letter{color:var(--teal)}
+
+/* ── CUSTOM: CELL CARDS (with optional bullet-list content) ── */
+.cell-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:740px;width:100%}
+.cell-cards.four-col{grid-template-columns:1fr 1fr 1fr 1fr;max-width:820px}
+.cell-card{display:flex;align-items:flex-start;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px 16px;border-left:5px solid}
+.cell-card .cell-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.cell-card .cell-text{font-size:0.92rem;line-height:1.4}
+.cell-card .cell-text strong{display:block;font-size:0.98rem;margin-bottom:4px;color:var(--text)}
+.cell-card .cell-text ul{list-style:none;margin:0}
+.cell-card .cell-text ul li{padding:2px 0 2px 12px;position:relative;font-size:0.86rem;line-height:1.35;color:var(--text-dim)}
+.cell-card .cell-text ul li::before{content:'';position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.6}
+
+/* ── CUSTOM: BRAIN ART CONTAINER ── */
+.brain-art{width:100%;max-width:780px;margin:4px auto 0}
+.brain-art svg{width:100%;height:auto;display:block}
+
+/* ── CUSTOM: RULE + DECISION TREE (Monroe-Kellie pattern) ── */
+.rule-tree{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;max-width:920px;width:100%;align-items:stretch}
+.rule-card{background:var(--bg-card);border:2px solid var(--yellow);border-radius:14px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.rule-card .rule-label{font-size:11px;letter-spacing:2.5px;color:var(--yellow);font-weight:800;margin-bottom:10px}
+.rule-card .rule-headline{font-size:1.05rem;font-weight:800;margin-bottom:10px;color:var(--text)}
+.rule-card .rule-body{font-size:0.92rem;color:var(--text-dim);line-height:1.55}
+.rule-card .rule-body strong.accent{color:var(--yellow)}
+.rule-card .rule-body strong.warn{color:var(--red)}
+.rule-card ul{list-style:none;margin:8px 0}
+.rule-card ul li{padding:3px 0 3px 16px;position:relative;font-size:0.93rem;color:var(--text)}
+.rule-card ul li::before{content:'•';position:absolute;left:0;color:var(--yellow);font-weight:700}
+.decision-tree{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.decision-tree .dec-label{font-size:11px;letter-spacing:2.5px;color:var(--blue);font-weight:800;margin-bottom:4px}
+.dec-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;background:var(--bg-card);border-radius:10px;padding:12px 14px;border-left:4px solid}
+.dec-row .d-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.dec-row .d-if{line-height:1.3}
+.dec-row .d-if .label{font-weight:700;font-size:0.94rem;display:block}
+.dec-row .d-if .examples{font-size:0.8rem;color:var(--text-dim);display:block;margin-top:2px}
+.dec-row .d-arrow{font-size:1.3rem;font-weight:800}
+.dec-row .d-action{font-weight:800;color:var(--green);font-size:0.95rem;letter-spacing:1px;white-space:nowrap}
+@media(max-width:768px){
+  .rule-tree{grid-template-columns:1fr;gap:14px}
+  .dec-row{grid-template-columns:auto 1fr;row-gap:8px}
+  .dec-row .d-arrow{display:none}
+  .dec-row .d-action{grid-column:2}
+}
+
+/* ── KNOWN GAP FLAG ── */
+.gap-flag{background:rgba(245,158,11,0.1);border:1.5px dashed rgba(245,158,11,0.5);border-radius:10px;padding:14px 20px;font-size:0.92rem;line-height:1.5;max-width:820px;margin-top:14px;color:var(--yellow)}
+.gap-flag strong{display:block;font-size:0.85rem;letter-spacing:1.5px;color:var(--yellow);margin-bottom:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:56px 20px 80px;padding-top:calc(env(safe-area-inset-top,0px)+56px);justify-content:flex-start}
+  .slide.title h1,.slide.section-divider h2{font-size:1.8rem} .slide.anchor h2{font-size:1.6rem}
+  .slide.narrative h3,.slide.flow h3,.slide.compare h3{font-size:1.2rem}
+  .slide.narrative ul li,.slide p,.case-scenario,.choice-btn,.flow-step,.callout,.compare-col ul li,.subline,.divider-sub{font-size:0.9rem}
+  .content.cols{flex-direction:column;gap:20px}
+  .choices{grid-template-columns:1fr} .compare-grid,.compare-grid.three{grid-template-columns:1fr;gap:16px}
+  .cell-cards,.cell-cards.four-col{grid-template-columns:1fr}
+  .flow-chain{flex-direction:column;align-items:center;overflow-x:visible;gap:0;padding:10px 0} .flow-step{padding:10px 18px;font-size:0.85rem;white-space:normal;text-align:center;width:80%} .flow-arrow{transform:rotate(90deg);margin:4px 0}
+  .nav-btn{width:40px;height:40px;font-size:1.1rem} #prev-btn{left:8px} #next-btn{right:8px} #slide-counter{bottom:12px;right:16px;font-size:0.75rem}
+  .callout{padding:12px 16px;font-size:0.85rem}
+}
+.flow-chain.horizontal{flex-direction:row}
+.flow-chain.vertical{flex-direction:column;overflow-x:visible}
+.flow-chain.vertical .flow-step{white-space:normal;text-align:center;min-width:240px;padding:8px 18px}
+.flow-chain.vertical .flow-arrow{transform:rotate(90deg);margin:2px 0}
+@media(max-width:768px){.flow-chain.horizontal{flex-direction:column}}
+/* ── Ch 7 visuals ── */
+.anatomical-map{width:100%;max-width:580px;margin:4px auto 12px;background:transparent}
+.anatomical-map svg{width:100%;height:auto;max-height:66vh;display:block}
+.anatomical-map text{font-family:'Inter',sans-serif}
+.anatomical-map .am-label{font-size:13px;fill:var(--text);font-weight:700}
+.anatomical-map .am-sub{font-size:10.5px;fill:var(--text-dim);font-weight:400}
+.anatomical-map .am-connector{stroke-width:1.2;opacity:0.6;fill:none;stroke-dasharray:3,3}
+.viz-row{display:flex;gap:30px;align-items:center;justify-content:center;width:100%;max-width:1040px}
+.viz-row .anatomical-map{flex:1 1 56%;margin:0}
+.viz-side{flex:1 1 44%;text-align:left}
+.viz-side ul{list-style:none;padding:0;margin:0}
+.viz-side ul li{font-size:0.95rem;color:var(--text-dim);padding:5px 0 5px 18px;position:relative;line-height:1.4}
+.viz-side ul li::before{content:'';position:absolute;left:0;top:13px;width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.viz-side ul li strong{color:var(--text)}
+.viz-side .callout{margin-top:12px}
+@media(max-width:768px){.viz-row{flex-direction:column;gap:12px}.anatomical-map svg{max-height:52vh}.viz-side ul li{font-size:0.85rem}}
+.slide .viz-side ul li{padding:5px 0 5px 18px;font-size:0.95rem;line-height:1.4}
+.slide .viz-side ul li::before{top:13px;width:7px;height:7px}
+.viz-side h4{font-size:1rem;margin:0 0 6px;font-weight:700}
+.legend-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+.slide .legend-list li{display:flex;align-items:flex-start;gap:10px;padding:0;font-size:0.92rem;line-height:1.35;color:var(--text-dim)}
+.slide .legend-list li::before{display:none}
+.legend-list .num{flex:0 0 26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#0f172a}
+.legend-list li strong{color:var(--text)}
+.chain-rows{display:flex;flex-direction:column;gap:14px;width:100%;max-width:1260px}
+.chain-row{display:flex;align-items:center;gap:14px}
+.chain-tag{flex:0 0 86px;font-weight:800;font-size:0.92rem;text-align:right;line-height:1.2}
+.chain-row .flow-chain{justify-content:flex-start;flex-wrap:nowrap;padding:0;overflow:visible}
+.chain-row .flow-step{white-space:nowrap}
+.chain-row .flow-step{padding:7px 9px;font-size:0.8rem;border-radius:10px}
+.chain-row .flow-arrow{font-size:1rem;margin:0 3px}
+.mini-col{display:flex;gap:14px;align-items:flex-start}
+.mini-col svg{flex:0 0 108px;height:auto}
+@media(max-width:768px){
+  .chain-row{flex-direction:column;align-items:flex-start;gap:4px}.chain-tag{flex:none;text-align:left}
+  .chain-row .flow-chain{flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px}
+  .chain-row.long .flow-chain{flex-direction:column;align-items:flex-start;gap:1px}
+  .chain-row.long .flow-arrow{transform:rotate(90deg);margin:0 0 0 14px;line-height:1}
+  .chain-row .flow-step{width:auto;padding:4px 6px;font-size:0.68rem;white-space:normal;flex:0 1 auto;min-width:0;text-align:center}
+  .chain-row:not(.long) .flow-chain{width:100%}
+  .chain-row:not(.long) .flow-step{flex:1 1 0}
+  .chain-row:not(.long) .flow-arrow{flex:none;margin:0 1px;font-size:0.8rem}
+  .chain-row .flow-arrow{transform:none;margin:0 2px}
+  .mini-col svg{flex-basis:80px}
+}
+.slide svg text{font-family:'Inter',sans-serif}
+.slide svg .am-label{font-size:13px;fill:var(--text);font-weight:700}
+.slide svg .am-sub{font-size:10.5px;fill:var(--text-dim);font-weight:400}
+.show-sm{display:none}
+@media(max-width:768px){.hide-sm{display:none!important}.show-sm{display:block}.cell-card{padding:8px 10px;gap:8px}.cell-card .cell-text ul li{font-size:0.76rem;line-height:1.25}.cell-card .cell-text strong{font-size:0.85rem}}
+.viz-row>*{min-width:0}
+@media(max-width:768px){.viz-row{width:100%}.viz-row .anatomical-map,.viz-row .viz-side{flex:none;width:100%}}
+.help-grid{display:flex;flex-direction:column;gap:8px}
+.help-card{background:var(--bg-card);border-radius:10px;padding:8px 12px;border-left:5px solid}
+.help-h{font-weight:800;font-size:0.92rem;margin-bottom:2px}
+.help-b{font-size:0.84rem;line-height:1.45;color:var(--text)}
+@media(max-width:768px){.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.help-card{padding:6px 8px}.help-h{font-size:0.78rem}.help-b{font-size:0.7rem;line-height:1.35}}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+<div id="slide-counter"></div>
+<button class="nav-btn" id="prev-btn">&#8592;</button>
+<button class="nav-btn" id="next-btn">&#8594;</button>
+
+<!-- ════════ SLIDE 1: TITLE ════════ -->
+<div class="slide title active">
+  <h1>Urinary &mdash; Disorders</h1>
+  <div class="subtitle">Chapter 7 &middot; Incontinence, UTI, kidney stones, and BPH</div>
+  <div class="meta">Lindsay Wilson &amp; Claude Code<br>Supplemental Instructor Review</div>
+  <div class="start-hint">Press &rarr; arrow key, spacebar, or swipe to begin</div>
+</div>
+
+<!-- ════════ SLIDE 2: FOUNDATIONS RECAP ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Before You Start</div>
+  <h3>If You Haven&rsquo;t Yet &mdash; <em>Skim the Foundations Deck</em></h3>
+  <div style="background:rgba(56,189,248,0.06);border:1.5px dashed rgba(56,189,248,0.35);border-radius:14px;padding:24px;max-width:720px;width:100%;text-align:left;">
+    <h4 style="font-size:0.9rem;letter-spacing:2px;color:var(--blue);font-weight:800;margin-bottom:10px;text-transform:uppercase;">Quick Anchor</h4>
+    <p style="font-size:0.95rem;color:var(--text-dim);line-height:1.55;">This deck builds on the <strong style="color:var(--text);">Urinary Foundations deck</strong> &mdash; the path of urine (kidney &rarr; ureter &rarr; bladder &rarr; urethra), the short female urethra, bladder capacity, and what normal urine looks like. Skim it first if any of that is fuzzy.</p>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 3: SECTION A ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section A</div>
+  <h2><em>Incontinence</em></h2>
+  <div class="divider-sub">Loss of urinary control &mdash; and what it costs the client.</div>
+</div>
+
+<!-- ════════ SLIDE 4: ANCHOR — stress most common ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2><em class="blue">Stress</em> Incontinence Is the Most Common</h2>
+  <div class="viz-row">
+    <div class="anatomical-map" style="max-width:500px;">
+      <svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="stressTitle">
+        <title id="stressTitle">Stress incontinence: increased intra-abdominal pressure from coughing, sneezing, laughing, and lifting pushes down on the bladder; a weakened sphincter lets urine leak out the urethra.</title>
+        <defs>
+          <linearGradient id="stUrine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.35"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.6"/></linearGradient>
+          <clipPath id="stClip"><path d="M140,190 Q140,130 230,130 Q320,130 320,190 Q320,280 255,320 L205,320 Q140,280 140,190 Z"/></clipPath>
+          <marker id="stArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ef4444"/></marker>
+        </defs>
+        <!-- pressure arrows -->
+        <g stroke="#ef4444" stroke-width="7" stroke-linecap="round" marker-end="url(#stArrow)" opacity="0.9">
+          <line x1="155" y1="48" x2="168" y2="112"/><line x1="205" y1="44" x2="210" y2="106"/><line x1="255" y1="44" x2="250" y2="106"/><line x1="305" y1="48" x2="292" y2="112"/>
+        </g>
+        <g font-size="13" font-weight="700" fill="#fca5a5" text-anchor="middle">
+          <text x="150" y="34">cough</text><text x="205" y="28">sneeze</text><text x="257" y="28">laugh</text><text x="312" y="34">lift</text>
+        </g>
+        <!-- bladder -->
+        <path d="M140,190 Q140,130 230,130 Q320,130 320,190 Q320,280 255,320 L205,320 Q140,280 140,190 Z" fill="#1e293b"/>
+        <rect x="130" y="185" width="200" height="140" fill="url(#stUrine)" clip-path="url(#stClip)"/>
+        <path d="M140,190 Q140,130 230,130 Q320,130 320,190 Q320,280 255,320 L205,320 Q140,280 140,190 Z" fill="none" stroke="#38bdf8" stroke-width="3"/>
+        <!-- weak sphincter -->
+        <rect x="196" y="321" width="22" height="16" rx="6" fill="rgba(239,68,68,0.25)" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+        <rect x="242" y="321" width="22" height="16" rx="6" fill="rgba(239,68,68,0.25)" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+        <!-- urethra -->
+        <path d="M220,337 L220,382 M240,337 L240,382" stroke="#94a3b8" stroke-width="2.5"/>
+        <rect x="222" y="322" width="16" height="64" fill="rgba(245,158,11,0.45)"/>
+        <!-- drops -->
+        <path d="M230,392 q-7,10 0,14 q7,-4 0,-14 Z" fill="#f59e0b"/>
+        <path d="M230,408 q-5,7 0,10 q5,-3 0,-10 Z" fill="#f59e0b" opacity="0.7"/>
+        <!-- labels -->
+        <text x="350" y="70" class="am-label" fill="#ef4444" style="fill:#ef4444">&#8593; intra-abdominal</text>
+        <text x="350" y="86" class="am-label" style="fill:#ef4444">pressure</text>
+        <line x1="320" y1="210" x2="360" y2="210" class="am-connector" stroke="#38bdf8"/>
+        <text x="366" y="207" class="am-label">Bladder</text>
+        <text x="366" y="222" class="am-sub">pushed on from above</text>
+        <line x1="266" y1="329" x2="360" y2="329" class="am-connector" stroke="#ef4444"/>
+        <text x="366" y="326" class="am-label" style="fill:#ef4444">Weak sphincter</text>
+        <text x="366" y="341" class="am-sub">can&#8217;t hold against the push</text>
+        <line x1="240" y1="402" x2="360" y2="402" class="am-connector" stroke="#f59e0b"/>
+        <text x="366" y="406" class="am-label" style="fill:#f59e0b">Urine leaks</text>
+      </svg>
+    </div>
+    <div class="viz-side">
+      <ul>
+        <li><strong>&uarr; Intra-abdominal pressure</strong> &mdash; cough, sneeze, laugh, lift, exercise</li>
+        <li>Pushes on a <strong>weakened sphincter</strong> &rarr; urine leaks</li>
+        <li>A short female urethra makes it worse</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 5: CELL-CARDS — stress risks ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Stress Incontinence</div>
+  <h3 style="text-align:center;">What Weakens the <em>Sphincter</em>?</h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Pelvic changes</strong><ul><li>Pregnancy, childbirth</li><li>Menopause</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#8595;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Cystocele</strong><ul><li>Anatomy change: bladder hangs into the vagina</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">&#8593;</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">More pressure</strong><ul><li>Obesity</li><li>Chronic coughing</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#9794;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Prostate removal</strong><ul><li>Surgery near the sphincter</li></ul></div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:740px;">
+    <strong>Risk factors for any incontinence:</strong> female, advancing age, overweight, smoking, other diseases.
+  </div>
+</div>
+
+<!-- ════════ SLIDE 6: CELL-CARDS — other types ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Types</div>
+  <h3 style="text-align:center;">The Other <em>Types</em></h3>
+  <style>
+    .types-cards .cell-icon svg{width:26px;height:26px;display:block}
+    @media(max-width:768px){.types-cards{gap:6px!important}.types-cards .cell-card{padding:7px 10px;gap:8px}.types-cards .cell-icon{display:none}.types-cards .cell-text strong{font-size:0.84rem;margin-bottom:1px}.types-cards .cell-text ul li{font-size:0.74rem;line-height:1.22;padding:1px 0 1px 10px}}
+  </style>
+  <div class="cell-cards types-cards" style="max-width:860px;">
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5,11 Q5,4 13,4 Q21,4 21,11 Q21,18 15,21 L11,21 Q5,18 5,11 Z" fill="none" stroke="#a78bfa" stroke-width="2"/><path d="M14,7 L10,13 L13,13 L11,18 L16,11 L13,11 Z" fill="#a78bfa"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--purple);">Urge / overactive bladder</strong><ul><li>Sudden, intense urge &rarr; involuntary loss</li><li>UTI, caffeine, nicotine, constipation, Parkinson&rsquo;s, stroke</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3,13 L7,8 L11,18 L15,8 L19,18 L23,13" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/><line x1="4" y1="22" x2="22" y2="4" stroke="#ef4444" stroke-width="2"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--purple);">Reflex</strong><ul><li>Nervous-system damage</li><li>Detrusor contracts with no sensation to void &mdash; no urgency</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5,10 Q5,3 13,3 Q21,3 21,10 Q21,16 15,18 L11,18 Q5,16 5,10 Z" fill="rgba(245,158,11,0.55)" stroke="#f59e0b" stroke-width="2"/><circle cx="13" cy="21.5" r="1.4" fill="#f59e0b"/><circle cx="13" cy="25" r="1" fill="#f59e0b"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Overflow</strong><ul><li>Can&rsquo;t empty (retention) &rarr; dribbling, weak stream</li><li>Spinal cord injury, blockage, prostate</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="9.5" fill="none" stroke="#22d3ee" stroke-width="2"/><path d="M13,7 L13,13 L17,16" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--teal);">Functional</strong><ul><li>Physical or mental impairment &rarr; can&rsquo;t get there in time</li><li>Arthritis, broken hand &rarr; elastic-waist pants</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M7,3 L19,3 M7,23 L19,23 M8,3 Q8,11 13,13 Q18,11 18,3 M8,23 Q8,15 13,13 Q18,15 18,23" fill="none" stroke="#34d399" stroke-width="2"/><path d="M10,21 Q13,17 16,21 Z" fill="#34d399"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--green);">Transient</strong><ul><li>Temporary cause: delirium, infection, diuretics, sedatives, constipation, alcohol, caffeine</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M17,4 A9.5,9.5 0 1 0 22,18 A7.5,7.5 0 1 1 17,4 Z" fill="rgba(56,189,248,0.35)" stroke="#38bdf8" stroke-width="1.8"/></svg></div>
+      <div class="cell-text"><strong style="color:var(--blue);">Enuresis &middot; Mixed &middot; Gross total</strong><ul><li>Enuresis: after age 4&ndash;5 (nocturnal = bed-wetting)</li><li>Mixed: more than one type</li><li>Gross total: continuous leak, no storage</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 7: COMPARE — Urge vs Overflow ════════ -->
+<div class="slide compare">
+  <h3>Urge <em class="yellow">vs.</em> Overflow</h3>
+  <div class="compare-grid">
+    <div class="compare-col col-purple">
+      <h4>Urge &mdash; bladder too eager</h4>
+      <ul>
+        <li><strong>Sudden, intense urge</strong>, then leaks</li>
+        <li>Irritants: UTI, caffeine, nicotine</li>
+        <li>Brain conditions: Parkinson&rsquo;s, Alzheimer&rsquo;s, stroke</li>
+        <li>Overactive bladder = urge with no known cause</li>
+      </ul>
+    </div>
+    <div class="compare-col col-yellow">
+      <h4>Overflow &mdash; bladder can&rsquo;t empty</h4>
+      <ul>
+        <li><strong>Retention</strong> &rarr; dribbling, weak stream</li>
+        <li>Spinal cord injury &rarr; can&rsquo;t sense the need to void</li>
+        <li>Urethral blockage, <strong>prostate conditions</strong></li>
+        <li>Chronic holding it &rarr; overstretched detrusor</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 8: ANCHOR — PVR ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-pearl">Clinical Pearl</div>
+  <h2>Post-Void Residual: <em style="color:var(--teal);">Under 50 mL</em></h2>
+  <div class="subline">What&rsquo;s left in the bladder after voiding. Check it with a bedside bladder scan.</div>
+  <div class="anatomical-map" style="max-width:560px;margin-top:14px;">
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pvrTitle">
+      <title id="pvrTitle">Two bladders after voiding. Left: normal, less than 50 mL left. Right: retention, much more left, stagnant urine with bacteria, increased UTI risk.</title>
+      <defs>
+        <linearGradient id="pvU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.4"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.65"/></linearGradient>
+        <clipPath id="pvClipL"><path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" transform="translate(140,0)"/></clipPath>
+        <clipPath id="pvClipR"><path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" transform="translate(420,0)"/></clipPath>
+      </defs>
+      <text x="140" y="30" text-anchor="middle" class="am-label" style="fill:#34d399;font-size:15px;">Normal</text>
+      <text x="420" y="30" text-anchor="middle" class="am-label" style="fill:#f59e0b;font-size:15px;">Retention</text>
+      <!-- left -->
+      <g transform="translate(140,0)">
+        <path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" fill="#1e293b"/>
+      </g>
+      <rect x="40" y="200" width="200" height="30" fill="url(#pvU)" clip-path="url(#pvClipL)"/>
+      <g transform="translate(140,0)">
+        <path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" fill="none" stroke="#34d399" stroke-width="3"/>
+        <path d="M-9,222 L-9,250 M9,222 L9,250" stroke="#94a3b8" stroke-width="2.5"/>
+      </g>
+      <!-- right -->
+      <g transform="translate(420,0)">
+        <path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" fill="#1e293b"/>
+      </g>
+      <rect x="320" y="92" width="200" height="140" fill="url(#pvU)" clip-path="url(#pvClipR)"/>
+      <g fill="#ef4444">
+        <rect x="372" y="128" width="12" height="5" rx="2.5" transform="rotate(-20 378 130)"/>
+        <rect x="430" y="118" width="12" height="5" rx="2.5" transform="rotate(25 436 120)"/>
+        <rect x="455" y="150" width="12" height="5" rx="2.5" transform="rotate(-35 461 152)"/>
+        <rect x="395" y="165" width="12" height="5" rx="2.5" transform="rotate(10 401 167)"/>
+        <rect x="425" y="190" width="12" height="5" rx="2.5" transform="rotate(-15 431 192)"/>
+        <rect x="360" y="148" width="12" height="5" rx="2.5" transform="rotate(40 366 150)"/>
+      </g>
+      <g transform="translate(420,0)">
+        <path d="M-90,110 Q-90,50 0,50 Q90,50 90,110 Q90,190 25,222 L-25,222 Q-90,190 -90,110 Z" fill="none" stroke="#f59e0b" stroke-width="3"/>
+        <path d="M-9,222 L-9,250 M9,222 L9,250" stroke="#94a3b8" stroke-width="2.5"/>
+      </g>
+      <text x="140" y="275" text-anchor="middle" class="am-label">Less than 50 mL left</text>
+      <text x="140" y="292" text-anchor="middle" class="am-sub">bladder empties</text>
+      <text x="420" y="275" text-anchor="middle" class="am-label" style="fill:#ef4444;">More than 50 mL = stagnant urine</text>
+      <text x="420" y="292" text-anchor="middle" class="am-sub">bacteria multiply &#8594; &#8593; UTI risk</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 9: NARRATIVE — cost + treatment ════════ -->
+<div class="slide narrative" style="align-items:center;max-width:1120px;">
+  <div class="section-label">Impact of Incontinence</div>
+  <h3 style="text-align:center;margin-bottom:12px;">What Incontinence <em style="color:var(--red)">Costs</em> the Client &mdash; <em>and What Helps</em></h3>
+  <div class="viz-row" style="align-items:center;">
+    <div class="anatomical-map" style="max-width:430px;">
+      <div style="text-align:center;font-weight:800;font-size:0.8rem;letter-spacing:0.08em;color:var(--red);margin-bottom:2px;">THE COST</div>
+      <svg viewBox="-20 0 450 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="icTitle"><title id="icTitle">Impact of incontinence on the client. Physical: wetness, skin breakdown, infection, recurrent UTIs. Emotional: stops going out, social isolation.</title>
+<path d="M210,180 L80,62" stroke="#ef4444" stroke-width="2" stroke-opacity="0.7"/><path d="M210,180 L60,128" stroke="#ef4444" stroke-width="2" stroke-opacity="0.7"/><path d="M210,180 L60,232" stroke="#ef4444" stroke-width="2" stroke-opacity="0.7"/><path d="M210,180 L80,298" stroke="#ef4444" stroke-width="2" stroke-opacity="0.7"/><path d="M210,180 L345,110" stroke="#f59e0b" stroke-width="2" stroke-opacity="0.7"/><path d="M210,180 L345,250" stroke="#f59e0b" stroke-width="2" stroke-opacity="0.7"/><rect x="43.099999999999994" y="47" width="73.80000000000001" height="30" rx="15" fill="#0f172a"/><rect x="43.099999999999994" y="47" width="73.80000000000001" height="30" rx="15" fill="#ef4444" fill-opacity="0.14" stroke="#ef4444" stroke-width="1.5"/><text x="80" y="66.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Wetness</text><rect x="-2.8000000000000043" y="113" width="125.60000000000001" height="30" rx="15" fill="#0f172a"/><rect x="-2.8000000000000043" y="113" width="125.60000000000001" height="30" rx="15" fill="#ef4444" fill-opacity="0.14" stroke="#ef4444" stroke-width="1.5"/><text x="60" y="132.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Skin breakdown</text><rect x="15.699999999999996" y="217" width="88.60000000000001" height="30" rx="15" fill="#0f172a"/><rect x="15.699999999999996" y="217" width="88.60000000000001" height="30" rx="15" fill="#ef4444" fill-opacity="0.14" stroke="#ef4444" stroke-width="1.5"/><text x="60" y="236.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Infection</text><rect x="17.199999999999996" y="283" width="125.60000000000001" height="30" rx="15" fill="#0f172a"/><rect x="17.199999999999996" y="283" width="125.60000000000001" height="30" rx="15" fill="#ef4444" fill-opacity="0.14" stroke="#ef4444" stroke-width="1.5"/><text x="80" y="302.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Recurrent UTIs</text><rect x="278.5" y="95" width="133" height="30" rx="15" fill="#0f172a"/><rect x="278.5" y="95" width="133" height="30" rx="15" fill="#f59e0b" fill-opacity="0.14" stroke="#f59e0b" stroke-width="1.5"/><text x="345" y="114.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Stops going out</text><rect x="274.8" y="235" width="140.4" height="30" rx="15" fill="#0f172a"/><rect x="274.8" y="235" width="140.4" height="30" rx="15" fill="#f59e0b" fill-opacity="0.14" stroke="#f59e0b" stroke-width="1.5"/><text x="345" y="254.5" text-anchor="middle" class="am-label" style="font-size:12.5px">Social isolation</text>
+<circle cx="210" cy="180" r="46" fill="#0f172a" stroke="#22d3ee" stroke-width="3"/>
+<path d="M210,144 C196,164 192,174 192,182 A18,18 0 0 0 228,182 C228,174 224,164 210,144 Z" fill="#22d3ee" fill-opacity="0.35" stroke="#22d3ee" stroke-width="2"/>
+<text x="210" y="252" text-anchor="middle" class="am-label" style="font-size:12px;fill:#22d3ee">INCONTINENCE</text>
+<text x="20" y="20" class="am-label" style="fill:#ef4444">PHYSICAL</text>
+<text x="410" y="66" text-anchor="end" class="am-label" style="fill:#f59e0b">EMOTIONAL</text>
+</svg>
+    </div>
+    <div class="viz-side">
+      <div style="font-weight:800;font-size:0.8rem;letter-spacing:0.08em;color:var(--green);margin-bottom:8px;">WHAT HELPS THE INCONTINENT CLIENT</div>
+      <div class="help-grid">
+        <div class="help-card" style="border-left-color:#34d399"><div class="help-h" style="color:#34d399"><span>&#8635;</span> Habits</div><div class="help-b">&bull; Bladder training, scheduled toileting<br>&bull; Fluid + diet changes</div></div>
+        <div class="help-card" style="border-left-color:#22d3ee"><div class="help-h" style="color:#22d3ee"><span>&#9881;</span> Muscles + devices</div><div class="help-b">&bull; Pelvic floor exercises<br>&bull; Nerve stimulation, pessaries</div></div>
+        <div class="help-card" style="border-left-color:#a78bfa"><div class="help-h" style="color:#a78bfa"><span>&#8853;</span> Medical</div><div class="help-b">&bull; Medications, <strong>Botox</strong><br>&bull; Surgery: sling, artificial sphincter</div></div>
+        <div class="help-card" style="border-left-color:#f59e0b"><div class="help-h" style="color:#f59e0b"><span>&#9825;</span> Daily care</div><div class="help-b">&bull; Pads, barrier creams, catheter<br>&bull; Scrupulous perineal hygiene, safety, coping support</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 10: NARRATIVE — neurogenic bladder ════════ -->
+<div class="slide narrative">
+  <div class="section-label">Neurogenic Bladder</div>
+  <h3>When the <em>Nerves</em> to the Bladder Are Cut Off</h3>
+  <ul>
+    <li>Bladder dysfunction from an <strong>interruption of normal nerve supply</strong></li>
+    <li>Causes: brain or spinal cord injury, dementia, Parkinson&rsquo;s, stroke, MS, spina bifida, <strong>diabetes</strong>, vaginal childbirth, chronic alcoholism</li>
+    <li>Shows symptoms of <strong>both</strong> an overactive and an underactive bladder</li>
+    <li>Treated by cause, using the incontinence treatments</li>
+  </ul>
+  <div class="callout info"><strong>Spiral:</strong> stroke, Parkinson&rsquo;s, dementia, and spinal cord injury interrupt the brain&ndash;bladder signal (Ch 11 Neural).</div>
+</div>
+
+<!-- ════════ SLIDE 11: CHECK — SATA stress ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A 52-year-old post-menopausal client leaks urine when she laughs or sneezes. Which history item is a <strong>stress incontinence</strong> risk factor?</div>
+  <div class="choices">
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Three vaginal births and a chronic smoker&rsquo;s cough
+      <div class="explanation">Correct &mdash; childbirth weakens the sphincter; chronic coughing raises intra-abdominal pressure.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Parkinson&rsquo;s disease
+      <div class="explanation">No &mdash; Parkinson&rsquo;s is a cause of <strong>urge</strong> incontinence.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Stroke last year
+      <div class="explanation">No &mdash; stroke is a cause of <strong>urge</strong> incontinence.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Four cups of coffee a day
+      <div class="explanation">No &mdash; caffeine is a bladder irritant (urge / overactive bladder).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 12: SECTION B ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section B</div>
+  <h2>Urinary Tract <em>Infection</em></h2>
+  <div class="divider-sub">Lower UTI is a bladder problem. Upper UTI means the kidney is involved.</div>
+</div>
+
+<!-- ════════ SLIDE 13: DIAGRAM — lower vs upper UTI ════════ -->
+<div class="slide flow">
+  <h3>Bacteria Climb <em class="red">Up</em> the Tract</h3>
+  <div class="viz-row">
+    <div class="anatomical-map" style="max-width:560px;">
+      <svg viewBox="0 0 560 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="utiTitle">
+        <title id="utiTitle">Urinary tract from top to bottom: kidney, ureter, bladder, urethra. Bacteria enter at the urethra and climb upward. Urethra and bladder infection is a lower UTI, cystitis. Kidney infection is an upper UTI, pyelonephritis.</title>
+        <defs>
+          <radialGradient id="utKid" cx="0.4" cy="0.4" r="0.7"><stop offset="0" stop-color="#7f1d1d"/><stop offset="1" stop-color="#450a0a"/></radialGradient>
+          <linearGradient id="utU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.3"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.55"/></linearGradient>
+          <marker id="utArr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ef4444"/></marker>
+        </defs>
+        <!-- kidney -->
+        <g transform="translate(160,105) scale(1.15)">
+          <path d="M0,-65 C35,-65 45,-40 40,-20 C30,-10 28,10 40,20 C45,40 35,65 0,65 C-35,65 -48,35 -48,0 C-48,-35 -35,-65 0,-65 Z" fill="url(#utKid)" stroke="#ef4444" stroke-width="2.2"/>
+          <path d="M2,-22 Q14,-18 22,-9 Q30,-4 36,0 Q30,4 22,9 Q14,18 2,22 Q-8,11 -5,0 Q-8,-11 2,-22 Z" fill="rgba(245,158,11,0.45)" stroke="#f59e0b" stroke-width="1"/>
+        </g>
+        <!-- ureter -->
+        <path d="M201,105 C232,118 238,180 240,240 C242,280 248,300 252,318" fill="none" stroke="#64748b" stroke-width="11" stroke-linecap="round"/>
+        <path d="M201,105 C232,118 238,180 240,240 C242,280 248,300 252,318" fill="none" stroke="rgba(245,158,11,0.55)" stroke-width="4" stroke-linecap="round"/>
+        <!-- bladder -->
+        <path d="M195,350 Q195,312 260,312 Q325,312 325,350 Q325,398 278,420 L242,420 Q195,398 195,350 Z" fill="url(#utU)" stroke="#38bdf8" stroke-width="2.5"/>
+        <!-- urethra -->
+        <rect x="251" y="419" width="18" height="62" rx="4" fill="rgba(245,158,11,0.35)" stroke="#94a3b8" stroke-width="1.8"/>
+        <!-- climb arrow -->
+        <path d="M296,470 C320,430 345,360 300,290 C285,250 280,200 255,150" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="7,6" marker-end="url(#utArr)"/>
+        <text x="312" y="242" class="am-sub" style="fill:#fca5a5;font-weight:600;" transform="rotate(-70 312 242)">bacteria climb up</text>
+        <!-- bacteria -->
+        <g fill="#ef4444" stroke="#fecaca" stroke-width="0.6">
+          <rect x="255" y="462" width="11" height="5" rx="2.5" transform="rotate(70 260 464)"/>
+          <rect x="254" y="440" width="11" height="5" rx="2.5" transform="rotate(100 259 442)"/>
+          <rect x="236" y="380" width="11" height="5" rx="2.5" transform="rotate(-20 241 382)"/>
+          <rect x="275" y="362" width="11" height="5" rx="2.5" transform="rotate(30 280 364)"/>
+          <rect x="254" y="395" width="11" height="5" rx="2.5" transform="rotate(-40 259 397)"/>
+          <rect x="237" y="262" width="11" height="5" rx="2.5" transform="rotate(80 242 264)"/>
+          <rect x="232" y="182" width="11" height="5" rx="2.5" transform="rotate(70 237 184)"/>
+          <rect x="165" y="98" width="11" height="5" rx="2.5" transform="rotate(-20 170 100)"/>
+          <rect x="140" y="130" width="11" height="5" rx="2.5" transform="rotate(30 145 132)"/>
+        </g>
+        <!-- left labels -->
+        <line x1="104" y1="60" x2="70" y2="40" class="am-connector" stroke="#ef4444"/>
+        <text x="14" y="34" class="am-label">Kidney</text>
+        <line x1="236" y1="215" x2="150" y2="215" class="am-connector" stroke="#94a3b8"/>
+        <text x="144" y="219" text-anchor="end" class="am-label">Ureter</text>
+        <line x1="196" y1="360" x2="150" y2="360" class="am-connector" stroke="#38bdf8"/>
+        <text x="144" y="364" text-anchor="end" class="am-label">Bladder</text>
+        <line x1="250" y1="460" x2="150" y2="460" class="am-connector" stroke="#94a3b8"/>
+        <text x="144" y="456" text-anchor="end" class="am-label">Urethra</text>
+        <text x="144" y="471" text-anchor="end" class="am-sub">gut bacteria (gram-negative</text>
+        <text x="144" y="484" text-anchor="end" class="am-sub"><tspan font-style="italic">E. coli</tspan>) get in here</text>
+        <!-- brackets -->
+        <path d="M400,32 L412,32 L412,178 L400,178" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+        <text x="420" y="96" class="am-label" style="fill:#ef4444;font-size:15px;">UPPER UTI</text>
+        <text x="420" y="114" class="am-sub" style="font-size:12px;">kidney =</text>
+        <text x="420" y="130" class="am-label" style="fill:#ef4444;">pyelonephritis</text>
+        <path d="M400,310 L412,310 L412,482 L400,482" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="420" y="384" class="am-label" style="fill:#38bdf8;font-size:15px;">LOWER UTI</text>
+        <text x="420" y="402" class="am-sub" style="font-size:12px;">bladder =</text>
+        <text x="420" y="418" class="am-label" style="fill:#38bdf8;">cystitis</text>
+      </svg>
+    </div>
+    <div class="viz-side" style="max-width:300px;">
+      <div class="callout info" style="margin-top:0;">Bacteria climb <strong>against</strong> the flow of urine: urethra &rarr; bladder &rarr; ureter &rarr; kidney.</div>
+      <div class="callout warn">A <strong>urinary catheter</strong> can carry bacteria in &rarr; iatrogenic UTI.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 14: CELL-CARDS — cystitis risks ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Cystitis</div>
+  <h3 style="text-align:center;">Cystitis = <em>Inflamed Bladder</em> &mdash; Who&rsquo;s at Risk?</h3>
+  <div class="cell-cards" style="max-width:840px;">
+    <div class="cell-card" style="border-left-color:var(--teal);">
+      <div class="cell-icon" style="background:rgba(34,211,238,0.15);color:var(--teal);">&#9792;</div>
+      <div class="cell-text"><strong style="color:var(--teal);">Women</strong><ul><li>Urethra within an inch of the anus</li><li>Not voiding every 3&ndash;4 hr (stagnant urine)</li><li>Sex, tight clothes, perineal irritants</li><li>Post-menopause, pregnancy, alkaline urine, stones</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">&#9794;</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Men</strong><ul><li>Age</li><li>Uncircumcised</li><li>Anal sex</li><li>Stones, <strong>BPH</strong></li></ul></div>
+    </div>
+  </div>
+  <div class="callout info" style="max-width:840px;">The bladder and urethra walls turn <strong>red and swollen</strong>. Cause: infection or irritants.</div>
+</div>
+
+<!-- ════════ SLIDE 15: CELL-CARDS — signs + treatment ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Cystitis</div>
+  <h3 style="text-align:center;">Signs &amp; <em class="green">Treatment</em></h3>
+  <div class="cell-cards">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">!</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Signs</strong><ul><li>Urgency, frequency</li><li>Burning, pain, pelvic pressure</li><li>Hematuria (blood in urine)</li><li>May have fever, chills</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--green);">Treatment</strong><ul><li>Fluids</li><li>OTC urinary antiseptic (AZO)</li><li>Pyridium &rarr; turns urine <strong>orange</strong></li><li>Maybe antibiotics</li><li>Cranberry juice acidifies urine</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 16: CHECK — Pyridium ════════ -->
+<div class="slide check">
+  <div class="check-label">Quick Check</div>
+  <div class="question">A client taking Pyridium for cystitis calls, worried: <strong>&ldquo;My urine is bright orange.&rdquo;</strong> Best response?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> &ldquo;Go to the ER &mdash; that&rsquo;s blood in your urine.&rdquo;
+      <div class="explanation">Hematuria looks red, not bright orange. Orange is the expected drug effect.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> &ldquo;That&rsquo;s expected with Pyridium.&rdquo;
+      <div class="explanation">Correct. Pyridium makes pee orange. It eases symptoms &mdash; tell the provider if fever or back pain appears.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> &ldquo;Your kidneys are failing.&rdquo;
+      <div class="explanation">Orange color alone isn&rsquo;t a sign of kidney failure.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> &ldquo;You&rsquo;re dehydrated &mdash; stop the drug.&rdquo;
+      <div class="explanation">Dehydration makes urine dark yellow; the orange is the drug.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 17: ANCHOR emergency — pyelo ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-emergency">Very Serious</div>
+  <h2>Back Pain + Fever <em class="red">&gt; 101&deg;F</em> = Pyelonephritis</h2>
+  <div class="subline">The UTI has reached one or both <strong>kidneys</strong>. Pain on a <strong>thump to the back</strong> (flank), high fever, &uarr; WBCs. Needs <strong>IV antibiotics in the hospital</strong> &mdash; often 4&ndash;6 weeks.</div>
+</div>
+
+<!-- ════════ SLIDE 18: BRANCH — pyelo damage ════════ -->
+<div class="slide flow">
+  <h3>How Pyelonephritis <em class="red">Damages</em> the Kidney</h3>
+  <div class="anatomical-map" style="max-width:920px;">
+    <svg viewBox="0 0 920 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pyTitle">
+      <title id="pyTitle">Bacteria reach the kidney, then two branches. Branch one: kidney swells and fills with exudate, compresses the renal artery, abscess and necrosis, renal failure. Branch two: bacteria spread to the blood, sepsis.</title>
+      <defs>
+        <marker id="pyArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#94a3b8"/></marker>
+        <marker id="pyArrR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ef4444"/></marker>
+      </defs>
+      <style>
+        .pyb{fill:#1e293b;stroke-width:2}
+        .pyt{font-family:Inter,sans-serif;font-size:15px;font-weight:700;text-anchor:middle}
+        .pys{font-family:Inter,sans-serif;font-size:12px;fill:#94a3b8;text-anchor:middle}
+      </style>
+      <!-- start -->
+      <rect x="10" y="128" width="170" height="74" rx="12" class="pyb" stroke="#f59e0b"/>
+      <text x="95" y="160" class="pyt" fill="#f59e0b">Bacteria</text>
+      <text x="95" y="180" class="pys">reach the kidney</text>
+      <!-- branch arrows -->
+      <path d="M180,150 C205,150 205,62 232,62" fill="none" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#pyArr)"/>
+      <path d="M180,180 C205,180 205,268 232,268" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#pyArrR)"/>
+      <!-- top row -->
+      <rect x="236" y="26" width="190" height="72" rx="12" class="pyb" stroke="#a78bfa"/>
+      <text x="331" y="56" class="pyt" fill="#a78bfa">Kidney swells</text>
+      <text x="331" y="76" class="pys">fills with exudate</text>
+      <line x1="426" y1="62" x2="462" y2="62" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#pyArr)"/>
+      <rect x="466" y="26" width="190" height="72" rx="12" class="pyb" stroke="#ef4444"/>
+      <text x="561" y="56" class="pyt" fill="#ef4444">Compresses</text>
+      <text x="561" y="76" class="pys">the renal artery</text>
+      <line x1="656" y1="62" x2="692" y2="62" stroke="#ef4444" stroke-width="2.5" marker-end="url(#pyArrR)"/>
+      <rect x="696" y="26" width="200" height="72" rx="12" class="pyb" stroke="#ef4444"/>
+      <text x="796" y="56" class="pyt" fill="#ef4444">Abscess / necrosis</text>
+      <text x="796" y="76" class="pys">kidney damage</text>
+      <line x1="796" y1="98" x2="796" y2="138" stroke="#ef4444" stroke-width="2.5" marker-end="url(#pyArrR)"/>
+      <rect x="696" y="142" width="200" height="66" rx="12" fill="rgba(239,68,68,0.14)" stroke="#ef4444" stroke-width="2.5"/>
+      <text x="796" y="181" class="pyt" fill="#fca5a5">RENAL FAILURE</text>
+      <!-- bottom row -->
+      <rect x="236" y="232" width="190" height="72" rx="12" class="pyb" stroke="#ef4444"/>
+      <text x="331" y="262" class="pyt" fill="#ef4444">Spread to blood</text>
+      <text x="331" y="282" class="pys">bacteria in the bloodstream</text>
+      <line x1="426" y1="268" x2="462" y2="268" stroke="#ef4444" stroke-width="2.5" marker-end="url(#pyArrR)"/>
+      <rect x="466" y="236" width="190" height="64" rx="12" fill="rgba(239,68,68,0.14)" stroke="#ef4444" stroke-width="2.5"/>
+      <text x="561" y="274" class="pyt" fill="#fca5a5">SEPSIS</text>
+    </svg>
+  </div>
+  <div class="callout danger" style="margin-top:14px;max-width:740px;">Complications: renal failure, recurrent UTIs, <strong>sepsis</strong>.</div>
+</div>
+
+<!-- ════════ SLIDE 19: COMPARE — cystitis vs pyelo ════════ -->
+<div class="slide compare">
+  <h3>Cystitis <em class="yellow">vs.</em> Pyelonephritis</h3>
+  <div class="compare-grid">
+    <div class="compare-col col-blue">
+      <h4>Cystitis &mdash; lower UTI</h4>
+      <ul>
+        <li><strong>Where:</strong> bladder</li>
+        <li><strong>Signs:</strong> urgency, frequency, burning, pelvic pressure, hematuria</li>
+        <li><strong>Urine:</strong> cloudy, foul-smelling, WBCs</li>
+        <li><strong>Tx:</strong> fluids, AZO / Pyridium, maybe antibiotics</li>
+      </ul>
+    </div>
+    <div class="compare-col col-red">
+      <h4>Pyelonephritis &mdash; upper UTI</h4>
+      <ul>
+        <li><strong>Where:</strong> kidney(s)</li>
+        <li><strong>Signs:</strong> severe UTI signs + <strong>flank/back pain</strong>, fever &gt; 101&deg;F, malaise, &uarr; BP</li>
+        <li><strong>Labs:</strong> &uarr; WBC; urine + blood cultures, CBC</li>
+        <li><strong>Tx:</strong> <strong>IV antibiotics</strong> in hospital, 4&ndash;6 wk</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 20: CHECK — reached kidney ════════ -->
+<div class="slide check">
+  <div class="check-label">NCLEX Check</div>
+  <div class="question">Which finding best tells the nurse that a client&rsquo;s UTI has moved from the bladder to the <strong>kidney</strong>?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Burning and frequency on urination
+      <div class="explanation">Happens with any UTI, including cystitis.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Cloudy urine with a foul odor
+      <div class="explanation">Points to a UTI, but doesn&rsquo;t tell you where.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Flank pain with a temperature of 102&deg;F
+      <div class="explanation">Correct. Back/flank pain + fever over 101&deg;F = pyelonephritis.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Hematuria
+      <div class="explanation">Blood in the urine is a general UTI sign.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 21: SECTION C ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section C</div>
+  <h2>Kidney <em>Stones</em></h2>
+  <div class="divider-sub">A ureter about as wide as a pencil eraser.</div>
+</div>
+
+<!-- ════════ SLIDE 22: DIAGRAM — stones ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">Nephrolithiasis</div>
+  <h3 style="text-align:center;margin-bottom:14px;">A Stone Can <em>Plug the Ureter</em></h3>
+  <div class="viz-row">
+    <div class="anatomical-map" style="max-width:480px;">
+      <svg viewBox="0 0 480 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="stoneTitle">
+        <title id="stoneTitle">A stone lodged in the ureter blocks urine flow. Urine backs up above the stone, the ureter widens, and the kidney swells (hydronephrosis), which leads to kidney failure.</title>
+        <defs>
+          <radialGradient id="snKid" cx="0.4" cy="0.4" r="0.7"><stop offset="0" stop-color="#7f1d1d"/><stop offset="1" stop-color="#450a0a"/></radialGradient>
+          <linearGradient id="snU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.35"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.6"/></linearGradient>
+          <marker id="snArr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ef4444"/></marker>
+        </defs>
+        <!-- swollen kidney -->
+        <g transform="translate(140,118) scale(1.3)">
+          <path d="M0,-65 C35,-65 45,-40 40,-20 C30,-10 28,10 40,20 C45,40 35,65 0,65 C-35,65 -48,35 -48,0 C-48,-35 -35,-65 0,-65 Z" fill="url(#snKid)" stroke="#ef4444" stroke-width="2"/>
+          <path d="M-10,-38 Q8,-32 20,-17 Q30,-7 36,0 Q30,7 20,17 Q8,32 -10,38 Q-26,20 -21,0 Q-26,-20 -10,-38 Z" fill="rgba(245,158,11,0.6)" stroke="#f59e0b" stroke-width="1.2"/>
+        </g>
+        <!-- dilated ureter above stone -->
+        <path d="M186,118 C222,132 230,190 232,250 L233,286" fill="none" stroke="#64748b" stroke-width="22" stroke-linecap="round"/>
+        <path d="M186,118 C222,132 230,190 232,250 L233,286" fill="none" stroke="rgba(245,158,11,0.7)" stroke-width="14" stroke-linecap="round"/>
+        <!-- thin ureter below -->
+        <path d="M233,312 C234,350 228,380 222,402" fill="none" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>
+        <!-- stone -->
+        <path d="M222,292 L230,284 L243,286 L249,296 L245,309 L232,313 L221,306 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle cx="231" cy="296" r="1.6" fill="#94a3b8"/><circle cx="240" cy="303" r="1.4" fill="#94a3b8"/>
+        <!-- bladder -->
+        <path d="M160,435 Q160,402 222,402 Q284,402 284,435 Q284,474 240,490 L204,490 Q160,474 160,435 Z" fill="url(#snU)" stroke="#38bdf8" stroke-width="2.2" opacity="0.85"/>
+        <!-- back-up arrow -->
+        <path d="M268,280 C276,230 268,180 236,140" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="6,5" marker-end="url(#snArr)"/>
+        <text x="284" y="214" class="am-sub" style="fill:#fca5a5;font-weight:600;">urine backs up</text>
+        <!-- labels -->
+        <line x1="200" y1="60" x2="300" y2="60" class="am-connector" stroke="#ef4444"/>
+        <text x="306" y="56" class="am-label" style="fill:#ef4444;">Hydronephrosis</text>
+        <text x="306" y="72" class="am-sub">swollen kidney</text>
+        <text x="306" y="87" class="am-sub" style="fill:#fca5a5;">&#8594; kidney failure</text>
+        <line x1="250" y1="298" x2="300" y2="298" class="am-connector" stroke="#e2e8f0"/>
+        <text x="306" y="295" class="am-label">Stone</text>
+        <text x="306" y="311" class="am-sub">blocks urine flow</text>
+        <line x1="236" y1="355" x2="300" y2="355" class="am-connector" stroke="#94a3b8"/>
+        <text x="306" y="352" class="am-label">Ureter</text>
+        <text x="306" y="368" class="am-sub">&#8776; pencil-eraser wide</text>
+        <line x1="284" y1="445" x2="300" y2="445" class="am-connector" stroke="#38bdf8"/>
+        <text x="306" y="449" class="am-label">Bladder</text>
+      </svg>
+    </div>
+    <div class="viz-side">
+      <ul>
+        <li>Hard mineral crystals the kidneys normally excrete &mdash; in the renal pelvis, ureters, or bladder</li>
+        <li>Most common: <strong>calcium</strong> + oxalate or phosphate (also struvite/infection, uric acid, cystine)</li>
+        <li>Stones are a <strong>common cause of UTI</strong>; more common in men</li>
+        <li>Risks: pH changes, concentrated salts, urinary stasis, family history, obesity, HTN, diet</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 23: SECTION D ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section D</div>
+  <h2>Benign Prostatic <em>Hyperplasia</em></h2>
+  <div class="divider-sub">Not cancer &mdash; but it squeezes the urethra.</div>
+</div>
+
+<!-- ════════ SLIDE 24: DIAGRAM — prostate location ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">The Prostate</div>
+  <h3 style="text-align:center;margin-bottom:14px;">Where It Sits <em>Explains Everything</em></h3>
+  <div class="viz-row">
+    <div class="anatomical-map" style="max-width:560px;">
+      <svg viewBox="-60 0 580 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="prosTitle">
+        <title id="prosTitle">Side view, front on the left and back on the right. The bladder sits on top. The prostate sits just below the bladder and wraps around the urethra, which runs straight through it. The rectum lies right behind the prostate, so a gloved finger in the rectum can feel the prostate: the digital rectal exam.</title>
+        <defs>
+          <linearGradient id="prU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.25"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.5"/></linearGradient>
+          <radialGradient id="prP" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#8b5cf6" stop-opacity="0.85"/><stop offset="1" stop-color="#5b21b6" stop-opacity="0.9"/></radialGradient>
+          <marker id="prOut" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#f59e0b"/></marker>
+        </defs>
+        <text x="-50" y="24" class="am-sub" style="font-size:11px;letter-spacing:2px;font-weight:700;">&#8592; FRONT</text>
+        <text x="512" y="24" class="am-sub" style="font-size:11px;letter-spacing:2px;font-weight:700;" text-anchor="end">BACK &#8594;</text>
+        <!-- rectum: tube behind the prostate -->
+        <path d="M400,40 C392,120 340,190 316,272 C316,350 324,400 336,452 L402,452 C392,400 386,350 386,272 C406,200 456,120 466,40 Z" fill="rgba(148,163,184,0.14)" stroke="#94a3b8" stroke-width="2.5"/>
+        <text x="434" y="72" text-anchor="middle" class="am-label" style="fill:#cbd5e1;">RECTUM</text>
+        <text x="434" y="88" text-anchor="middle" class="am-sub">right behind</text>
+        <text x="434" y="100" text-anchor="middle" class="am-sub">the prostate</text>
+        <!-- bladder -->
+        <path d="M170,140 Q170,52 250,52 Q330,52 330,140 Q330,200 286,226 L214,226 Q170,200 170,140 Z" fill="url(#prU)" stroke="#38bdf8" stroke-width="3"/>
+        <text x="250" y="140" text-anchor="middle" class="am-label" style="font-size:15px;">BLADDER</text>
+        <text x="250" y="157" text-anchor="middle" class="am-sub">holds urine</text>
+        <!-- prostate wrapping urethra -->
+        <ellipse cx="250" cy="266" rx="62" ry="40" fill="url(#prP)" stroke="#c4b5fd" stroke-width="2.5"/>
+        <!-- urethra -->
+        <path d="M250,224 L250,330 C250,372 232,404 180,430" fill="none" stroke="#f59e0b" stroke-width="9" stroke-linecap="round" marker-end="url(#prOut)"/>
+        <path d="M250,224 L250,330 C250,372 232,404 182,429" fill="none" stroke="#fde68a" stroke-width="3" stroke-linecap="round"/>
+        <text x="216" y="270" text-anchor="middle" class="am-label" style="fill:#fff;font-size:11px;">PROSTATE</text>
+        <!-- gloved finger in rectum -->
+        <path d="M366,470 L366,292 Q366,262 348,262 Q330,262 330,292 L330,470" fill="#34d399" fill-opacity="0.35" stroke="#34d399" stroke-width="2.5"/>
+        <path d="M336,276 Q348,268 360,276" fill="none" stroke="#34d399" stroke-width="1.5" stroke-opacity="0.8"/>
+        <circle cx="322" cy="268" r="6" fill="none" stroke="#34d399" stroke-width="2.5"/>
+        <!-- labels left -->
+        <line x1="168" y1="110" x2="118" y2="110" class="am-connector" stroke="#38bdf8"/>
+        <text x="112" y="106" text-anchor="end" class="am-label" style="fill:#38bdf8;">Bladder</text>
+        <text x="112" y="121" text-anchor="end" class="am-sub">on top</text>
+        <line x1="188" y1="290" x2="118" y2="290" class="am-connector" stroke="#a78bfa"/>
+        <text x="112" y="286" text-anchor="end" class="am-label" style="fill:#c4b5fd;">Prostate</text>
+        <text x="112" y="301" text-anchor="end" class="am-sub">just below the bladder,</text>
+        <text x="112" y="314" text-anchor="end" class="am-sub">wraps around the urethra</text>
+        <line x1="240" y1="384" x2="118" y2="384" class="am-connector" stroke="#f59e0b"/>
+        <text x="112" y="380" text-anchor="end" class="am-label" style="fill:#f59e0b;">Urethra</text>
+        <text x="112" y="395" text-anchor="end" class="am-sub">runs THROUGH the prostate</text>
+        <!-- DRE label -->
+        <text x="420" y="330" class="am-label" style="fill:#34d399;">DRE</text>
+        <text x="420" y="346" class="am-sub">gloved finger</text>
+        <text x="420" y="359" class="am-sub">in the rectum</text>
+        <text x="420" y="372" class="am-sub">feels the prostate</text>
+      </svg>
+    </div>
+    <div class="viz-side">
+      <ul>
+        <li>Sits <strong>just below the bladder</strong></li>
+        <li><strong>Surrounds the urethra</strong> at the base of the bladder</li>
+        <li>Lies <strong>in front of the rectum</strong> &rarr; felt with a <strong>digital rectal exam</strong></li>
+        <li>Male reproductive tract: the ductus deferens and seminal vesicles join at the prostate</li>
+      </ul>
+      <div class="callout info"><strong>So:</strong> anything that enlarges the prostate squeezes the urethra and blocks urine leaving the bladder.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 25: ANCHOR — hyperplasia ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Core Concept</div>
+  <h2>BPH = <em class="blue">Hyperplasia</em>, Not Cancer</h2>
+  <div class="anatomical-map" style="max-width:600px;margin:0 auto 10px;">
+    <svg viewBox="0 0 600 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bphxTitle">
+      <title id="bphxTitle">Cross-section of the prostate around the urethra. Normal: small prostate, urethra open. BPH: more cells make the prostate bigger and the urethra is squeezed nearly shut.</title>
+      <defs>
+        <radialGradient id="bxP" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#7c3aed" stop-opacity="0.7"/><stop offset="1" stop-color="#4c1d95" stop-opacity="0.85"/></radialGradient>
+        <pattern id="bxCells" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="3.2" fill="none" stroke="rgba(196,181,253,0.45)" stroke-width="1"/></pattern>
+      </defs>
+      <!-- normal -->
+      <circle cx="150" cy="95" r="52" fill="url(#bxP)" stroke="#a78bfa" stroke-width="2"/>
+      <circle cx="150" cy="95" r="15" fill="rgba(245,158,11,0.55)" stroke="#f59e0b" stroke-width="2"/>
+      <text x="150" y="172" text-anchor="middle" class="am-label" style="fill:#34d399;">Normal</text>
+      <text x="150" y="190" text-anchor="middle" class="am-sub">urethra open</text>
+      <!-- arrow -->
+      <path d="M232,95 L300,95" stroke="#94a3b8" stroke-width="3"/><path d="M300,87 L314,95 L300,103 Z" fill="#94a3b8"/>
+      <text x="273" y="82" text-anchor="middle" class="am-sub">with aging</text>
+      <!-- BPH -->
+      <circle cx="430" cy="95" r="82" fill="url(#bxP)" stroke="#a78bfa" stroke-width="2"/>
+      <circle cx="430" cy="95" r="82" fill="url(#bxCells)"/>
+      <ellipse cx="430" cy="95" rx="14" ry="2.5" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"/>
+      <text x="430" y="196" text-anchor="middle" class="am-label" style="fill:#c4b5fd;">BPH: more cells &#8594; urethra squeezed</text>
+    </svg>
+  </div>
+  <div class="subline" style="font-size:1.05rem;">Non-malignant enlargement with aging. Cause unknown &mdash; <strong>declining testosterone + &uarr; estrogen</strong> may drive stromal cells to multiply, or prostate stem cells fail to mature and die on schedule. (Spiral: Ch 1 cell adaptation &mdash; hyperplasia = more cells.)</div>
+</div>
+
+<!-- ════════ SLIDE 26: DIAGRAM — BPH back-pressure (read bottom → up) ════════ -->
+<div class="slide flow">
+  <h3 style="margin-bottom:8px;">From Big Prostate to <em class="red">Kidney Damage</em> <span style="font-size:0.85rem;color:var(--text-dim);font-weight:400;">&mdash; read from the bottom up</span></h3>
+  <div class="anatomical-map" style="max-width:640px;">
+    <svg viewBox="0 0 640 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bpTitle">
+      <title id="bpTitle">BPH back-pressure, read from the bottom up. 1: prostate enlarges and squeezes the urethra at the bladder base. 2: retention, increased post-void residual. 3: stagnant urine, bacteria multiply, recurrent UTI. 4: back-pressure widens the ureter, hydroureter. 5: renal failure.</title>
+      <defs>
+        <radialGradient id="bpKid" cx="0.4" cy="0.4" r="0.7"><stop offset="0" stop-color="#7f1d1d"/><stop offset="1" stop-color="#450a0a"/></radialGradient>
+        <radialGradient id="bpP" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#7c3aed" stop-opacity="0.75"/><stop offset="1" stop-color="#4c1d95" stop-opacity="0.9"/></radialGradient>
+        <linearGradient id="bpU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d" stop-opacity="0.4"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0.7"/></linearGradient>
+        <marker id="bpArr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#ef4444"/></marker>
+      </defs>
+      <style>.bpn{font-family:Inter,sans-serif;font-size:13px;font-weight:800;text-anchor:middle;fill:#0f172a}</style>
+      <!-- kidney -->
+      <g transform="translate(190,82) scale(1.05)">
+        <path d="M0,-65 C35,-65 45,-40 40,-20 C30,-10 28,10 40,20 C45,40 35,65 0,65 C-35,65 -48,35 -48,0 C-48,-35 -35,-65 0,-65 Z" fill="url(#bpKid)" stroke="#ef4444" stroke-width="2.2"/>
+        <path d="M-6,-30 Q8,-26 18,-14 Q28,-6 36,0 Q28,6 18,14 Q8,26 -6,30 Q-18,16 -14,0 Q-18,-16 -6,-30 Z" fill="rgba(245,158,11,0.6)" stroke="#f59e0b" stroke-width="1.2"/>
+      </g>
+      <!-- wide ureter -->
+      <path d="M228,82 C262,96 262,170 252,262" fill="none" stroke="#64748b" stroke-width="22" stroke-linecap="round"/>
+      <path d="M228,82 C262,96 262,170 252,262" fill="none" stroke="rgba(245,158,11,0.7)" stroke-width="14" stroke-linecap="round"/>
+      <!-- distended bladder -->
+      <path d="M160,330 Q160,258 245,258 Q330,258 330,330 Q330,392 272,414 L218,414 Q160,392 160,330 Z" fill="url(#bpU)" stroke="#38bdf8" stroke-width="2.5"/>
+      <g fill="#ef4444">
+        <rect x="200" y="300" width="12" height="5" rx="2.5" transform="rotate(-20 206 302)"/>
+        <rect x="260" y="290" width="12" height="5" rx="2.5" transform="rotate(30 266 292)"/>
+        <rect x="290" y="330" width="12" height="5" rx="2.5" transform="rotate(-35 296 332)"/>
+        <rect x="225" y="345" width="12" height="5" rx="2.5" transform="rotate(15 231 347)"/>
+        <rect x="190" y="360" width="12" height="5" rx="2.5" transform="rotate(50 196 362)"/>
+        <rect x="255" y="375" width="12" height="5" rx="2.5" transform="rotate(-10 261 377)"/>
+      </g>
+      <!-- enlarged prostate -->
+      <ellipse cx="245" cy="446" rx="74" ry="38" fill="url(#bpP)" stroke="#a78bfa" stroke-width="2.2"/>
+      <!-- urethra: pinched inside prostate -->
+      <path d="M245,414 L245,424" stroke="#f59e0b" stroke-width="6"/>
+      <path d="M245,424 L245,470" stroke="#fcd34d" stroke-width="2.6"/>
+      <path d="M245,484 L245,512" stroke="#f59e0b" stroke-width="6"/>
+      <path d="M245,470 L245,484" stroke="#f59e0b" stroke-width="3"/>
+      <path d="M228,446 L238,446 M262,446 L252,446" stroke="#c4b5fd" stroke-width="2.5"/>
+      <path d="M232,440 L240,446 L232,452 M258,440 L250,446 L258,452" fill="none" stroke="#c4b5fd" stroke-width="2"/>
+      <!-- back-pressure arrow on left -->
+      <path d="M118,440 C100,360 100,230 125,120" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="9,6" marker-end="url(#bpArr)"/>
+      <text x="80" y="300" class="am-label" style="fill:#fca5a5;" text-anchor="middle" transform="rotate(-90 80 300)">back-pressure climbs up</text>
+      <!-- numbered steps -->
+      <g>
+        <line x1="320" y1="446" x2="372" y2="446" class="am-connector" stroke="#a78bfa"/>
+        <circle cx="386" cy="446" r="12" fill="#a78bfa"/><text x="386" y="451" class="bpn">1</text>
+        <text x="406" y="442" class="am-label" style="fill:#c4b5fd;">Prostate enlarges</text>
+        <text x="406" y="458" class="am-sub">squeezes the urethra at the bladder base</text>
+
+        <line x1="330" y1="372" x2="372" y2="372" class="am-connector" stroke="#f59e0b"/>
+        <circle cx="386" cy="372" r="12" fill="#f59e0b"/><text x="386" y="377" class="bpn">2</text>
+        <text x="406" y="368" class="am-label" style="fill:#f59e0b;">Retention</text>
+        <text x="406" y="384" class="am-sub">&#8593; post-void residual</text>
+
+        <line x1="330" y1="304" x2="372" y2="304" class="am-connector" stroke="#f59e0b"/>
+        <circle cx="386" cy="304" r="12" fill="#f59e0b"/><text x="386" y="309" class="bpn">3</text>
+        <text x="406" y="300" class="am-label" style="fill:#f59e0b;">Stagnant urine</text>
+        <text x="406" y="316" class="am-sub">bacteria multiply &#8594; recurrent UTI</text>
+
+        <line x1="262" y1="180" x2="372" y2="180" class="am-connector" stroke="#ef4444"/>
+        <circle cx="386" cy="180" r="12" fill="#ef4444"/><text x="386" y="185" class="bpn">4</text>
+        <text x="406" y="176" class="am-label" style="fill:#ef4444;">Back-pressure</text>
+        <text x="406" y="192" class="am-sub">ureter widens = hydroureter</text>
+
+        <line x1="232" y1="60" x2="372" y2="60" class="am-connector" stroke="#ef4444"/>
+        <circle cx="386" cy="60" r="12" fill="#ef4444"/><text x="386" y="65" class="bpn">5</text>
+        <text x="406" y="56" class="am-label" style="fill:#ef4444;">Renal failure</text>
+        <text x="406" y="72" class="am-sub">kidney damaged by the back-up</text>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 27: CELL-CARDS — BPH signs/risk/dx/tx ════════ -->
+<div class="slide narrative" style="align-items:center;">
+  <div class="section-label">BPH</div>
+  <h3 style="text-align:center;">Signs, Risk, Diagnosis, <em class="green">Treatment</em></h3>
+  <div class="cell-cards" style="max-width:860px;">
+    <div class="cell-card" style="border-left-color:var(--yellow);">
+      <div class="cell-icon" style="background:rgba(245,158,11,0.15);color:var(--yellow);">!</div>
+      <div class="cell-text"><strong style="color:var(--yellow);">Signs</strong><ul><li>Can&rsquo;t start peeing, weak stream, dribbling</li><li>Frequency, urgency, nocturia</li><li>Retention, overflow incontinence, UTI</li><li>Erectile dysfunction</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--blue);">
+      <div class="cell-icon" style="background:rgba(56,189,248,0.15);color:var(--blue);">45</div>
+      <div class="cell-text"><strong style="color:var(--blue);">Risk</strong><ul><li>Age over 45</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--purple);">
+      <div class="cell-icon" style="background:rgba(167,139,250,0.15);color:var(--purple);">Dx</div>
+      <div class="cell-text"><strong style="color:var(--purple);">Diagnosis</strong><ul><li>Digital rectal exam</li><li>PSA &mdash; elevated with cancer</li><li>Cancer feels <strong>hard, nodular, doesn&rsquo;t move</strong></li><li>Urine flow, urinalysis, ultrasound, cystoscopy</li></ul></div>
+    </div>
+    <div class="cell-card" style="border-left-color:var(--green);">
+      <div class="cell-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">Rx</div>
+      <div class="cell-text"><strong style="color:var(--green);">Treatment</strong><ul><li>Saw palmetto, lycopene (red foods)</li><li>Avoid alcohol</li><li>Alpha-blockers, 5-alpha-reductase inhibitors</li><li>TURP: transurethral resection of the prostate</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 28: CHECK — BPH + UTI ════════ -->
+<div class="slide check">
+  <div class="check-label">NCLEX Check</div>
+  <div class="question">A 70-year-old man with BPH has his <strong>third UTI this year</strong>. Which explanation links the two?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> BPH is a cancer that spreads to the bladder lining
+      <div class="explanation">BPH is benign &mdash; not cancer.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> The prostate lengthens the urethra, so bacteria travel farther
+      <div class="explanation">A longer path would lower risk, not raise it.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> The prostate squeezes the urethra, so urine stays in the bladder and bacteria multiply
+      <div class="explanation">Correct. Squeezed urethra &rarr; incomplete emptying (&uarr; post-void residual) &rarr; stagnant urine &rarr; UTI again and again.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Rising testosterone weakens the bladder&rsquo;s defenses
+      <div class="explanation">BPH is linked to <strong>declining</strong> testosterone.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 29: SECTION E ════════ -->
+<div class="slide section-divider">
+  <div class="section-num">Section E</div>
+  <h2>Clinical <em>Application</em></h2>
+  <div class="divider-sub">Put it all together</div>
+</div>
+
+<!-- ════════ SLIDE 30: CASE — Dana ════════ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <div class="case-scenario">
+    <strong>Dana Reyes, 24F</strong>, college swimmer. Three days of <strong>burning and frequency</strong>; she has been taking AZO and her urine is orange. She often &ldquo;holds it&rdquo; through long practices and sits in a wet suit for hours. Today: chills and <strong>pain in her right lower back</strong>. T <strong>102.4&deg;F</strong>, HR 108, BP 138/86. <strong>Pain when the right flank is tapped.</strong> Urine cloudy and foul-smelling with WBCs and blood. CBC: <strong>&uarr; WBC</strong>.
+  </div>
+  <div class="question">What is happening, and what does Dana need?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> Cystitis &mdash; keep taking AZO and push fluids at home
+      <div class="explanation">No. Flank pain + fever over 101&deg;F + &uarr; WBC means the infection has climbed to the kidney. AZO only eases symptoms.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> Pyelonephritis &mdash; IV antibiotics in the hospital
+      <div class="explanation">Correct. Short urethra + holding urine (stagnant) &rarr; cystitis &rarr; bacteria climbed to the kidney. Very serious: risk of kidney damage and sepsis.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> Kidney stone &mdash; strain her urine
+      <div class="explanation">Stones can block flow, but cloudy urine with WBCs, fever, and three days of burning point to infection that reached the kidney.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> Stress incontinence from swim training
+      <div class="explanation">Stress incontinence is leaking with pressure &mdash; no fever, no WBCs.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 31: CASE — Walter ════════ -->
+<div class="slide case">
+  <div class="case-label">Clinical Scenario</div>
+  <div class="case-scenario">
+    <strong>Walter Okafor, 74M</strong>, retired bus driver. Up <strong>4 times a night</strong> to void, <strong>hard to start</strong> the stream, dribbling. <strong>Second UTI in 6 months.</strong> Bladder scan after voiding: <strong>320 mL</strong> left. Digital rectal exam: enlarged, smooth prostate that <strong>moves</strong>. BUN and creatinine mildly &uarr;. Takes his alpha-blocker &ldquo;when I remember.&rdquo;
+  </div>
+  <div class="question">Which statement best explains Walter&rsquo;s picture?</div>
+  <div class="choices">
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">A.</span> His post-void residual is normal; the UTIs are unrelated
+      <div class="explanation">No &mdash; normal is under 50 mL. 320 mL is a lot of stagnant urine.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">B.</span> The prostate findings point to cancer
+      <div class="explanation">Cancer feels hard, nodular, and fixed. His is smooth and moves &mdash; fits BPH.</div>
+    </div>
+    <div class="choice-btn" data-correct="true" onclick="revealChoice(this)">
+      <span class="choice-letter">C.</span> BPH is squeezing his urethra &rarr; retention &rarr; recurrent UTI, with early back-pressure on the kidneys
+      <div class="explanation">Correct. Squeezed urethra &rarr; hesitancy, dribbling, nocturia, 320 mL residual &rarr; stagnant urine &rarr; UTIs. Rising BUN/creatinine = back-pressure (hydroureter) starting to hurt kidney function.</div>
+    </div>
+    <div class="choice-btn" onclick="revealChoice(this)">
+      <span class="choice-letter">D.</span> He has urge incontinence from an overactive bladder
+      <div class="explanation">His problem is emptying, not a sudden urge &mdash; that&rsquo;s retention from obstruction.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SLIDE 32: BIG PICTURE ════════ -->
+<div class="slide anchor">
+  <div class="tag tag-concept">Big Picture</div>
+  <h2 style="font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Urinary Disorders &mdash; The Big Picture</h2>
+  <div class="subline" style="max-width:760px;text-align:left;font-size:1.05rem;line-height:1.85;">
+    <span class="hl-blue">&bull;</span> <strong>Stress incontinence</strong> (most common) = pressure on a weak sphincter.<br>
+    <span class="hl-yellow">&bull;</span> <strong>Stagnant urine &rarr; UTI.</strong> Post-void residual should be under 50 mL.<br>
+    <span class="hl-blue">&bull;</span> <strong>Cystitis</strong> = bladder. Pyridium turns urine orange.<br>
+    <span class="hl-red">&bull;</span> <strong>Back thump + fever &gt; 101&deg;F = pyelonephritis</strong> &rarr; IV antibiotics; risk of sepsis.<br>
+    <span class="hl-purple">&bull;</span> A <strong>stone</strong> can plug a pencil-eraser-wide ureter.<br>
+    <span class="hl-green">&bull;</span> <strong>BPH is not cancer</strong> &mdash; it squeezes the urethra &rarr; retention &rarr; recurrent UTI.
+  </div>
+</div>
+
+<script>
+(function(){
+  const slides=document.querySelectorAll('.slide'),total=slides.length;let current=0;
+  const pb=document.getElementById('progress-bar'),ct=document.getElementById('slide-counter'),prev=document.getElementById('prev-btn'),next=document.getElementById('next-btn');
+  function ui(){pb.style.width=((current+1)/total*100)+'%';ct.textContent=(current+1)+' / '+total;prev.style.opacity=current===0?'0.3':'1';prev.style.pointerEvents=current===0?'none':'auto';next.style.opacity=current===total-1?'0.3':'1';next.style.pointerEvents=current===total-1?'none':'auto'}
+  function go(i){if(i<0||i>=total||i===current)return;slides[current].classList.remove('active');slides[current].style.display='none';current=i;slides[current].classList.add('active');slides[current].style.display='flex';slides[current].scrollTop=0;slides[current].style.animation='none';slides[current].offsetHeight;slides[current].style.animation='';ui()}
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(total-1)}});
+  prev.addEventListener('click',function(){go(current-1)});next.addEventListener('click',function(){go(current+1)});
+  let tx=0,ty=0;document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].screenX;ty=e.changedTouches[0].screenY},{passive:true});document.addEventListener('touchend',function(e){const dx=e.changedTouches[0].screenX-tx,dy=e.changedTouches[0].screenY-ty;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx<0)go(current+1);else go(current-1)}},{passive:true});
+  ui();
+})();
+function revealChoice(el){const slide=el.closest('.slide');if(slide.dataset.answered)return;slide.dataset.answered='true';const btns=slide.querySelectorAll('.choice-btn');btns.forEach(b=>{b.classList.add('revealed');if(b.dataset.correct==='true')b.classList.add('correct');else if(b===el)b.classList.add('incorrect')})}
+</script>
+
+<!-- Student Tracking -->
+<div id="nameGate" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.97);z-index:99999;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">
+<div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;">
+<h2 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:8px;">Welcome!</h2>
+<p style="color:#94a3b8;font-size:0.9rem;margin-bottom:20px;">Enter your name to get started.</p>
+<input type="text" id="siNameInput" placeholder="First and Last Name" style="width:100%;padding:12px 16px;border-radius:8px;border:2px solid #475569;background:#0f172a;color:#f1f5f9;font-size:1rem;font-family:inherit;margin-bottom:16px;outline:none;box-sizing:border-box;" />
+<button id="siNameBtn" style="width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;font-family:inherit;">Continue</button>
+</div></div>
+<script>
+(function(){var S='https://script.google.com/macros/s/AKfycbwnHdQCxsW8vuchKOpav_5uMI8Vj_P2tAyKnw0NXHoUKYFvkCZC6F0URkKEOR5ZU5tp/exec';var R=document.title;var n=localStorage.getItem('si_student_name');if(n){logVisit(n)}else{var g=document.getElementById('nameGate');g.style.display='flex';document.getElementById('siNameInput').addEventListener('keydown',function(e){if(e.key==='Enter')doName()});document.getElementById('siNameBtn').addEventListener('click',doName)}function doName(){var v=document.getElementById('siNameInput').value.trim();if(!v)return;localStorage.setItem('si_student_name',v);document.getElementById('nameGate').style.display='none';logVisit(v)}function logVisit(name){try{navigator.sendBeacon(S,JSON.stringify({name:name,resource:R}))}catch(e){}}})();
+</script>
+</body>
+</html>
